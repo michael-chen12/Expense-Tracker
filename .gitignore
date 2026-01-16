@@ -1,0 +1,7 @@
+node_modules
+client/.next
+client/out
+server/data/*.db
+.env
+client/.env
+client/.env.*
