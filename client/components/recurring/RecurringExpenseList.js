@@ -1,38 +1,32 @@
 'use client';
 
 import RecurringExpenseCard from './RecurringExpenseCard';
+import Spinner from '@/components/Spinner';
 
-export default function RecurringExpenseList({ recurring, isLoading, onDelete, onEdit }) {
+export default function RecurringExpenseList({ recurringExpenses, isLoading, onDelete }) {
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="border border-gray-200 rounded-lg p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-          </div>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+        <Spinner size="large" color="primary" />
       </div>
     );
   }
 
-  if (!recurring || recurring.length === 0) {
+  if (!recurringExpenses || recurringExpenses.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-600 mb-4">No recurring expenses yet.</p>
-        <p className="text-sm text-gray-500">Create one to automate your regular payments.</p>
+      <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
+        <p className="subtle">No recurring expenses yet. Create one to get started!</p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-3">
-      {recurring.map((item) => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+      {recurringExpenses.map(expense => (
         <RecurringExpenseCard
-          key={item.id}
-          recurring={item}
+          key={expense.id}
+          recurringExpense={expense}
           onDelete={onDelete}
-          onEdit={onEdit}
         />
       ))}
     </div>

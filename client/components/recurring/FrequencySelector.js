@@ -1,102 +1,123 @@
 'use client';
 
-export default function FrequencySelector({ frequency, onChange, dayOfWeek, dayOfMonth, monthOfYear, onDetailsChange }) {
-  const handleFrequencyChange = (e) => {
-    onChange(e.target.value);
-  };
+export default function FrequencySelector({ frequency, onChange, dayOfWeek, dayOfMonth, monthOfYear }) {
+  const frequencies = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' }
+  ];
+
+  const daysOfWeek = [
+    { value: 0, label: 'Sunday' },
+    { value: 1, label: 'Monday' },
+    { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' },
+    { value: 4, label: 'Thursday' },
+    { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' }
+  ];
+
+  const months = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' }
+  ];
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <div>
-        <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-2">
-          Frequency
-        </label>
+        <label htmlFor="frequency">Frequency</label>
         <select
           id="frequency"
+          name="frequency"
           value={frequency}
-          onChange={handleFrequencyChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          onChange={onChange}
+          required
         >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
+          <option value="">Select frequency</option>
+          {frequencies.map(f => (
+            <option key={f.value} value={f.value}>{f.label}</option>
+          ))}
         </select>
       </div>
 
       {frequency === 'weekly' && (
         <div>
-          <label htmlFor="dayOfWeek" className="block text-sm font-medium text-gray-700 mb-2">
-            Day of Week
-          </label>
+          <label htmlFor="dayOfWeek">Day of Week</label>
           <select
             id="dayOfWeek"
-            value={dayOfWeek || 0}
-            onChange={(e) => onDetailsChange('dayOfWeek', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            name="dayOfWeek"
+            value={dayOfWeek ?? ''}
+            onChange={onChange}
+            required
           >
-            <option value={0}>Sunday</option>
-            <option value={1}>Monday</option>
-            <option value={2}>Tuesday</option>
-            <option value={3}>Wednesday</option>
-            <option value={4}>Thursday</option>
-            <option value={5}>Friday</option>
-            <option value={6}>Saturday</option>
+            <option value="">Select day</option>
+            {daysOfWeek.map(d => (
+              <option key={d.value} value={d.value}>{d.label}</option>
+            ))}
           </select>
         </div>
       )}
 
       {frequency === 'monthly' && (
         <div>
-          <label htmlFor="dayOfMonth" className="block text-sm font-medium text-gray-700 mb-2">
-            Day of Month
-          </label>
+          <label htmlFor="dayOfMonth">Day of Month</label>
           <input
             id="dayOfMonth"
+            name="dayOfMonth"
             type="number"
             min="1"
             max="31"
-            value={dayOfMonth || 1}
-            onChange={(e) => onDetailsChange('dayOfMonth', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            value={dayOfMonth ?? ''}
+            onChange={onChange}
+            placeholder="1-31"
+            required
           />
         </div>
       )}
 
       {frequency === 'yearly' && (
-        <div className="grid grid-cols-2 gap-3">
+        <>
           <div>
-            <label htmlFor="monthOfYear" className="block text-sm font-medium text-gray-700 mb-2">
-              Month
-            </label>
+            <label htmlFor="monthOfYear">Month</label>
             <select
               id="monthOfYear"
-              value={monthOfYear || 1}
-              onChange={(e) => onDetailsChange('monthOfYear', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              name="monthOfYear"
+              value={monthOfYear ?? ''}
+              onChange={onChange}
+              required
             >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i + 1}>
-                  {new Date(2024, i, 1).toLocaleString('default', { month: 'long' })}
-                </option>
+              <option value="">Select month</option>
+              {months.map(m => (
+                <option key={m.value} value={m.value}>{m.label}</option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="dayOfMonth" className="block text-sm font-medium text-gray-700 mb-2">
-              Day
-            </label>
+            <label htmlFor="dayOfMonth">Day of Month</label>
             <input
               id="dayOfMonth"
+              name="dayOfMonth"
               type="number"
               min="1"
               max="31"
-              value={dayOfMonth || 1}
-              onChange={(e) => onDetailsChange('dayOfMonth', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              value={dayOfMonth ?? ''}
+              onChange={onChange}
+              placeholder="1-31"
+              required
             />
           </div>
-        </div>
+        </>
       )}
     </div>
   );

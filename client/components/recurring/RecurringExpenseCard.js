@@ -1,56 +1,91 @@
 'use client';
 
-const FREQUENCY_LABELS = {
-  daily: 'Daily',
-  weekly: 'Weekly',
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-};
+import { formatCurrency, formatDate } from '@/lib/format';
 
-export default function RecurringExpenseCard({ recurring, onDelete, onEdit }) {
-  const formatDate = (dateStr) => {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+export default function RecurringExpenseCard({ recurringExpense, onDelete }) {
+  const getFrequencyLabel = (freq, dayOfWeek, dayOfMonth, monthOfYear) => {
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    switch (freq) {
+      case 'daily':
+        return 'Daily';
+      case 'weekly':
+        return `Weekly on ${daysOfWeek[dayOfWeek]}`;
+      case 'monthly':
+        return `Monthly on day ${dayOfMonth}`;
+      case 'yearly':
+        return `Yearly on ${months[monthOfYear]} ${dayOfMonth}`;
+      default:
+        return freq;
+    }
+  };
+
+  const handleDelete = () => {
+    const confirmed = window.confirm(`Delete recurring expense: ${recurringExpense.category}?`);
+    if (confirmed) {
+      onDelete(recurringExpense.id);
+    }
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-      <div className="flex justify-between items-start mb-3">
+    <div className="card" style={{ padding: '16px', transition: 'transform 0.2s, box-shadow 0.2s' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
         <div>
-          <h3 className="font-semibold text-gray-900">{recurring.category}</h3>
-          <p className="text-sm text-gray-600 mt-1">{FREQUENCY_LABELS[recurring.frequency]}</p>
+          <h3 style={{ margin: '0 0 4px 0' }}>{recurringExpense.category}</h3>
+          <p className="subtle" style={{ margin: 0, fontSize: '14px' }}>
+            {getFrequencyLabel(
+              recurringExpense.frequency,
+              recurringExpense.dayOfWeek,
+              recurringExpense.dayOfMonth,
+              recurringExpense.monthOfYear
+            )}
+          </p>
         </div>
-        <div className="text-right">
-          <p className="text-lg font-semibold text-gray-900">${recurring.amount.toFixed(2)}</p>
-          <p className="text-xs text-gray-500 mt-1">Next: {formatDate(recurring.nextDate)}</p>
+        <div style={{ fontSize: '20px', fontWeight: '700', color: '#ff7a00' }}>
+          {formatCurrency(recurringExpense.amount)}
         </div>
       </div>
 
-      {recurring.note && (
-        <p className="text-sm text-gray-600 mb-3 italic">{recurring.note}</p>
+      {recurringExpense.note && (
+        <p className="subtle" style={{ margin: '0 0 12px 0', fontSize: '14px' }}>
+          {recurringExpense.note}
+        </p>
       )}
 
-      {recurring.endDate && (
-        <p className="text-xs text-gray-500 mb-3">Ends: {formatDate(recurring.endDate)}</p>
-      )}
-
-      <div className="flex gap-2 justify-end">
-        {onEdit && (
-          <button
-            onClick={() => onEdit(recurring)}
-            className="px-3 py-1 text-sm text-orange-600 hover:text-orange-700 font-medium"
-          >
-            Edit
-          </button>
-        )}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e5dccf' }}>
+        <div>
+          <p className="subtle" style={{ margin: 0, fontSize: '12px' }}>Next: {formatDate(recurringExpense.nextDate)}</p>
+          {recurringExpense.endDate && (
+            <p className="subtle" style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
+              Ends: {formatDate(recurringExpense.endDate)}
+            </p>
+          )}
+        </div>
         <button
-          onClick={() => onDelete(recurring.id)}
-          className="px-3 py-1 text-sm text-red-600 hover:text-red-700 font-medium"
+          type="button"
+          className="button ghost"
+          onClick={handleDelete}
+          aria-label={`Delete ${recurringExpense.category}`}
+          style={{ padding: '8px' }}
         >
-          Delete
+          <svg
+            aria-hidden="true"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
         </button>
       </div>
     </div>

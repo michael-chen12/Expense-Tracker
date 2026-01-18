@@ -11,7 +11,7 @@ import {
  * Custom hook to process expense data for charts
  * Aggregates and formats data for different chart components
  */
-export function useChartData(expenses, allowanceData, fixedCosts, isLoadingExpenses = false) {
+export function useChartData(expenses, allowanceData, isLoadingExpenses = false, dateRange = null) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,40 +32,54 @@ export function useChartData(expenses, allowanceData, fixedCosts, isLoadingExpen
       setIsLoading(false);
       setError(err.message || 'Failed to process chart data');
     }
-  }, [expenses, allowanceData, fixedCosts, isLoadingExpenses]);
-  // Calculate monthly trend data (last 6 months)
-  const monthlyTrendData = useMemo(() => {
-    if (!expenses || expenses.length === 0) return [];
-    return aggregateExpensesByMonth(expenses, 6);
-  }, [expenses]);
+  }, [expenses, allowanceData, isLoadingExpenses]);
 
-  // Calculate category breakdown data (current month only)
+  // Filter expenses by date range
+  const filteredExpenses = useMemo(() => {
+    if (!expenses || expenses.length === 0 || !dateRange) return expenses;
+
+    return expenses.filter((expense) => {
+      const expenseDate = expense.date;
+      return expenseDate >= dateRange.from && expenseDate <= dateRange.to;
+    });
+  }, [expenses, dateRange]);
+
+  // Calculate monthly trend data (based on filtered expenses)
+  const monthlyTrendData = useMemo(() => {
+    if (!filteredExpenses || filteredExpenses.length === 0) return [];
+
+    // Calculate number of months in the selected range
+    if (dateRange) {
+      const fromDate = new Date(dateRange.from);
+      const toDate = new Date(dateRange.to);
+      const monthsDiff = (toDate.getFullYear() - fromDate.getFullYear()) * 12 +
+                         (toDate.getMonth() - fromDate.getMonth()) + 1;
+      const monthsToShow = Math.min(Math.max(monthsDiff, 1), 12); // Cap at 12 months for readability
+      return aggregateExpensesByMonth(filteredExpenses, monthsToShow);
+    }
+
+    return aggregateExpensesByMonth(filteredExpenses, 6);
+  }, [filteredExpenses, dateRange]);
+
+  // Calculate category breakdown data (for selected date range)
   const categoryData = useMemo(() => {
-    if (!expenses || expenses.length === 0) return [];
-    return aggregateExpensesByCategory(expenses, true);
-  }, [expenses]);
+    if (!filteredExpenses || filteredExpenses.length === 0) return [];
+    return aggregateExpensesByCategory(filteredExpenses, false); // Don't filter to current month - already filtered
+  }, [filteredExpenses]);
 
   // Calculate overview card metrics
   const overviewMetrics = useMemo(() => {
-    if (!expenses || !allowanceData) {
+    if (!filteredExpenses || !allowanceData) {
       return {
         totalSpentThisMonth: '$0.00',
         allowanceRemaining: '$0.00',
-        monthlyFixedCosts: '$0.00',
+        totalSpentCents: 0,
+        allowanceCents: 0,
       };
     }
 
-    // Calculate total spent this month
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-
-    const thisMonthExpenses = expenses.filter((expense) => {
-      const expenseDate = new Date(expense.date);
-      const expenseMonth = `${expenseDate.getFullYear()}-${String(expenseDate.getMonth() + 1).padStart(2, '0')}`;
-      return expenseMonth === currentMonth;
-    });
-
-    const totalSpentCents = thisMonthExpenses.reduce(
+    // Calculate total spent in selected period
+    const totalSpentCents = filteredExpenses.reduce(
       (sum, expense) => sum + (expense.amountCents || expense.amount * 100),
       0
     );
@@ -77,22 +91,16 @@ export function useChartData(expenses, allowanceData, fixedCosts, isLoadingExpen
     const allowanceAmountCents = Math.round(allowanceAmount * 100);
     const remainingCents = Math.max(allowanceAmountCents - totalSpentCents, 0);
 
-    // Calculate total fixed costs
-    const totalFixedCostsCents = fixedCosts
-      ? fixedCosts.reduce((sum, cost) => sum + (cost.amountCents || cost.amount * 100), 0)
-      : 0;
-
     return {
       totalSpentThisMonth: formatCurrency(totalSpentCents),
       allowanceRemaining: formatCurrency(remainingCents),
-      monthlyFixedCosts: formatCurrency(totalFixedCostsCents),
       totalSpentCents,
       allowanceCents: allowanceAmountCents,
     };
-  }, [expenses, allowanceData, fixedCosts]);
+  }, [filteredExpenses, allowanceData]);
 
   // Check if there's any data
-  const hasData = expenses && expenses.length > 0;
+  const hasData = filteredExpenses && filteredExpenses.length > 0;
 
   return {
     monthlyTrendData,

@@ -8,20 +8,17 @@ import LandingPage from '@/components/LandingPage';
 import LoadingScreen from '@/components/LoadingScreen';
 import {
   getExpenses,
-  createFixedCost,
-  deleteFixedCost,
   deleteExpense,
   getAllowanceSettings,
   getAllowanceStatus,
-  getFixedCosts,
   setAllowanceSettings
 } from '@/lib/api-backend';
 import { useChartData } from '@/lib/hooks/useChartData';
 import DashboardCharts from '@/components/DashboardCharts';
 import RecentExpenses from '@/components/RecentExpenses';
 import AllowanceSection from '@/components/AllowanceSection';
-import FixedCostsSection from '@/components/FixedCostsSection';
 import UpcomingRecurringExpenses from '@/components/UpcomingRecurringExpenses';
+import DateRangeFilter from '@/components/DateRangeFilter';
 
 function getMonthRange() {
   const today = new Date();
@@ -42,26 +39,22 @@ function Dashboard() {
   const [allExpenses, setAllExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingAllowance, setLoadingAllowance] = useState(true);
-  const [loadingFixedCosts, setLoadingFixedCosts] = useState(true);
   const [error, setError] = useState('');
   const [allowance, setAllowance] = useState({ amount: '', cadence: 'month' });
   const [allowanceStatus, setAllowanceStatus] = useState(null);
   const [allowanceError, setAllowanceError] = useState('');
   const [savingAllowance, setSavingAllowance] = useState(false);
-  const [fixedCosts, setFixedCosts] = useState([]);
-  const [fixedCostForm, setFixedCostForm] = useState({ name: '', amount: '' });
-  const [fixedCostError, setFixedCostError] = useState('');
-  const [savingFixedCost, setSavingFixedCost] = useState(false);
+  const [dateRange, setDateRange] = useState(getMonthRange());
 
   // Check if all dashboard data is loaded
-  const isDashboardLoading = loading || loadingAllowance || loadingFixedCosts;
+  const isDashboardLoading = loading || loadingAllowance;
 
   // Process data for charts using custom hook
   const { monthlyTrendData, categoryData, overviewMetrics, hasData, isLoading: isLoadingCharts, error: chartError } = useChartData(
     allExpenses,
     allowanceStatus,
-    fixedCosts,
-    isDashboardLoading
+    isDashboardLoading,
+    dateRange
   );
 
   useEffect(() => {
@@ -120,26 +113,6 @@ function Dashboard() {
       });
   }, [userId]);
 
-  useEffect(() => {
-    if (!userId) {
-      setLoadingFixedCosts(false);
-      return;
-    }
-
-    setLoadingFixedCosts(true);
-
-    getFixedCosts()
-      .then((items) => {
-        setFixedCosts(items);
-        setFixedCostError('');
-      })
-      .catch((fetchError) => {
-        setFixedCostError(fetchError.message || 'Unable to load fixed costs.');
-      })
-      .finally(() => {
-        setLoadingFixedCosts(false);
-      });
-  }, [userId]);
 
   const handleAllowanceChange = (event) => {
     const { name, value } = event.target;
@@ -172,48 +145,6 @@ function Dashboard() {
     }
   };
 
-  const handleFixedCostChange = (event) => {
-    const { name, value } = event.target;
-    setFixedCostForm((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleFixedCostSubmit = async (event) => {
-    event.preventDefault();
-    setFixedCostError('');
-    setSavingFixedCost(true);
-
-    try {
-      await createFixedCost({
-        name: fixedCostForm.name,
-        amount: Number(fixedCostForm.amount)
-      });
-      const items = await getFixedCosts();
-      setFixedCosts(items);
-      setFixedCostForm({ name: '', amount: '' });
-    } catch (submitError) {
-      setFixedCostError(submitError.message || 'Unable to save fixed cost.');
-    } finally {
-      setSavingFixedCost(false);
-    }
-  };
-
-  const handleFixedCostDelete = async (itemId) => {
-    const confirmed = window.confirm('Delete this fixed cost?');
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteFixedCost(itemId);
-      const items = await getFixedCosts();
-      setFixedCosts(items);
-    } catch (deleteError) {
-      setFixedCostError(deleteError.message || 'Unable to delete fixed cost.');
-    }
-  };
 
   const handleExpenseDelete = async (expenseId) => {
     const confirmed = window.confirm('Delete this expense?');
@@ -235,7 +166,6 @@ function Dashboard() {
     }
   };
 
-  const month = getMonthRange().label;
   return (
     <div>
       {!isDashboardLoading && (
@@ -243,12 +173,17 @@ function Dashboard() {
           <div className="page-header">
             <div>
               <h1>Dashboard</h1>
-              <p className="subtle">{month} snapshot of your spending.</p>
+              <p className="subtle">Track your spending and manage your budget.</p>
             </div>
             <Link className="button primary" href="/expenses/new">Add expense</Link>
           </div>
 
           {error ? <div className="error">{error}</div> : null}
+
+          <DateRangeFilter
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+          />
         </>
       )}
 
@@ -259,6 +194,7 @@ function Dashboard() {
         monthlyTrendData={monthlyTrendData}
         categoryData={categoryData}
         overviewMetrics={overviewMetrics}
+        dateRange={dateRange}
       />
 
       {!isDashboardLoading && (
@@ -278,16 +214,6 @@ function Dashboard() {
             savingAllowance={savingAllowance}
             onChange={handleAllowanceChange}
             onSubmit={handleAllowanceSubmit}
-          />
-
-          <FixedCostsSection
-            fixedCosts={fixedCosts}
-            fixedCostForm={fixedCostForm}
-            fixedCostError={fixedCostError}
-            savingFixedCost={savingFixedCost}
-            onChange={handleFixedCostChange}
-            onSubmit={handleFixedCostSubmit}
-            onDelete={handleFixedCostDelete}
           />
         </>
       )}

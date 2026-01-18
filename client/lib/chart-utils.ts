@@ -62,12 +62,36 @@ export function aggregateExpensesByMonth(
     }
   });
 
-  // Get the last N months
-  const now = new Date();
+  // Get months from the expense data range
+  const sortedMonths = Array.from(monthlyMap.keys()).sort();
+
+  if (sortedMonths.length === 0) {
+    return [];
+  }
+
+  // Always use current month as the end date to ensure we show recent context
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+
+  // Get the oldest expense month
+  const oldestMonth = sortedMonths[0];
+  const [oldYear, oldMonth] = oldestMonth.split('-').map(Number);
+  const startDate = new Date(oldYear, oldMonth - 1, 1);
+  const endDate = new Date(currentYear, currentMonth, 1);
+
+  // Calculate months between start and end (including current month)
+  const monthsDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                     (endDate.getMonth() - startDate.getMonth()) + 1;
+
+  // Use the smaller of monthsToShow or actual range
+  const actualMonthsToShow = Math.min(monthsToShow, monthsDiff);
+
+  // Start from current month and go backwards
   const monthsData: MonthlyData[] = [];
 
-  for (let i = monthsToShow - 1; i >= 0; i--) {
-    const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+  for (let i = actualMonthsToShow - 1; i >= 0; i--) {
+    const targetDate = new Date(currentYear, currentMonth - i, 1);
     const monthKey = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`;
 
     const data = monthlyMap.get(monthKey) || { total: 0, count: 0 };

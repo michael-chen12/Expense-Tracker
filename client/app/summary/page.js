@@ -145,7 +145,14 @@ export default function MonthlySummaryPage() {
                     </svg>
                   </button>
 
-                  {isExpanded ? (
+                  <div
+                    style={{
+                      maxHeight: isExpanded ? '2000px' : '0',
+                      overflow: 'hidden',
+                      transition: 'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
+                      opacity: isExpanded ? 1 : 0
+                    }}
+                  >
                     <div className="expense-list" style={{ marginTop: '12px' }}>
                       {monthExpenses.map((expense) => (
                         <div key={expense.id} className="expense-row">
@@ -187,7 +194,7 @@ export default function MonthlySummaryPage() {
                         <p className="subtle">No expenses recorded this month.</p>
                       ) : null}
                     </div>
-                  ) : null}
+                  </div>
                 </div>
               );
             })}

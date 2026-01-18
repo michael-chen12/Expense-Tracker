@@ -19,6 +19,7 @@ export default function SpendingTrendChart({ data }) {
   // Custom tooltip component
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
+      const isEmptyMonth = payload[0].payload.count === 0;
       return (
         <div
           style={{
@@ -44,7 +45,7 @@ export default function SpendingTrendChart({ data }) {
               margin: '0',
               fontSize: '16px',
               fontWeight: '700',
-              color: '#ff7a00',
+              color: isEmptyMonth ? '#9ca3af' : '#ff7a00',
             }}
           >
             {formatCurrency(payload[0].value * 100)}
@@ -56,7 +57,10 @@ export default function SpendingTrendChart({ data }) {
               color: '#6b645b',
             }}
           >
-            {payload[0].payload.count} {payload[0].payload.count === 1 ? 'expense' : 'expenses'}
+            {isEmptyMonth
+              ? 'No expenses recorded'
+              : `${payload[0].payload.count} ${payload[0].payload.count === 1 ? 'expense' : 'expenses'}`
+            }
           </p>
         </div>
       );
@@ -70,6 +74,37 @@ export default function SpendingTrendChart({ data }) {
       return `$${(value / 1000).toFixed(1)}k`;
     }
     return `$${value}`;
+  };
+
+  // Custom dot component to highlight zero-value months
+  const CustomDot = (props) => {
+    const { cx, cy, payload } = props;
+    const isEmptyMonth = payload.count === 0;
+
+    if (isEmptyMonth) {
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={4}
+          fill="#ffffff"
+          stroke="#9ca3af"
+          strokeWidth={2}
+          strokeDasharray="2,2"
+        />
+      );
+    }
+
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill="#ff7a00"
+        stroke="#ffffff"
+        strokeWidth={2}
+      />
+    );
   };
 
   return (
@@ -108,6 +143,8 @@ export default function SpendingTrendChart({ data }) {
             fillOpacity={1}
             fill="url(#colorSpending)"
             animationDuration={600}
+            dot={<CustomDot />}
+            activeDot={{ r: 6 }}
           />
         </AreaChart>
       </ResponsiveContainer>

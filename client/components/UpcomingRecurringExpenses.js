@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getRecurringExpenses } from '@/lib/api-backend';
-
-const FREQUENCY_LABELS = {
-  daily: 'Daily',
-  weekly: 'Weekly',
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-};
+import { formatCurrency } from '@/lib/format';
+import Spinner from '@/components/Spinner';
 
 export default function UpcomingRecurringExpenses() {
   const [upcoming, setUpcoming] = useState([]);
@@ -17,108 +12,98 @@ export default function UpcomingRecurringExpenses() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadUpcomingRecurring();
+    const loadUpcoming = async () => {
+      try {
+        setIsLoading(true);
+        const all = await getRecurringExpenses();
+
+        // Filter to next 7 days
+        const today = new Date();
+        const weekFromNow = new Date(today);
+        weekFromNow.setDate(today.getDate() + 7);
+
+        const filtered = all.filter(expense => {
+          const nextDate = new Date(expense.nextDate);
+          return nextDate >= today && nextDate <= weekFromNow;
+        });
+
+        // Sort by nextDate
+        filtered.sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate));
+
+        setUpcoming(filtered);
+        setError('');
+      } catch (err) {
+        setError(err.message || 'Failed to load upcoming expenses');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUpcoming();
   }, []);
 
-  const loadUpcomingRecurring = async () => {
-    try {
-      const data = await getRecurringExpenses();
-      // Get upcoming expenses (next 7 days)
-      const today = new Date();
-      const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-      
-      const upcomingItems = data
-        .filter(item => {
-          const nextDate = new Date(item.nextDate + 'T00:00:00');
-          return nextDate >= today && nextDate <= nextWeek;
-        })
-        .sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate))
-        .slice(0, 5);
-
-      setUpcoming(upcomingItems);
-      setError('');
-    } catch (err) {
-      setError('Failed to load recurring expenses');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const getDaysUntil = (dateStr) => {
+  const getDaysUntil = (dateString) => {
     const today = new Date();
-    const targetDate = new Date(dateStr + 'T00:00:00');
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(dateString);
+    targetDate.setHours(0, 0, 0, 0);
     const diffTime = targetDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     return `In ${diffDays} days`;
   };
 
+  const getFrequencyLabel = (freq) => {
+    switch (freq) {
+      case 'daily': return 'Daily';
+      case 'weekly': return 'Weekly';
+      case 'monthly': return 'Monthly';
+      case 'yearly': return 'Yearly';
+      default: return freq;
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="card">
-        <h2>Upcoming Recurring</h2>
-        <div className="space-y-2">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
-          ))}
+      <section className="card" style={{ marginTop: '24px' }}>
+        <div className="card-header">
+          <h2>Upcoming Recurring</h2>
         </div>
-      </div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+          <Spinner size="medium" color="primary" />
+        </div>
+      </section>
     );
   }
 
   if (error) {
-    return (
-      <div className="card">
-        <h2>Upcoming Recurring</h2>
-        <p className="text-sm text-red-600">{error}</p>
-      </div>
-    );
+    return null; // Silently fail to not clutter the dashboard
   }
 
   if (upcoming.length === 0) {
-    return (
-      <div className="card">
-        <h2>Upcoming Recurring</h2>
-        <p className="subtle text-sm">No recurring expenses due in the next 7 days.</p>
-        <Link className="button primary text-sm mt-3" href="/recurring">
-          Manage Recurring
-        </Link>
-      </div>
-    );
+    return null; // Don't show if no upcoming expenses
   }
 
   return (
-    <div className="card">
-      <div className="flex justify-between items-center mb-3">
+    <section className="card" style={{ marginTop: '24px' }}>
+      <div className="card-header">
         <h2>Upcoming Recurring</h2>
-        <Link className="button secondary text-xs" href="/recurring">
-          Manage
-        </Link>
+        <Link className="button ghost" href="/recurring">Manage</Link>
       </div>
-      <div className="space-y-3">
-        {upcoming.map((item) => (
-          <div key={item.id} className="flex justify-between items-center p-2 bg-orange-50 rounded-lg">
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">{item.category}</p>
-              <p className="text-xs text-gray-600">{FREQUENCY_LABELS[item.frequency]}</p>
+
+      <div className="expense-list">
+        {upcoming.map(expense => (
+          <div key={expense.id} className="expense-row">
+            <div>
+              <h3>{expense.category}</h3>
+              <p className="subtle">{getFrequencyLabel(expense.frequency)} • {getDaysUntil(expense.nextDate)}</p>
             </div>
-            <div className="text-right">
-              <p className="font-semibold text-gray-900">${item.amount.toFixed(2)}</p>
-              <p className="text-xs text-gray-600">{getDaysUntil(item.nextDate)}</p>
-            </div>
+            <div className="expense-amount">{formatCurrency(expense.amount)}</div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

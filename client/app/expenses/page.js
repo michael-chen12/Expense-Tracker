@@ -140,14 +140,19 @@ export default function ExpensesPage() {
         </div>
       ) : dates.length ? (
         <div className="grid">
-          {dates.map((dateKey) => (
-            <section key={dateKey} className="card">
-              <div className="card-header">
-                <h2>{formatDate(dateKey)}</h2>
-                <span className="badge">{groupedExpenses[dateKey].length} entries</span>
-              </div>
-              <div className="expense-list">
-                {groupedExpenses[dateKey].map((expense) => (
+          {dates.map((dateKey) => {
+            const dailyTotal = groupedExpenses[dateKey].reduce((sum, expense) => sum + expense.amount, 0);
+            return (
+              <section key={dateKey} className="card">
+                <div className="card-header">
+                  <div>
+                    <h2>{formatDate(dateKey)}</h2>
+                    <p className="subtle" style={{ margin: 0 }}>Total: {formatCurrency(dailyTotal)}</p>
+                  </div>
+                  <span className="badge">{groupedExpenses[dateKey].length} entries</span>
+                </div>
+                <div className="expense-list">
+                  {groupedExpenses[dateKey].map((expense) => (
                   <div key={expense.id} className="expense-row">
                     <div>
                       <h3>{expense.category}</h3>
@@ -185,7 +190,8 @@ export default function ExpensesPage() {
                 ))}
               </div>
             </section>
-          ))}
+          );
+          })}
         </div>
       ) : (
         <p className="subtle">No expenses match those filters.</p>

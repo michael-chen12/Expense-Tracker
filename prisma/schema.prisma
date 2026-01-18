@@ -19,7 +19,6 @@ model User {
   updatedAt  DateTime    @updatedAt
 
   expenses   Expense[]
-  fixedCosts FixedCost[]
   allowance  Allowance?
   recurringExpenses RecurringExpense[]
 }
@@ -40,18 +39,6 @@ model Expense {
   @@index([userId, category])
 }
 
-model FixedCost {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  name      String
-  amountCents Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-}
 
 model Allowance {
   id        Int      @id @default(autoincrement())

@@ -48,22 +48,30 @@ async function getAuthHeaders(): Promise<HeadersInit> {
     const response = await fetch('/api/auth/session');
     const session = await response.json();
     console.log('[API] Session:', session);
-    
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     // Pass user ID in header for backend to use
     if (session?.userId) {
       headers['X-User-Id'] = session.userId;
+      console.log('[API] Using session.userId:', session.userId);
     } else if (session?.user?.id) {
       headers['X-User-Id'] = session.user.id;
+      console.log('[API] Using session.user.id:', session.user.id);
+    } else {
+      console.warn('[API] No user ID found in session!');
     }
-    
+
     if (session?.accessToken) {
       headers['Authorization'] = `Bearer ${session.accessToken}`;
+      console.log('[API] Added Authorization header');
+    } else {
+      console.warn('[API] No access token found in session!');
     }
-    
+
+    console.log('[API] Final headers:', headers);
     return headers;
   } catch (error) {
     console.error('Failed to get auth session:', error);
@@ -175,45 +183,6 @@ export async function getSummary(params: {
   const endpoint = query ? `/api/summary?${query}` : '/api/summary';
 
   return fetchAPI<SummaryResponse>(endpoint);
-}
-
-// ============================================
-// Fixed Costs
-// ============================================
-
-interface FixedCost {
-  id: number;
-  name: string;
-  amount: number;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-}
-
-interface FixedCostListResponse {
-  items: FixedCost[];
-}
-
-interface FixedCostResponse {
-  item: FixedCost;
-}
-
-export async function getFixedCosts(): Promise<FixedCost[]> {
-  const response = await fetchAPI<FixedCostListResponse>('/api/fixed-costs');
-  return response.items;
-}
-
-export async function createFixedCost(payload: { name: string; amount: number }): Promise<FixedCostResponse> {
-  return fetchAPI<FixedCostResponse>('/api/fixed-costs', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
-}
-
-export async function deleteFixedCost(id: number): Promise<{ success: boolean }> {
-  return fetchAPI<{ success: boolean }>(`/api/fixed-costs/${id}`, {
-    method: 'DELETE',
-  });
 }
 
 // ============================================

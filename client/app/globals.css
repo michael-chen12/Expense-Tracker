@@ -286,6 +286,18 @@ textarea {
   width: 100%;
   text-align: left;
   cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  background: linear-gradient(135deg, #fff8ed 0%, #fff2dc 100%);
+  border: 1px solid #ffd9a3;
+}
+
+.summary-row:hover {
+  background: linear-gradient(135deg, var(--accent-soft) 0%, #ffe4b3 100%);
+  transform: translateY(-1px);
+}
+
+.summary-row:active {
+  transform: translateY(0);
 }
 
 .expense-row h3 {

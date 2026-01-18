@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+// Use NEXTAUTH_SECRET to match what NextAuth uses
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'your-secret-key';
 
 /**
  * Middleware to authenticate requests using JWT from NextAuth
@@ -47,23 +48,31 @@ export function optionalAuth(
 ) {
   // First check X-User-Id header (from NextAuth session)
   const userIdHeader = req.headers['x-user-id'];
+  console.log('[optionalAuth] X-User-Id header:', userIdHeader);
+
   if (userIdHeader && typeof userIdHeader === 'string') {
     req.userId = userIdHeader;
+    console.log('[optionalAuth] Set userId from header:', req.userId);
     return next();
   }
 
   // Fall back to JWT token
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
+  console.log('[optionalAuth] Authorization header present:', !!authHeader);
+  console.log('[optionalAuth] Token present:', !!token);
 
   if (!token) {
+    console.log('[optionalAuth] No token, proceeding without auth');
     return next();
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     req.userId = decoded.userId;
+    console.log('[optionalAuth] Set userId from JWT:', req.userId);
   } catch (error) {
+    console.log('[optionalAuth] JWT verification failed:', error instanceof Error ? error.message : error);
     // Ignore invalid tokens for optional auth
   }
 

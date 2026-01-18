@@ -2,174 +2,181 @@
 
 import { useState } from 'react';
 import FrequencySelector from './FrequencySelector';
+import Spinner from '@/components/Spinner';
 
-export default function RecurringExpenseForm({ onSubmit, isLoading, categories = [] }) {
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('Food');
-  const [note, setNote] = useState('');
-  const [frequency, setFrequency] = useState('monthly');
-  const [dayOfWeek, setDayOfWeek] = useState(0);
-  const [dayOfMonth, setDayOfMonth] = useState(1);
-  const [monthOfYear, setMonthOfYear] = useState(1);
-  const [nextDate, setNextDate] = useState(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState('');
+export default function RecurringExpenseForm({ onSubmit, onCancel }) {
+  const [formData, setFormData] = useState({
+    amount: '',
+    category: '',
+    note: '',
+    frequency: '',
+    dayOfWeek: null,
+    dayOfMonth: null,
+    monthOfYear: null,
+    nextDate: new Date().toISOString().slice(0, 10),
+    endDate: ''
+  });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleDetailsChange = (field, value) => {
-    switch (field) {
-      case 'dayOfWeek':
-        setDayOfWeek(value);
-        break;
-      case 'dayOfMonth':
-        setDayOfMonth(value);
-        break;
-      case 'monthOfYear':
-        setMonthOfYear(value);
-        break;
-    }
+  const categories = [
+    'Food',
+    'Transportation',
+    'Housing',
+    'Utilities',
+    'Entertainment',
+    'Health',
+    'Shopping',
+    'Education',
+    'Other'
+  ];
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value === '' ? null : (name === 'dayOfWeek' || name === 'dayOfMonth' || name === 'monthOfYear' ? Number(value) : value)
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
-
-    if (!amount || Number(amount) <= 0) {
-      setError('Amount must be greater than 0');
-      return;
-    }
-
-    if (!category) {
-      setError('Category is required');
-      return;
-    }
-
-    const payload = {
-      amount: Number(amount),
-      category,
-      note: note.trim() || undefined,
-      frequency,
-      dayOfWeek: frequency === 'weekly' ? dayOfWeek : null,
-      dayOfMonth: frequency === 'monthly' || frequency === 'yearly' ? dayOfMonth : null,
-      monthOfYear: frequency === 'yearly' ? monthOfYear : null,
-      nextDate,
-      endDate: endDate.trim() ? endDate : null,
-    };
+    setIsSubmitting(true);
 
     try {
+      const payload = {
+        amount: Number(formData.amount),
+        category: formData.category,
+        note: formData.note || undefined,
+        frequency: formData.frequency,
+        dayOfWeek: formData.dayOfWeek,
+        dayOfMonth: formData.dayOfMonth,
+        monthOfYear: formData.monthOfYear,
+        nextDate: formData.nextDate,
+        endDate: formData.endDate || null
+      };
+
       await onSubmit(payload);
-      setAmount('');
-      setCategory('Food');
-      setNote('');
-      setFrequency('monthly');
-      setNextDate(new Date().toISOString().split('T')[0]);
-      setEndDate('');
+
+      // Reset form
+      setFormData({
+        amount: '',
+        category: '',
+        note: '',
+        frequency: '',
+        dayOfWeek: null,
+        dayOfMonth: null,
+        monthOfYear: null,
+        nextDate: new Date().toISOString().slice(0, 10),
+        endDate: ''
+      });
     } catch (err) {
       setError(err.message || 'Failed to create recurring expense');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="card" style={{ marginBottom: '24px' }}>
+      <h3>Create Recurring Expense</h3>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-            Amount
-          </label>
+          <label htmlFor="amount">Amount</label>
           <input
             id="amount"
+            name="amount"
             type="number"
-            step="0.01"
             min="0"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            step="0.01"
+            value={formData.amount}
+            onChange={handleChange}
             placeholder="0.00"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            required
           />
         </div>
 
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
+          <label htmlFor="category">Category</label>
           <select
             id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
           >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
+            <option value="">Select category</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
         </div>
       </div>
 
-      <div>
-        <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-2">
-          Note (Optional)
-        </label>
+      <div style={{ marginTop: '16px' }}>
+        <label htmlFor="note">Note (optional)</label>
         <input
           id="note"
+          name="note"
           type="text"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
+          value={formData.note}
+          onChange={handleChange}
           placeholder="e.g., Netflix subscription"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
 
-      <FrequencySelector
-        frequency={frequency}
-        onChange={setFrequency}
-        dayOfWeek={dayOfWeek}
-        dayOfMonth={dayOfMonth}
-        monthOfYear={monthOfYear}
-        onDetailsChange={handleDetailsChange}
-      />
+      <div style={{ marginTop: '16px' }}>
+        <FrequencySelector
+          frequency={formData.frequency}
+          dayOfWeek={formData.dayOfWeek}
+          dayOfMonth={formData.dayOfMonth}
+          monthOfYear={formData.monthOfYear}
+          onChange={handleChange}
+        />
+      </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
         <div>
-          <label htmlFor="nextDate" className="block text-sm font-medium text-gray-700 mb-2">
-            Next Date
-          </label>
+          <label htmlFor="nextDate">Start Date</label>
           <input
             id="nextDate"
+            name="nextDate"
             type="date"
-            value={nextDate}
-            onChange={(e) => setNextDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            value={formData.nextDate}
+            onChange={handleChange}
+            required
           />
         </div>
 
         <div>
-          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
-            End Date (Optional)
-          </label>
+          <label htmlFor="endDate">End Date (optional)</label>
           <input
             id="endDate"
+            name="endDate"
             type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            value={formData.endDate}
+            onChange={handleChange}
           />
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 disabled:opacity-50 transition"
-      >
-        {isLoading ? 'Creating...' : 'Create Recurring Expense'}
-      </button>
+      {error && <div className="error" style={{ marginTop: '16px' }}>{error}</div>}
+
+      <div className="inline-actions" style={{ marginTop: '24px' }}>
+        <button type="submit" className="button primary" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Spinner size="small" color="white" />
+              Creating...
+            </span>
+          ) : 'Create Recurring Expense'}
+        </button>
+        <button type="button" className="button ghost" onClick={onCancel} disabled={isSubmitting}>
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }
