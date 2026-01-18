@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import AuthGate from '@/components/AuthGate';
+import Spinner from '@/components/Spinner';
 import { getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 
@@ -83,7 +84,10 @@ export default function MonthlySummaryPage() {
         {error ? <div className="error">{error}</div> : null}
 
         {loading ? (
-          <p className="subtle">Loading summary...</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+            <Spinner size="medium" color="primary" />
+            <p className="subtle" style={{ margin: 0 }}>Loading summary...</p>
+          </div>
         ) : months.length ? (
           <div className="expense-list">
             {months.map((month) => {

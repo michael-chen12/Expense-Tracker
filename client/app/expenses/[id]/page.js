@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import ExpenseForm from '@/components/ExpenseForm';
+import Spinner from '@/components/Spinner';
 import { deleteExpense, getExpense, updateExpense } from '@/lib/api-backend';
 
 export default function EditExpensePage() {
@@ -54,7 +55,10 @@ export default function EditExpensePage() {
 
         {error ? <div className="error">{error}</div> : null}
         {loading ? (
-          <p className="subtle">Loading expense...</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+            <Spinner size="medium" color="primary" />
+            <p className="subtle" style={{ margin: 0 }}>Loading expense...</p>
+          </div>
         ) : expense ? (
           <ExpenseForm
             initialValues={expense}

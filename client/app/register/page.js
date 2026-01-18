@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Spinner from '@/components/Spinner';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -169,7 +170,12 @@ export default function RegisterPage() {
             className="button primary full-width"
             disabled={loading}
           >
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Spinner size="small" color="white" />
+                Creating account...
+              </span>
+            ) : 'Create Account'}
           </button>
         </form>
 

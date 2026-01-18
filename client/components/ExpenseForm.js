@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Spinner from './Spinner';
 
 const EMPTY_FORM = {
   amount: '',
@@ -188,11 +189,21 @@ export default function ExpenseForm({
 
       <div className="inline-actions">
         <button className="button primary" type="submit" disabled={saving}>
-          {saving ? 'Saving...' : submitLabel}
+          {saving ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Spinner size="small" color="white" />
+              Saving...
+            </span>
+          ) : submitLabel}
         </button>
         {onDelete ? (
           <button className="button ghost" type="button" onClick={handleDelete} disabled={saving}>
-            Delete
+            {saving ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Spinner size="small" color="gray" />
+                Deleting...
+              </span>
+            ) : 'Delete'}
           </button>
         ) : null}
       </div>

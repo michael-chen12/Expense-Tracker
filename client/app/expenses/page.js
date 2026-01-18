@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import AuthGate from '@/components/AuthGate';
+import Spinner from '@/components/Spinner';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 
@@ -133,7 +134,10 @@ export default function ExpensesPage() {
       {error ? <div className="error">{error}</div> : null}
 
       {loading ? (
-        <p className="subtle">Loading expenses...</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+          <Spinner size="medium" color="primary" />
+          <p className="subtle" style={{ margin: 0 }}>Loading expenses...</p>
+        </div>
       ) : dates.length ? (
         <div className="grid">
           {dates.map((dateKey) => (

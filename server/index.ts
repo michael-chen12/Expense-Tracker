@@ -446,6 +446,110 @@ app.get('/api/summary', optionalAuth, async (req: Request, res: Response) => {
   }
 });
 
+// ============================================
+// Fixed Costs Endpoints
+// ============================================
+
+// Get fixed costs for authenticated user
+app.get('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const where: any = {};
+
+    // Filter by userId if authenticated
+    if (req.userId) {
+      where.userId = req.userId;
+    }
+
+    const fixedCosts = await prisma.fixedCost.findMany({
+      where,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const items = fixedCosts.map(cost => ({
+      id: cost.id,
+      name: cost.name,
+      amount: centsToDollars(cost.amountCents),
+      createdAt: cost.createdAt.toISOString(),
+      updatedAt: cost.updatedAt.toISOString(),
+      userId: cost.userId
+    }));
+
+    res.json({ items });
+  } catch (error) {
+    console.error('Error fetching fixed costs:', error);
+    res.status(500).json({ error: 'Failed to load fixed costs.' });
+  }
+});
+
+// Create fixed cost
+app.post('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const amountCents = parseAmountToCents(req.body.amount);
+    if (amountCents === null) {
+      return res.status(400).json({ error: 'Amount must be a positive number.' });
+    }
+
+    const name = String(req.body.name || '').trim();
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required.' });
+    }
+
+    // Use authenticated userId or fallback to temp (for development)
+    const userId = req.userId || req.body.userId || 'temp-user-id';
+
+    const fixedCost = await prisma.fixedCost.create({
+      data: {
+        userId,
+        name,
+        amountCents
+      }
+    });
+
+    res.status(201).json({
+      item: {
+        id: fixedCost.id,
+        name: fixedCost.name,
+        amount: centsToDollars(fixedCost.amountCents),
+        createdAt: fixedCost.createdAt.toISOString(),
+        updatedAt: fixedCost.updatedAt.toISOString(),
+        userId: fixedCost.userId
+      }
+    });
+  } catch (error) {
+    console.error('Error creating fixed cost:', error);
+    res.status(500).json({ error: 'Failed to create fixed cost.' });
+  }
+});
+
+// Delete fixed cost
+app.delete('/api/fixed-costs/:id', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: 'Invalid fixed cost id.' });
+    }
+
+    // Build where clause with userId filter if authenticated
+    const where: any = { id };
+    if (req.userId) {
+      where.userId = req.userId;
+    }
+
+    const result = await prisma.fixedCost.deleteMany({
+      where
+    });
+
+    if (result.count === 0) {
+      return res.status(404).json({ error: 'Fixed cost not found.' });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting fixed cost:', error);
+    res.status(500).json({ error: 'Failed to delete fixed cost.' });
+  }
+});
+
 // Sync user (called by NextAuth on sign-in)
 app.post('/api/users/sync', async (req: Request, res: Response) => {
   try {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Spinner from '@/components/Spinner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -109,7 +110,12 @@ export default function LoginPage() {
             className="button primary full-width"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Spinner size="small" color="white" />
+                Signing in...
+              </span>
+            ) : 'Sign In'}
           </button>
         </form>
 
