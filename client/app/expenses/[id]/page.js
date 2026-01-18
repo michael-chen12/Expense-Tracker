@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import AuthGate from '@/components/AuthGate';
 import ExpenseForm from '@/components/ExpenseForm';
-import { deleteExpense, getExpense, updateExpense } from '@/lib/api';
+import { deleteExpense, getExpense, updateExpense } from '@/lib/api-backend';
 
 export default function EditExpensePage() {
   const params = useParams();
@@ -42,27 +43,29 @@ export default function EditExpensePage() {
   };
 
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1>Edit expense</h1>
-          <p className="subtle">Update or remove this entry.</p>
+    <AuthGate>
+      <div>
+        <div className="page-header">
+          <div>
+            <h1>Edit expense</h1>
+            <p className="subtle">Update or remove this entry.</p>
+          </div>
         </div>
-      </div>
 
-      {error ? <div className="error">{error}</div> : null}
-      {loading ? (
-        <p className="subtle">Loading expense...</p>
-      ) : expense ? (
-        <ExpenseForm
-          initialValues={expense}
-          submitLabel="Save changes"
-          onSubmit={handleSubmit}
-          onDelete={handleDelete}
-        />
-      ) : (
-        <p className="subtle">Expense not found.</p>
-      )}
-    </div>
+        {error ? <div className="error">{error}</div> : null}
+        {loading ? (
+          <p className="subtle">Loading expense...</p>
+        ) : expense ? (
+          <ExpenseForm
+            initialValues={expense}
+            submitLabel="Save changes"
+            onSubmit={handleSubmit}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <p className="subtle">Expense not found.</p>
+        )}
+      </div>
+    </AuthGate>
   );
 }

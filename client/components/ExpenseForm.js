@@ -9,6 +9,20 @@ const EMPTY_FORM = {
   note: ''
 };
 
+const DEFAULT_CATEGORIES = [
+  'Transportation',
+  'Food',
+  'Clothing',
+  'Housing',
+  'Utilities',
+  'Subscriptions',
+  'Health',
+  'Entertainment',
+  'Education',
+  'Travel',
+  'Other'
+];
+
 export default function ExpenseForm({
   initialValues = {},
   submitLabel = 'Save expense',
@@ -16,11 +30,32 @@ export default function ExpenseForm({
   onDelete
 }) {
   const [form, setForm] = useState({ ...EMPTY_FORM, ...initialValues });
+  const [categorySelect, setCategorySelect] = useState(DEFAULT_CATEGORIES[0]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setForm({ ...EMPTY_FORM, ...initialValues });
+    const initialCategory = String(initialValues.category || '').trim();
+    const defaultCategory = DEFAULT_CATEGORIES[0] || '';
+
+    let selectedCategory = defaultCategory;
+    let categoryValue = defaultCategory;
+
+    if (initialCategory) {
+      const matched = DEFAULT_CATEGORIES.find(
+        (item) => item.toUpperCase() === initialCategory.toUpperCase()
+      );
+      const resolvedCategory = matched || 'Other';
+      selectedCategory = resolvedCategory;
+      categoryValue = resolvedCategory;
+    }
+
+    setCategorySelect(selectedCategory);
+    setForm({
+      ...EMPTY_FORM,
+      ...initialValues,
+      category: categoryValue
+    });
   }, [initialValues]);
 
   const handleChange = (event) => {
@@ -28,6 +63,15 @@ export default function ExpenseForm({
     setForm((prev) => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleCategorySelect = (event) => {
+    const { value } = event.target;
+    setCategorySelect(value);
+    setForm((prev) => ({
+      ...prev,
+      category: value
     }));
   };
 
@@ -41,7 +85,8 @@ export default function ExpenseForm({
       return;
     }
 
-    if (!form.category.trim()) {
+    const trimmedCategory = form.category.trim();
+    if (!trimmedCategory) {
       setError('Pick a category.');
       return;
     }
@@ -56,7 +101,7 @@ export default function ExpenseForm({
     try {
       await onSubmit({
         amount: amountValue,
-        category: form.category.trim(),
+        category: trimmedCategory,
         date: form.date,
         note: form.note.trim()
       });
@@ -106,16 +151,14 @@ export default function ExpenseForm({
       </div>
 
       <div>
-        <label htmlFor="category">Category</label>
-        <input
-          id="category"
-          name="category"
-          type="text"
-          value={form.category}
-          onChange={handleChange}
-          placeholder="Groceries, Rent, Coffee"
-          required
-        />
+        <label htmlFor="categorySelect">Category</label>
+        <select id="categorySelect" value={categorySelect} onChange={handleCategorySelect}>
+          {DEFAULT_CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

@@ -2,7 +2,16 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getExpenses, getSummary } from '@/lib/api';
+import AuthGate from '@/components/AuthGate';
+import { getExpenses } from '@/lib/api-backend';
+import {
+  createFixedCost,
+  deleteFixedCost,
+  getAllowanceSettings,
+  getAllowanceStatus,
+  getFixedCosts,
+  setAllowanceSettings
+} from '@/lib/api';
 import { formatCurrency, formatDate } from '@/lib/format';
 
 function getMonthRange() {
@@ -18,17 +27,21 @@ function getMonthRange() {
 }
 
 export default function Dashboard() {
-  const [summary, setSummary] = useState(null);
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [allowance, setAllowance] = useState({ amount: '', cadence: 'month' });
+  const [allowanceStatus, setAllowanceStatus] = useState(null);
+  const [allowanceError, setAllowanceError] = useState('');
+  const [savingAllowance, setSavingAllowance] = useState(false);
+  const [fixedCosts, setFixedCosts] = useState([]);
+  const [fixedCostForm, setFixedCostForm] = useState({ name: '', amount: '' });
+  const [fixedCostError, setFixedCostError] = useState('');
+  const [savingFixedCost, setSavingFixedCost] = useState(false);
 
   useEffect(() => {
-    const { from, to } = getMonthRange();
-
-    Promise.all([getSummary({ from, to }), getExpenses({ pageSize: 5 })])
-      .then(([summaryData, expenseData]) => {
-        setSummary(summaryData);
+    getExpenses({ pageSize: 5 })
+      .then((expenseData) => {
         setRecent(expenseData.items || []);
         setError('');
       })
@@ -40,67 +53,120 @@ export default function Dashboard() {
       });
   }, []);
 
-  const month = getMonthRange().label;
-  const topCategory = summary?.byCategory?.[0];
+  useEffect(() => {
+    const settings = getAllowanceSettings();
+    setAllowance({
+      amount: String(settings.amount),
+      cadence: settings.cadence
+    });
 
+    getAllowanceStatus()
+      .then((status) => {
+        setAllowanceStatus(status);
+      })
+      .catch((fetchError) => {
+        setAllowanceError(fetchError.message || 'Unable to load allowance.');
+      });
+  }, []);
+
+  useEffect(() => {
+    getFixedCosts()
+      .then((items) => {
+        setFixedCosts(items);
+        setFixedCostError('');
+      })
+      .catch((fetchError) => {
+        setFixedCostError(fetchError.message || 'Unable to load fixed costs.');
+      });
+  }, []);
+
+  const handleAllowanceChange = (event) => {
+    const { name, value } = event.target;
+    setAllowance((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleAllowanceSubmit = async (event) => {
+    event.preventDefault();
+    setAllowanceError('');
+    setSavingAllowance(true);
+
+    try {
+      const saved = setAllowanceSettings({
+        amount: allowance.amount,
+        cadence: allowance.cadence
+      });
+      setAllowance({
+        amount: String(saved.amount),
+        cadence: saved.cadence
+      });
+      const status = await getAllowanceStatus();
+      setAllowanceStatus(status);
+    } catch (submitError) {
+      setAllowanceError(submitError.message || 'Unable to save allowance.');
+    } finally {
+      setSavingAllowance(false);
+    }
+  };
+
+  const handleFixedCostChange = (event) => {
+    const { name, value } = event.target;
+    setFixedCostForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFixedCostSubmit = async (event) => {
+    event.preventDefault();
+    setFixedCostError('');
+    setSavingFixedCost(true);
+
+    try {
+      await createFixedCost({
+        name: fixedCostForm.name,
+        amount: fixedCostForm.amount
+      });
+      const items = await getFixedCosts();
+      setFixedCosts(items);
+      setFixedCostForm({ name: '', amount: '' });
+    } catch (submitError) {
+      setFixedCostError(submitError.message || 'Unable to save fixed cost.');
+    } finally {
+      setSavingFixedCost(false);
+    }
+  };
+
+  const handleFixedCostDelete = async (itemId) => {
+    const confirmed = window.confirm('Delete this fixed cost?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteFixedCost(itemId);
+      const items = await getFixedCosts();
+      setFixedCosts(items);
+    } catch (deleteError) {
+      setFixedCostError(deleteError.message || 'Unable to delete fixed cost.');
+    }
+  };
+
+  const month = getMonthRange().label;
   return (
-    <div>
-      <div className="page-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p className="subtle">{month} snapshot of your spending.</p>
-        </div>
+    <AuthGate>
+      <div>
+        <div className="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p className="subtle">{month} snapshot of your spending.</p>
+          </div>
         <Link className="button primary" href="/expenses/new">Add expense</Link>
       </div>
 
       {error ? <div className="error">{error}</div> : null}
-
-      <div className="grid two">
-        <section className="card">
-          <div className="card-header">
-            <h2>This month</h2>
-            <span className="badge">Live</span>
-          </div>
-          <h3>{formatCurrency(summary?.total || 0)}</h3>
-          <p className="subtle">Total spend across all categories.</p>
-          <div className="grid">
-            {(summary?.byCategory || []).slice(0, 3).map((item) => (
-              <div key={item.category} className="expense-row">
-                <div>
-                  <h3>{item.category}</h3>
-                  <p>{formatCurrency(item.total)}</p>
-                </div>
-                <div className="badge">Top</div>
-              </div>
-            ))}
-            {summary && summary.byCategory.length === 0 ? (
-              <p className="subtle">No expenses tracked yet.</p>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="card">
-          <div className="card-header">
-            <h2>Highlights</h2>
-            <span className="badge">Insight</span>
-          </div>
-          <div>
-            <p className="subtle">Most active category</p>
-            <h3>{topCategory ? topCategory.category : 'No data yet'}</h3>
-            <p className="subtle">
-              {topCategory ? `${formatCurrency(topCategory.total)} total this month.` : 'Start logging expenses to see trends.'}
-            </p>
-          </div>
-          <div className="card" style={{ background: 'var(--accent-soft)', border: 'none', boxShadow: 'none' }}>
-            <h3>Quick actions</h3>
-            <p className="subtle">Log a new expense or review the full list.</p>
-            <div className="inline-actions">
-              <Link className="button primary" href="/expenses/new">New expense</Link>
-              <Link className="button ghost" href="/expenses">View all</Link>
-            </div>
-          </div>
-        </section>
-      </div>
 
       <section className="card" style={{ marginTop: '24px' }}>
         <div className="card-header">
@@ -128,6 +194,151 @@ export default function Dashboard() {
           </div>
         )}
       </section>
+
+      <section className="card" style={{ marginTop: '24px' }}>
+        <div className="card-header">
+          <h2>Allowance top-up</h2>
+          <span className="badge">{allowanceStatus?.label || 'Period'}</span>
+        </div>
+
+        <div className="grid two fixed-costs-grid">
+          <div>
+            <h3>{formatCurrency(allowanceStatus?.remaining || 0)}</h3>
+            <p className="subtle">Remaining for the current period.</p>
+            <p className="subtle">Spent: {formatCurrency(allowanceStatus?.totalSpent || 0)}</p>
+            <p className="subtle">Next top-up: {allowanceStatus?.nextTopUp || '—'}</p>
+          </div>
+
+          <form onSubmit={handleAllowanceSubmit}>
+            <div>
+              <label htmlFor="allowanceAmount">Allowance amount</label>
+              <input
+                id="allowanceAmount"
+                name="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                value={allowance.amount}
+                onChange={handleAllowanceChange}
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="allowanceCadence">Top-up cadence</label>
+              <select
+                id="allowanceCadence"
+                name="cadence"
+                value={allowance.cadence}
+                onChange={handleAllowanceChange}
+              >
+                <option value="day">Daily</option>
+                <option value="week">Weekly</option>
+                <option value="month">Monthly</option>
+              </select>
+            </div>
+
+            {allowanceError ? <div className="error">{allowanceError}</div> : null}
+
+            <div className="inline-actions">
+              <button className="button primary" type="submit" disabled={savingAllowance}>
+                {savingAllowance ? 'Saving...' : 'Save allowance'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section className="card" style={{ marginTop: '24px' }}>
+        <div className="card-header">
+          <h2>Monthly fixed costs</h2>
+          <span className="badge">
+            {formatCurrency(fixedCosts.reduce((sum, item) => sum + item.amount, 0))} / month
+          </span>
+        </div>
+
+        <div className="grid two">
+          <form className="fixed-costs-form" onSubmit={handleFixedCostSubmit}>
+            <div>
+              <label htmlFor="fixedCostName">Name</label>
+              <input
+                id="fixedCostName"
+                name="name"
+                type="text"
+                value={fixedCostForm.name}
+                onChange={handleFixedCostChange}
+                placeholder="Rent, Spotify, Wi-Fi"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="fixedCostAmount">Monthly amount</label>
+              <input
+                id="fixedCostAmount"
+                name="amount"
+                type="number"
+                min="0"
+                step="0.01"
+                value={fixedCostForm.amount}
+                onChange={handleFixedCostChange}
+                placeholder="0.00"
+                required
+              />
+            </div>
+
+            {fixedCostError ? <div className="error">{fixedCostError}</div> : null}
+
+            <div className="inline-actions">
+              <button className="button primary fixed-costs-button" type="submit" disabled={savingFixedCost}>
+                {savingFixedCost ? 'Saving...' : 'Add fixed cost'}
+              </button>
+            </div>
+          </form>
+
+          <div className="expense-list scroll-list">
+            {fixedCosts.length ? (
+              fixedCosts.map((item) => (
+                <div key={item.id} className="expense-row">
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p className="subtle">Monthly</p>
+                  </div>
+                  <div className="expense-amount">{formatCurrency(item.amount)}</div>
+                  <div className="inline-actions">
+                    <button
+                      className="button ghost"
+                      type="button"
+                      aria-label={`Delete ${item.name}`}
+                      onClick={() => handleFixedCostDelete(item.id)}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="subtle">No fixed costs yet. Add recurring bills here.</p>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
+    </AuthGate>
   );
 }

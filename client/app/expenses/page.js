@@ -2,10 +2,22 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getExpenses } from '@/lib/api';
+import AuthGate from '@/components/AuthGate';
+import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 
+function groupByDate(expenses) {
+  return expenses.reduce((acc, expense) => {
+    if (!acc[expense.date]) {
+      acc[expense.date] = [];
+    }
+    acc[expense.date].push(expense);
+    return acc;
+  }, {});
+}
+
 export default function ExpensesPage() {
+  const today = new Date().toISOString().slice(0, 10);
   const [filters, setFilters] = useState({
     from: '',
     to: '',
@@ -44,8 +56,26 @@ export default function ExpensesPage() {
     }));
   };
 
+  const handleDelete = async (expenseId) => {
+    const confirmed = window.confirm('Delete this expense?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteExpense(expenseId);
+      setExpenses((prev) => prev.filter((expense) => expense.id !== expenseId));
+    } catch (deleteError) {
+      setError(deleteError.message || 'Unable to delete expense.');
+    }
+  };
+
+  const groupedExpenses = groupByDate(expenses);
+  const dates = Object.keys(groupedExpenses).sort((a, b) => (a > b ? -1 : 1));
+
   return (
-    <div>
+    <AuthGate>
+      <div>
       <div className="page-header">
         <div>
           <h1>Expenses</h1>
@@ -64,15 +94,38 @@ export default function ExpensesPage() {
         <div className="filter-grid">
           <div>
             <label htmlFor="from">From</label>
-            <input id="from" name="from" type="date" value={filters.from} onChange={handleChange} />
+            <input id="from" name="from" type="date" value={filters.from} onChange={handleChange} max={today} />
           </div>
           <div>
             <label htmlFor="to">To</label>
-            <input id="to" name="to" type="date" value={filters.to} onChange={handleChange} />
+            <input
+              id="to"
+              name="to"
+              type="date"
+              value={filters.to}
+              onChange={handleChange}
+              max={today}
+              min={filters.from || undefined}
+              disabled={!filters.from}
+              title={filters.from ? '' : 'Select a From date first'}
+            />
           </div>
           <div>
             <label htmlFor="category">Category</label>
-            <input id="category" name="category" type="text" value={filters.category} onChange={handleChange} placeholder="Groceries" />
+            <select id="category" name="category" value={filters.category} onChange={handleChange}>
+              <option value="">All categories</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Food">Food</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Housing">Housing</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Subscriptions">Subscriptions</option>
+              <option value="Health">Health</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Education">Education</option>
+              <option value="Travel">Travel</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
         </div>
       </section>
@@ -81,23 +134,59 @@ export default function ExpensesPage() {
 
       {loading ? (
         <p className="subtle">Loading expenses...</p>
-      ) : (
-        <div className="expense-list">
-          {expenses.map((expense) => (
-            <div key={expense.id} className="expense-row">
-              <div>
-                <h3>{expense.category}</h3>
-                <p>{expense.note || 'No note'} • {formatDate(expense.date)}</p>
+      ) : dates.length ? (
+        <div className="grid">
+          {dates.map((dateKey) => (
+            <section key={dateKey} className="card">
+              <div className="card-header">
+                <h2>{formatDate(dateKey)}</h2>
+                <span className="badge">{groupedExpenses[dateKey].length} entries</span>
               </div>
-              <div className="expense-amount">{formatCurrency(expense.amount)}</div>
-              <div className="inline-actions">
-                <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+              <div className="expense-list">
+                {groupedExpenses[dateKey].map((expense) => (
+                  <div key={expense.id} className="expense-row">
+                    <div>
+                      <h3>{expense.category}</h3>
+                      <p>{expense.note || 'No note'}</p>
+                    </div>
+                    <div className="expense-amount">{formatCurrency(expense.amount)}</div>
+                    <div className="inline-actions">
+                      <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+                      <button
+                        className="button ghost"
+                        type="button"
+                        aria-label={`Delete ${expense.category}`}
+                        onClick={() => handleDelete(expense.id)}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            </section>
           ))}
-          {!expenses.length && !error ? <p className="subtle">No expenses match those filters.</p> : null}
         </div>
+      ) : (
+        <p className="subtle">No expenses match those filters.</p>
       )}
     </div>
+    </AuthGate>
   );
 }

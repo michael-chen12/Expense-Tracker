@@ -5,3 +5,5 @@ server/data/*.db
 .env
 client/.env
 client/.env.*
+
+/generated/prisma

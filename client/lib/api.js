@@ -1,4 +1,9 @@
 const STORAGE_KEY = 'ledgerline.expenses';
+const ALLOWANCE_KEY = 'ledgerline.allowance';
+const FIXED_COST_KEY = 'ledgerline.fixedCosts';
+const DEFAULT_ALLOWANCE = { amount: 0, cadence: 'month' };
+
+const ALLOWANCE_CADENCES = new Set(['day', 'week', 'month']);
 
 function readExpenses() {
   if (typeof window === 'undefined') {
@@ -24,6 +29,121 @@ function writeExpenses(expenses) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
 }
 
+function readFixedCosts() {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(FIXED_COST_KEY);
+    if (!raw) {
+      return [];
+    }
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeFixedCosts(items) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(FIXED_COST_KEY, JSON.stringify(items));
+}
+
+function readAllowance() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_ALLOWANCE;
+  }
+
+  try {
+    const raw = window.localStorage.getItem(ALLOWANCE_KEY);
+    if (!raw) {
+      return DEFAULT_ALLOWANCE;
+    }
+    const parsed = JSON.parse(raw);
+    return normalizeAllowance(parsed);
+  } catch (error) {
+    return DEFAULT_ALLOWANCE;
+  }
+}
+
+function writeAllowance(settings) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(ALLOWANCE_KEY, JSON.stringify(settings));
+}
+
+function normalizeAllowance(settings) {
+  const amount = Number(settings?.amount);
+  const cadence = ALLOWANCE_CADENCES.has(settings?.cadence) ? settings.cadence : 'month';
+
+  if (!Number.isFinite(amount) || amount < 0) {
+    return { ...DEFAULT_ALLOWANCE, cadence };
+  }
+
+  return {
+    amount: Number(amount.toFixed(2)),
+    cadence
+  };
+}
+
+function formatDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(date, amount) {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+  return next;
+}
+
+function getAllowanceWindow(referenceDate, cadence) {
+  const base = new Date(
+    referenceDate.getFullYear(),
+    referenceDate.getMonth(),
+    referenceDate.getDate()
+  );
+
+  if (cadence === 'day') {
+    const start = base;
+    const end = base;
+    return {
+      label: 'Today',
+      startKey: formatDateKey(start),
+      endKey: formatDateKey(end),
+      nextTopUp: formatDateKey(addDays(end, 1))
+    };
+  }
+
+  if (cadence === 'week') {
+    const dayOfWeek = base.getDay();
+    const diff = (dayOfWeek + 6) % 7;
+    const start = addDays(base, -diff);
+    const end = addDays(start, 6);
+    return {
+      label: 'This week',
+      startKey: formatDateKey(start),
+      endKey: formatDateKey(end),
+      nextTopUp: formatDateKey(addDays(end, 1))
+    };
+  }
+
+  const start = new Date(base.getFullYear(), base.getMonth(), 1);
+  const end = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+  return {
+    label: 'This month',
+    startKey: formatDateKey(start),
+    endKey: formatDateKey(end),
+    nextTopUp: formatDateKey(addDays(end, 1))
+  };
+}
+
 function sortExpenses(expenses) {
   return [...expenses].sort((a, b) => {
     if (a.date !== b.date) {
@@ -31,6 +151,10 @@ function sortExpenses(expenses) {
     }
     return (b.createdAt || '').localeCompare(a.createdAt || '');
   });
+}
+
+function sortFixedCosts(items) {
+  return [...items].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
 }
 
 function validateExpense(payload) {
@@ -57,6 +181,25 @@ function validateExpense(payload) {
       category,
       date,
       note
+    }
+  };
+}
+
+function validateFixedCost(payload) {
+  const name = String(payload.name || '').trim();
+  if (!name) {
+    return { error: 'Name is required.' };
+  }
+
+  const amount = Number(payload.amount);
+  if (!Number.isFinite(amount) || amount < 0) {
+    return { error: 'Amount must be a positive number.' };
+  }
+
+  return {
+    value: {
+      name,
+      amount: Number(amount.toFixed(2))
     }
   };
 }
@@ -193,5 +336,85 @@ export async function getSummary(params = {}) {
     totalCents: Math.round(total * 100),
     total: Number(total.toFixed(2)),
     byCategory
+  };
+}
+
+export async function getFixedCosts() {
+  return sortFixedCosts(readFixedCosts());
+}
+
+export async function createFixedCost(payload) {
+  const { value, error } = validateFixedCost(payload);
+  if (error) {
+    throw new Error(error);
+  }
+
+  const items = readFixedCosts();
+  const now = new Date().toISOString();
+  const nextId = items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const item = {
+    id: nextId,
+    ...value,
+    createdAt: now
+  };
+
+  const updated = sortFixedCosts([item, ...items]);
+  writeFixedCosts(updated);
+
+  return { item };
+}
+
+export async function deleteFixedCost(id) {
+  const itemId = Number(id);
+  const items = readFixedCosts();
+  const updated = items.filter((item) => item.id !== itemId);
+
+  if (updated.length === items.length) {
+    throw new Error('Fixed cost not found.');
+  }
+
+  writeFixedCosts(updated);
+  return { success: true };
+}
+
+export function getAllowanceSettings() {
+  return readAllowance();
+}
+
+export function setAllowanceSettings(settings) {
+  const normalized = normalizeAllowance(settings);
+
+  if (!Number.isFinite(Number(settings?.amount)) || Number(settings.amount) < 0) {
+    throw new Error('Allowance amount must be a positive number.');
+  }
+
+  if (!ALLOWANCE_CADENCES.has(settings?.cadence)) {
+    throw new Error('Allowance cadence must be daily, weekly, or monthly.');
+  }
+
+  writeAllowance(normalized);
+  return normalized;
+}
+
+export async function getAllowanceStatus(referenceDate = new Date()) {
+  const settings = readAllowance();
+  const { label, startKey, endKey, nextTopUp } = getAllowanceWindow(referenceDate, settings.cadence);
+  const expenses = readExpenses();
+
+  const periodExpenses = expenses.filter(
+    (expense) => expense.date >= startKey && expense.date <= endKey
+  );
+
+  const totalSpent = periodExpenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+  const remaining = Number((settings.amount - totalSpent).toFixed(2));
+
+  return {
+    settings,
+    label,
+    startDate: startKey,
+    endDate: endKey,
+    nextTopUp,
+    totalSpent: Number(totalSpent.toFixed(2)),
+    remaining
   };
 }
