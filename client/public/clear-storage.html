@@ -75,8 +75,8 @@
         <p>This will clear all localStorage data including:</p>
         <ul>
             <li><code>ledgerline.expenses</code> - Old expense data</li>
-            <li><code>ledgerline.allowance</code> - Allowance settings</li>
-            <li><code>ledgerline.fixedCosts</code> - Fixed costs data</li>
+            <li><code>ledgerline.allowance.*</code> - Per-user allowance settings</li>
+            <li><code>ledgerline.fixedCosts.*</code> - Per-user fixed costs data</li>
         </ul>
         <p><strong>⚠️ Warning:</strong> This action cannot be undone! Make sure you've migrated your data to the backend first.</p>
 
@@ -90,18 +90,36 @@
 
     <script>
         function clearStorage() {
-            const keys = [
-                'ledgerline.expenses',
+            const exactKeys = [
+                'ledgerline.expenses'
+            ];
+            
+            const prefixes = [
                 'ledgerline.allowance',
                 'ledgerline.fixedCosts'
             ];
 
             const found = [];
-            keys.forEach(key => {
+            
+            // Clear exact match keys
+            exactKeys.forEach(key => {
                 if (localStorage.getItem(key)) {
                     found.push(key);
                     localStorage.removeItem(key);
                 }
+            });
+            
+            // Clear keys matching prefixes (for per-user allowance)
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && prefixes.some(prefix => key.startsWith(prefix))) {
+                    found.push(key);
+                }
+            }
+            
+            // Remove prefix-matched keys (separate loop to avoid index issues)
+            found.filter(key => !exactKeys.includes(key)).forEach(key => {
+                localStorage.removeItem(key);
             });
 
             const resultDiv = document.getElementById('result');
@@ -126,8 +144,11 @@
         }
 
         function showStorageInfo() {
-            const keys = [
-                'ledgerline.expenses',
+            const exactKeys = [
+                'ledgerline.expenses'
+            ];
+            
+            const prefixes = [
                 'ledgerline.allowance',
                 'ledgerline.fixedCosts'
             ];
@@ -135,9 +156,20 @@
             const data = {};
             let totalItems = 0;
 
-            keys.forEach(key => {
+            // Get exact match keys
+            exactKeys.forEach(key => {
                 const value = localStorage.getItem(key);
                 if (value) {
+                    data[key] = value;
+                    totalItems++;
+                }
+            });
+            
+            // Get keys matching prefixes (for per-user allowance)
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && prefixes.some(prefix => key.startsWith(prefix))) {
+                    const value = localStorage.getItem(key);
                     data[key] = value;
                     totalItems++;
                 }

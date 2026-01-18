@@ -1,9 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
-import { getExpenses } from '@/lib/api-backend';
+import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 
 function getMonthKey(dateValue) {
@@ -31,7 +32,8 @@ export default function MonthlySummaryPage() {
   const [error, setError] = useState('');
   const [expandedKey, setExpandedKey] = useState('');
 
-  useEffect(() => {
+  const loadExpenses = () => {
+    setLoading(true);
     getExpenses({ page: 1, pageSize: 10000 })
       .then((data) => {
         const totals = new Map();
@@ -69,7 +71,25 @@ export default function MonthlySummaryPage() {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadExpenses();
   }, []);
+
+  const handleDelete = async (expenseId) => {
+    const confirmed = window.confirm('Delete this expense?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteExpense(expenseId);
+      loadExpenses();
+    } catch (deleteError) {
+      setError(deleteError.message || 'Unable to delete expense.');
+    }
+  };
 
   return (
     <AuthGate>
@@ -106,6 +126,23 @@ export default function MonthlySummaryPage() {
                       <p>{month.count} entries</p>
                     </div>
                     <div className="expense-amount">{formatCurrency(month.total)}</div>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{
+                        transition: 'transform 0.2s ease',
+                        transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                        marginLeft: '12px'
+                      }}
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
                   </button>
 
                   {isExpanded ? (
@@ -117,6 +154,33 @@ export default function MonthlySummaryPage() {
                             <p>{expense.note || 'No note'} • {formatDate(expense.date)}</p>
                           </div>
                           <div className="expense-amount">{formatCurrency(expense.amount)}</div>
+                          <div className="inline-actions">
+                            <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+                            <button
+                              className="button ghost"
+                              type="button"
+                              aria-label={`Delete ${expense.category}`}
+                              onClick={() => handleDelete(expense.id)}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <line x1="10" y1="11" x2="10" y2="17" />
+                                <line x1="14" y1="11" x2="14" y2="17" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       ))}
                       {!monthExpenses.length ? (

@@ -1,7 +1,7 @@
 // API client for backend Express server
 // This replaces localStorage with actual backend API calls
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 interface APIError {
   error: string;
@@ -39,19 +39,35 @@ interface SummaryResponse {
 }
 
 // Helper to get auth token from NextAuth session
-async function getAuthToken(): Promise<string | null> {
+async function getAuthHeaders(): Promise<HeadersInit> {
   if (typeof window === 'undefined') {
-    return null;
+    return { 'Content-Type': 'application/json' };
   }
 
   try {
-    // NextAuth stores session in a cookie, we'll get it from the session
     const response = await fetch('/api/auth/session');
     const session = await response.json();
-    return session?.accessToken || null;
+    console.log('[API] Session:', session);
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Pass user ID in header for backend to use
+    if (session?.userId) {
+      headers['X-User-Id'] = session.userId;
+    } else if (session?.user?.id) {
+      headers['X-User-Id'] = session.user.id;
+    }
+    
+    if (session?.accessToken) {
+      headers['Authorization'] = `Bearer ${session.accessToken}`;
+    }
+    
+    return headers;
   } catch (error) {
-    console.error('Failed to get auth token:', error);
-    return null;
+    console.error('Failed to get auth session:', error);
+    return { 'Content-Type': 'application/json' };
   }
 }
 
@@ -60,20 +76,14 @@ async function fetchAPI<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = await getAuthToken();
+  const headers = await getAuthHeaders();
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    headers,
+    headers: {
+      ...headers,
+      ...options.headers,
+    },
   });
 
   if (!response.ok) {
@@ -103,14 +113,14 @@ export async function getExpenses(params: {
   if (params.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
   const query = searchParams.toString();
-  const endpoint = query ? `/expenses?${query}` : '/expenses';
+  const endpoint = query ? `/api/expenses?${query}` : '/api/expenses';
 
   return fetchAPI<ExpenseListResponse>(endpoint);
 }
 
 // Get single expense
 export async function getExpense(id: number): Promise<ExpenseResponse> {
-  return fetchAPI<ExpenseResponse>(`/expenses/${id}`);
+  return fetchAPI<ExpenseResponse>(`/api/expenses/${id}`);
 }
 
 // Create new expense
@@ -120,7 +130,7 @@ export async function createExpense(payload: {
   date: string;
   note?: string;
 }): Promise<ExpenseResponse> {
-  return fetchAPI<ExpenseResponse>('/expenses', {
+  return fetchAPI<ExpenseResponse>('/api/expenses', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -136,7 +146,7 @@ export async function updateExpense(
     note?: string;
   }
 ): Promise<ExpenseResponse> {
-  return fetchAPI<ExpenseResponse>(`/expenses/${id}`, {
+  return fetchAPI<ExpenseResponse>(`/api/expenses/${id}`, {
     method: 'PUT',
     body: JSON.stringify(payload),
   });
@@ -144,7 +154,7 @@ export async function updateExpense(
 
 // Delete expense
 export async function deleteExpense(id: number): Promise<{ success: boolean }> {
-  return fetchAPI<{ success: boolean }>(`/expenses/${id}`, {
+  return fetchAPI<{ success: boolean }>(`/api/expenses/${id}`, {
     method: 'DELETE',
   });
 }
@@ -162,47 +172,83 @@ export async function getSummary(params: {
   if (params.category) searchParams.set('category', params.category);
 
   const query = searchParams.toString();
-  const endpoint = query ? `/summary?${query}` : '/summary';
+  const endpoint = query ? `/api/summary?${query}` : '/api/summary';
 
   return fetchAPI<SummaryResponse>(endpoint);
 }
 
-// Fixed costs and allowance will be added later when we implement those endpoints
-// For now, these return empty data to maintain compatibility
-export async function getFixedCosts(): Promise<any[]> {
-  // TODO: Implement backend endpoint
-  return [];
+// ============================================
+// Fixed Costs
+// ============================================
+
+interface FixedCost {
+  id: number;
+  name: string;
+  amount: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
 }
 
-export async function createFixedCost(payload: any): Promise<any> {
-  // TODO: Implement backend endpoint
-  throw new Error('Not implemented yet');
+interface FixedCostListResponse {
+  items: FixedCost[];
 }
 
-export async function deleteFixedCost(id: number): Promise<any> {
-  // TODO: Implement backend endpoint
-  throw new Error('Not implemented yet');
+interface FixedCostResponse {
+  item: FixedCost;
 }
 
-export function getAllowanceSettings(): any {
-  // TODO: Implement backend endpoint
-  return { amount: 0, cadence: 'month' };
+export async function getFixedCosts(): Promise<FixedCost[]> {
+  const response = await fetchAPI<FixedCostListResponse>('/api/fixed-costs');
+  return response.items;
 }
 
-export function setAllowanceSettings(settings: any): any {
-  // TODO: Implement backend endpoint
-  throw new Error('Not implemented yet');
+export async function createFixedCost(payload: { name: string; amount: number }): Promise<FixedCostResponse> {
+  return fetchAPI<FixedCostResponse>('/api/fixed-costs', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }
 
-export async function getAllowanceStatus(referenceDate?: Date): Promise<any> {
-  // TODO: Implement backend endpoint
-  return {
-    settings: { amount: 0, cadence: 'month' },
-    label: 'This month',
-    startDate: '',
-    endDate: '',
-    nextTopUp: '',
-    totalSpent: 0,
-    remaining: 0,
-  };
+export async function deleteFixedCost(id: number): Promise<{ success: boolean }> {
+  return fetchAPI<{ success: boolean }>(`/api/fixed-costs/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// ============================================
+// Allowance
+// ============================================
+
+interface AllowanceSettings {
+  amount: number;
+  cadence: string;
+}
+
+interface AllowanceStatus {
+  settings: AllowanceSettings;
+  label: string;
+  startDate: string;
+  endDate: string;
+  nextTopUp: string;
+  totalSpent: number;
+  remaining: number;
+}
+
+export async function getAllowanceSettings(): Promise<AllowanceSettings> {
+  return fetchAPI<AllowanceSettings>('/api/allowance');
+}
+
+export async function setAllowanceSettings(settings: { amount: number | string; cadence: string }): Promise<AllowanceSettings> {
+  return fetchAPI<AllowanceSettings>('/api/allowance', {
+    method: 'PUT',
+    body: JSON.stringify({
+      amount: Number(settings.amount),
+      cadence: settings.cadence
+    }),
+  });
+}
+
+export async function getAllowanceStatus(): Promise<AllowanceStatus> {
+  return fetchAPI<AllowanceStatus>('/api/allowance/status');
 }

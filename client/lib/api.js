@@ -1,7 +1,21 @@
 const STORAGE_KEY = 'ledgerline.expenses';
-const ALLOWANCE_KEY = 'ledgerline.allowance';
-const FIXED_COST_KEY = 'ledgerline.fixedCosts';
+const ALLOWANCE_KEY_PREFIX = 'ledgerline.allowance';
+const FIXED_COST_KEY_PREFIX = 'ledgerline.fixedCosts';
 const DEFAULT_ALLOWANCE = { amount: 0, cadence: 'month' };
+
+function getAllowanceKey(userId) {
+  if (!userId) {
+    return ALLOWANCE_KEY_PREFIX;
+  }
+  return `${ALLOWANCE_KEY_PREFIX}.${userId}`;
+}
+
+function getFixedCostKey(userId) {
+  if (!userId) {
+    return FIXED_COST_KEY_PREFIX;
+  }
+  return `${FIXED_COST_KEY_PREFIX}.${userId}`;
+}
 
 const ALLOWANCE_CADENCES = new Set(['day', 'week', 'month']);
 
@@ -29,13 +43,14 @@ function writeExpenses(expenses) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
 }
 
-function readFixedCosts() {
+function readFixedCosts(userId) {
   if (typeof window === 'undefined') {
     return [];
   }
 
   try {
-    const raw = window.localStorage.getItem(FIXED_COST_KEY);
+    const key = getFixedCostKey(userId);
+    const raw = window.localStorage.getItem(key);
     if (!raw) {
       return [];
     }
@@ -46,20 +61,22 @@ function readFixedCosts() {
   }
 }
 
-function writeFixedCosts(items) {
+function writeFixedCosts(items, userId) {
   if (typeof window === 'undefined') {
     return;
   }
-  window.localStorage.setItem(FIXED_COST_KEY, JSON.stringify(items));
+  const key = getFixedCostKey(userId);
+  window.localStorage.setItem(key, JSON.stringify(items));
 }
 
-function readAllowance() {
+function readAllowance(userId) {
   if (typeof window === 'undefined') {
     return DEFAULT_ALLOWANCE;
   }
 
   try {
-    const raw = window.localStorage.getItem(ALLOWANCE_KEY);
+    const key = getAllowanceKey(userId);
+    const raw = window.localStorage.getItem(key);
     if (!raw) {
       return DEFAULT_ALLOWANCE;
     }
@@ -70,11 +87,12 @@ function readAllowance() {
   }
 }
 
-function writeAllowance(settings) {
+function writeAllowance(settings, userId) {
   if (typeof window === 'undefined') {
     return;
   }
-  window.localStorage.setItem(ALLOWANCE_KEY, JSON.stringify(settings));
+  const key = getAllowanceKey(userId);
+  window.localStorage.setItem(key, JSON.stringify(settings));
 }
 
 function normalizeAllowance(settings) {
@@ -339,17 +357,17 @@ export async function getSummary(params = {}) {
   };
 }
 
-export async function getFixedCosts() {
-  return sortFixedCosts(readFixedCosts());
+export async function getFixedCosts(userId) {
+  return sortFixedCosts(readFixedCosts(userId));
 }
 
-export async function createFixedCost(payload) {
+export async function createFixedCost(payload, userId) {
   const { value, error } = validateFixedCost(payload);
   if (error) {
     throw new Error(error);
   }
 
-  const items = readFixedCosts();
+  const items = readFixedCosts(userId);
   const now = new Date().toISOString();
   const nextId = items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
   const item = {
@@ -359,29 +377,29 @@ export async function createFixedCost(payload) {
   };
 
   const updated = sortFixedCosts([item, ...items]);
-  writeFixedCosts(updated);
+  writeFixedCosts(updated, userId);
 
   return { item };
 }
 
-export async function deleteFixedCost(id) {
+export async function deleteFixedCost(id, userId) {
   const itemId = Number(id);
-  const items = readFixedCosts();
+  const items = readFixedCosts(userId);
   const updated = items.filter((item) => item.id !== itemId);
 
   if (updated.length === items.length) {
     throw new Error('Fixed cost not found.');
   }
 
-  writeFixedCosts(updated);
+  writeFixedCosts(updated, userId);
   return { success: true };
 }
 
-export function getAllowanceSettings() {
-  return readAllowance();
+export function getAllowanceSettings(userId) {
+  return readAllowance(userId);
 }
 
-export function setAllowanceSettings(settings) {
+export function setAllowanceSettings(settings, userId) {
   const normalized = normalizeAllowance(settings);
 
   if (!Number.isFinite(Number(settings?.amount)) || Number(settings.amount) < 0) {
@@ -392,12 +410,12 @@ export function setAllowanceSettings(settings) {
     throw new Error('Allowance cadence must be daily, weekly, or monthly.');
   }
 
-  writeAllowance(normalized);
+  writeAllowance(normalized, userId);
   return normalized;
 }
 
-export async function getAllowanceStatus(referenceDate = new Date()) {
-  const settings = readAllowance();
+export async function getAllowanceStatus(userId, referenceDate = new Date()) {
+  const settings = readAllowance(userId);
   const { label, startKey, endKey, nextTopUp } = getAllowanceWindow(referenceDate, settings.cadence);
   const expenses = readExpenses();
 

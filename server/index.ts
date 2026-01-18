@@ -31,6 +31,25 @@ function centsToDollars(cents: number): number {
   return Number((cents / 100).toFixed(2));
 }
 
+// Helper to resolve user ID (handles both internal ID and GitHub ID)
+async function resolveUserId(authId: string | undefined): Promise<string | null> {
+  if (!authId) return null;
+  
+  // Try to find by internal ID first
+  let user = await prisma.user.findUnique({
+    where: { id: authId }
+  });
+  
+  // If not found, try GitHub ID
+  if (!user) {
+    user = await prisma.user.findUnique({
+      where: { githubId: authId }
+    });
+  }
+  
+  return user?.id || null;
+}
+
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok' });
@@ -148,7 +167,10 @@ app.get('/api/expenses', optionalAuth, async (req: Request, res: Response) => {
 
     // Filter by userId if authenticated
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     if (req.query.from) {
@@ -208,7 +230,10 @@ app.get('/api/expenses/:id', optionalAuth, async (req: Request, res: Response) =
 
     // Filter by userId if authenticated
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     const expense = await prisma.expense.findFirst({
@@ -239,35 +264,64 @@ app.get('/api/expenses/:id', optionalAuth, async (req: Request, res: Response) =
 // Create expense
 app.post('/api/expenses', optionalAuth, async (req: Request, res: Response) => {
   try {
+    console.log('[POST /api/expenses] Request body:', req.body);
+    console.log('[POST /api/expenses] User ID from auth:', req.userId);
+    
+    // Require authentication
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required to create expenses.' });
+    }
+
     const amountCents = parseAmountToCents(req.body.amount);
     if (amountCents === null) {
+      console.log('[POST /api/expenses] Invalid amount:', req.body.amount);
       return res.status(400).json({ error: 'Amount must be a positive number.' });
     }
 
     const category = String(req.body.category || '').trim();
     if (!category) {
+      console.log('[POST /api/expenses] Missing category');
       return res.status(400).json({ error: 'Category is required.' });
     }
 
     const date = String(req.body.date || '').trim();
     if (!date) {
+      console.log('[POST /api/expenses] Missing date');
       return res.status(400).json({ error: 'Date is required.' });
     }
 
     const note = req.body.note ? String(req.body.note).trim() : '';
-
-    // Use authenticated userId or fallback to temp (for development)
-    const userId = req.userId || req.body.userId || 'temp-user-id';
+    
+    // Look up user by ID or GitHub ID
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    // If not found by ID, try to find by GitHub ID
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      console.log('[POST /api/expenses] User not found:', req.userId);
+      return res.status(401).json({ error: 'User not found. Please sign in again.' });
+    }
+    
+    console.log('[POST /api/expenses] Found user:', user.id, user.email);
 
     const expense = await prisma.expense.create({
       data: {
-        userId,
+        userId: user.id,
         amountCents,
         category,
         date,
         note
       }
     });
+
+    console.log('[POST /api/expenses] Created expense:', expense.id);
 
     res.status(201).json({
       item: {
@@ -281,7 +335,8 @@ app.post('/api/expenses', optionalAuth, async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('Error creating expense:', error);
+    console.error('[POST /api/expenses] Error creating expense:', error instanceof Error ? error.message : error);
+    console.error('[POST /api/expenses] Full error:', error);
     res.status(500).json({ error: 'Failed to create expense.' });
   }
 });
@@ -314,7 +369,10 @@ app.put('/api/expenses/:id', optionalAuth, async (req: Request, res: Response) =
     // Build where clause with userId filter if authenticated
     const where: any = { id };
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     const expense = await prisma.expense.updateMany({
@@ -372,7 +430,10 @@ app.delete('/api/expenses/:id', optionalAuth, async (req: Request, res: Response
     // Build where clause with userId filter if authenticated
     const where: any = { id };
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     const result = await prisma.expense.deleteMany({
@@ -384,21 +445,27 @@ app.delete('/api/expenses/:id', optionalAuth, async (req: Request, res: Response
     }
 
     res.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error deleting expense:', error);
     res.status(500).json({ error: 'Failed to delete expense.' });
   }
 });
 
-// Get summary
+// ============================================
+// Summary Endpoints
+// ============================================
+
+// Get summary of expenses (total and by category) for authenticated user
 app.get('/api/summary', optionalAuth, async (req: Request, res: Response) => {
   try {
-    // Build filters
     const where: any = {};
 
     // Filter by userId if authenticated
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     if (req.query.from) {
@@ -413,10 +480,7 @@ app.get('/api/summary', optionalAuth, async (req: Request, res: Response) => {
 
     const expenses = await prisma.expense.findMany({
       where,
-      select: {
-        amountCents: true,
-        category: true
-      }
+      select: { amountCents: true, category: true }
     });
 
     const totalCents = expenses.reduce((sum, e) => sum + e.amountCents, 0);
@@ -428,18 +492,14 @@ app.get('/api/summary', optionalAuth, async (req: Request, res: Response) => {
     });
 
     const byCategory = Array.from(categoryMap.entries())
-      .map(([category, totalCents]) => ({
+      .map(([category, cents]) => ({
         category,
-        totalCents,
-        total: centsToDollars(totalCents)
+        totalCents: cents,
+        total: centsToDollars(cents)
       }))
       .sort((a, b) => b.totalCents - a.totalCents);
 
-    res.json({
-      totalCents,
-      total: centsToDollars(totalCents),
-      byCategory
-    });
+    res.json({ totalCents, total: centsToDollars(totalCents), byCategory });
   } catch (error) {
     console.error('Error fetching summary:', error);
     res.status(500).json({ error: 'Failed to load summary.' });
@@ -457,7 +517,10 @@ app.get('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) =>
 
     // Filter by userId if authenticated
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     const fixedCosts = await prisma.fixedCost.findMany({
@@ -484,6 +547,11 @@ app.get('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) =>
 // Create fixed cost
 app.post('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) => {
   try {
+    // Require authentication
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
     const amountCents = parseAmountToCents(req.body.amount);
     if (amountCents === null) {
       return res.status(400).json({ error: 'Amount must be a positive number.' });
@@ -494,12 +562,28 @@ app.post('/api/fixed-costs', optionalAuth, async (req: Request, res: Response) =
       return res.status(400).json({ error: 'Name is required.' });
     }
 
-    // Use authenticated userId or fallback to temp (for development)
-    const userId = req.userId || req.body.userId || 'temp-user-id';
+    // Look up user by ID or GitHub ID
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    // If not found by ID, try to find by GitHub ID
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      console.log('[POST /api/fixed-costs] User not found:', req.userId);
+      return res.status(401).json({ error: 'User not found. Please sign in again.' });
+    }
+    
+    console.log('[POST /api/fixed-costs] Found user:', user.id, user.email);
 
     const fixedCost = await prisma.fixedCost.create({
       data: {
-        userId,
+        userId: user.id,
         name,
         amountCents
       }
@@ -532,7 +616,10 @@ app.delete('/api/fixed-costs/:id', optionalAuth, async (req: Request, res: Respo
     // Build where clause with userId filter if authenticated
     const where: any = { id };
     if (req.userId) {
-      where.userId = req.userId;
+      const resolvedUserId = await resolveUserId(req.userId);
+      if (resolvedUserId) {
+        where.userId = resolvedUserId;
+      }
     }
 
     const result = await prisma.fixedCost.deleteMany({
@@ -550,11 +637,189 @@ app.delete('/api/fixed-costs/:id', optionalAuth, async (req: Request, res: Respo
   }
 });
 
+// ============================================
+// Allowance Endpoints
+// ============================================
+
+const VALID_CADENCES = ['day', 'week', 'month'];
+
+// Get allowance settings for authenticated user
+app.get('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.json({ amount: 0, cadence: 'month' });
+    }
+
+    const resolvedUserId = await resolveUserId(req.userId);
+    if (!resolvedUserId) {
+      return res.json({ amount: 0, cadence: 'month' });
+    }
+
+    const allowance = await prisma.allowance.findUnique({
+      where: { userId: resolvedUserId }
+    });
+
+    if (!allowance) {
+      return res.json({ amount: 0, cadence: 'month' });
+    }
+
+    res.json({
+      amount: centsToDollars(allowance.amountCents),
+      cadence: allowance.cadence
+    });
+  } catch (error) {
+    console.error('Error fetching allowance:', error);
+    res.status(500).json({ error: 'Failed to load allowance.' });
+  }
+});
+
+// Set allowance settings
+app.put('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const amountCents = parseAmountToCents(req.body.amount);
+    if (amountCents === null) {
+      return res.status(400).json({ error: 'Amount must be a positive number.' });
+    }
+
+    const cadence = String(req.body.cadence || '').trim();
+    if (!VALID_CADENCES.includes(cadence)) {
+      return res.status(400).json({ error: 'Cadence must be day, week, or month.' });
+    }
+
+    const resolvedUserId = await resolveUserId(req.userId);
+    if (!resolvedUserId) {
+      return res.status(401).json({ error: 'User not found. Please sign in again.' });
+    }
+
+    const allowance = await prisma.allowance.upsert({
+      where: { userId: resolvedUserId },
+      update: { amountCents, cadence },
+      create: { userId: resolvedUserId, amountCents, cadence }
+    });
+
+    res.json({
+      amount: centsToDollars(allowance.amountCents),
+      cadence: allowance.cadence
+    });
+  } catch (error) {
+    console.error('Error saving allowance:', error);
+    res.status(500).json({ error: 'Failed to save allowance.' });
+  }
+});
+
+// Get allowance status (settings + spending for current period)
+app.get('/api/allowance/status', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const defaultStatus = {
+      settings: { amount: 0, cadence: 'month' },
+      label: 'This month',
+      startDate: '',
+      endDate: '',
+      nextTopUp: '',
+      totalSpent: 0,
+      remaining: 0
+    };
+
+    if (!req.userId) {
+      return res.json(defaultStatus);
+    }
+
+    const resolvedUserId = await resolveUserId(req.userId);
+    if (!resolvedUserId) {
+      return res.json(defaultStatus);
+    }
+
+    const allowance = await prisma.allowance.findUnique({
+      where: { userId: resolvedUserId }
+    });
+
+    const settings = allowance
+      ? { amount: centsToDollars(allowance.amountCents), cadence: allowance.cadence }
+      : { amount: 0, cadence: 'month' };
+
+    // Calculate period window
+    const now = new Date();
+    let label: string;
+    let startDate: string;
+    let endDate: string;
+    let nextTopUp: string;
+
+    if (settings.cadence === 'day') {
+      label = 'Today';
+      startDate = formatDate(now);
+      endDate = formatDate(now);
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      nextTopUp = formatDate(tomorrow);
+    } else if (settings.cadence === 'week') {
+      label = 'This week';
+      const dayOfWeek = now.getDay();
+      const diff = (dayOfWeek + 6) % 7;
+      const start = new Date(now);
+      start.setDate(start.getDate() - diff);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      startDate = formatDate(start);
+      endDate = formatDate(end);
+      const next = new Date(end);
+      next.setDate(next.getDate() + 1);
+      nextTopUp = formatDate(next);
+    } else {
+      label = 'This month';
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      startDate = formatDate(start);
+      endDate = formatDate(end);
+      const next = new Date(end);
+      next.setDate(next.getDate() + 1);
+      nextTopUp = formatDate(next);
+    }
+
+    // Get expenses in period
+    const expenses = await prisma.expense.findMany({
+      where: {
+        userId: resolvedUserId,
+        date: { gte: startDate, lte: endDate }
+      },
+      select: { amountCents: true }
+    });
+
+    const totalSpentCents = expenses.reduce((sum, e) => sum + e.amountCents, 0);
+    const totalSpent = centsToDollars(totalSpentCents);
+    const remaining = Number((settings.amount - totalSpent).toFixed(2));
+
+    res.json({
+      settings,
+      label,
+      startDate,
+      endDate,
+      nextTopUp,
+      totalSpent,
+      remaining
+    });
+  } catch (error) {
+    console.error('Error fetching allowance status:', error);
+    res.status(500).json({ error: 'Failed to load allowance status.' });
+  }
+});
+
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // Sync user (called by NextAuth on sign-in)
 app.post('/api/users/sync', async (req: Request, res: Response) => {
   try {
     const { email, githubId, name } = req.body;
 
+    // Validation
     if (!email) {
       return res.status(400).json({ error: 'Email is required' });
     }
@@ -565,7 +830,7 @@ app.post('/api/users/sync', async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      // Create new user with cuid
+      // Create new user
       const { createId } = await import('@paralleldrive/cuid2');
       user = await prisma.user.create({
         data: {

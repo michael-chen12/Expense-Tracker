@@ -2,6 +2,20 @@ import NextAuth, { Account, Profile, Session, User } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import jwt from 'jsonwebtoken';
+
+// Helper to generate JWT for credentials login
+function generateAccessToken(userId: string, email: string): string {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    throw new Error('NEXTAUTH_SECRET is not configured');
+  }
+  return jwt.sign(
+    { sub: userId, userId, email },
+    secret,
+    { expiresIn: '7d' }
+  );
+}
 
 const handler = NextAuth({
   providers: [
@@ -97,15 +111,31 @@ const handler = NextAuth({
     }) {
       // Add userId and accessToken to the JWT
       if (user) {
+        console.log('[JWT] Adding user info:', { userId: user.id, email: user.email });
         token.userId = user.id;
         token.email = user.email;
         token.name = user.name;
+        
+        // Generate access token for credentials provider (account will be null)
+        if (!account) {
+          console.log('[JWT] Generating access token for credentials user (no account)');
+          token.accessToken = generateAccessToken(user.id!, user.email!);
+        }
       }
 
-      if (account) {
+      // For OAuth providers, use the provider's access_token
+      if (account?.access_token) {
+        console.log('[JWT] Using OAuth access token');
         token.accessToken = account.access_token;
       }
 
+      // Ensure users always have an access token on subsequent requests
+      if (!token.accessToken && token.userId && token.email) {
+        console.log('[JWT] Generating access token on refresh');
+        token.accessToken = generateAccessToken(token.userId as string, token.email as string);
+      }
+
+      console.log('[JWT] Final token:', { userId: token.userId, hasAccessToken: !!token.accessToken });
       return token;
     },
 
@@ -118,6 +148,10 @@ const handler = NextAuth({
         (session.user as any).id = token.userId || token.sub;
         (session as any).accessToken = token.accessToken;
         (session as any).userId = token.userId || token.sub;
+        console.log('[SESSION] Session updated:', { 
+          userId: (session as any).userId, 
+          hasAccessToken: !!token.accessToken 
+        });
       }
 
       return session;

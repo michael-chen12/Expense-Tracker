@@ -7,15 +7,15 @@ import AuthGate from '@/components/AuthGate';
 import LandingPage from '@/components/LandingPage';
 import LoadingScreen from '@/components/LoadingScreen';
 import Spinner from '@/components/Spinner';
-import { getExpenses } from '@/lib/api-backend';
 import {
+  getExpenses,
   createFixedCost,
   deleteFixedCost,
   getAllowanceSettings,
   getAllowanceStatus,
   getFixedCosts,
   setAllowanceSettings
-} from '@/lib/api';
+} from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 
 function getMonthRange() {
@@ -31,6 +31,8 @@ function getMonthRange() {
 }
 
 function Dashboard() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id || session?.userId;
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,11 +60,19 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const settings = getAllowanceSettings();
-    setAllowance({
-      amount: String(settings.amount),
-      cadence: settings.cadence
-    });
+    if (!userId) return;
+
+    // Load allowance settings from backend
+    getAllowanceSettings()
+      .then((settings) => {
+        setAllowance({
+          amount: String(settings.amount),
+          cadence: settings.cadence
+        });
+      })
+      .catch((fetchError) => {
+        setAllowanceError(fetchError.message || 'Unable to load allowance settings.');
+      });
 
     getAllowanceStatus()
       .then((status) => {
@@ -71,9 +81,11 @@ function Dashboard() {
       .catch((fetchError) => {
         setAllowanceError(fetchError.message || 'Unable to load allowance.');
       });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
+    if (!userId) return;
+
     getFixedCosts()
       .then((items) => {
         setFixedCosts(items);
@@ -82,7 +94,7 @@ function Dashboard() {
       .catch((fetchError) => {
         setFixedCostError(fetchError.message || 'Unable to load fixed costs.');
       });
-  }, []);
+  }, [userId]);
 
   const handleAllowanceChange = (event) => {
     const { name, value } = event.target;
@@ -98,7 +110,7 @@ function Dashboard() {
     setSavingAllowance(true);
 
     try {
-      const saved = setAllowanceSettings({
+      const saved = await setAllowanceSettings({
         amount: allowance.amount,
         cadence: allowance.cadence
       });
@@ -131,7 +143,7 @@ function Dashboard() {
     try {
       await createFixedCost({
         name: fixedCostForm.name,
-        amount: fixedCostForm.amount
+        amount: Number(fixedCostForm.amount)
       });
       const items = await getFixedCosts();
       setFixedCosts(items);
