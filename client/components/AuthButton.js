@@ -1,13 +1,15 @@
 'use client';
 
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function AuthButton() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   if (status === 'loading') {
     return (
-      <button className="button ghost" type="button" disabled>
+      <button className="button ghost" type="button" disabled style={{ color: 'white' }}>
         Loading...
       </button>
     );
@@ -18,7 +20,8 @@ export default function AuthButton() {
       <button
         className="button ghost"
         type="button"
-        onClick={() => signIn('github')}
+        onClick={() => router.push('/login')}
+        style={{ color: 'white' }}
       >
         Sign in
       </button>
@@ -30,6 +33,7 @@ export default function AuthButton() {
       className="button ghost auth-button auth-button--signout"
       type="button"
       onClick={() => signOut({ callbackUrl: '/' })}
+      style={{ color: 'white' }}
     >
       Sign out
     </button>

@@ -8,6 +8,7 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
 import { prisma } from './lib/prisma';
 import { authenticateToken, optionalAuth } from './middleware/auth';
 
@@ -34,6 +35,106 @@ function centsToDollars(cents: number): number {
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
+
+// ============================================
+// Authentication Endpoints
+// ============================================
+
+// Register new user with email/password
+app.post('/api/auth/register', async (req: Request, res: Response) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const { createId } = await import('@paralleldrive/cuid2');
+    const user = await prisma.user.create({
+      data: {
+        id: createId(),
+        email,
+        password: hashedPassword,
+        name: name || null
+      }
+    });
+
+    console.log('Created new user via registration:', user.email);
+
+    res.status(201).json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Failed to register user' });
+  }
+});
+
+// Login with email/password (for validation)
+app.post('/api/auth/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user || !user.password) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Validate password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Error logging in user:', error);
+    res.status(500).json({ error: 'Failed to login' });
+  }
+});
+
+// ============================================
+// Expense Endpoints
+// ============================================
 
 // Get expenses with pagination and filtering
 app.get('/api/expenses', optionalAuth, async (req: Request, res: Response) => {
