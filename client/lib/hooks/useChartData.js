@@ -71,8 +71,11 @@ export function useChartData(expenses, allowanceData, fixedCosts, isLoadingExpen
     );
 
     // Calculate allowance remaining
-    const allowanceCents = allowanceData.amountCents || (allowanceData.amount * 100) || 0;
-    const remainingCents = Math.max(allowanceCents - totalSpentCents, 0);
+    // allowanceData contains: settings { amount, cadence }, remaining, totalSpent, etc.
+    // We need to use the settings.amount (in dollars) to calculate remaining
+    const allowanceAmount = allowanceData?.settings?.amount || 0;
+    const allowanceAmountCents = Math.round(allowanceAmount * 100);
+    const remainingCents = Math.max(allowanceAmountCents - totalSpentCents, 0);
 
     // Calculate total fixed costs
     const totalFixedCostsCents = fixedCosts
@@ -84,7 +87,7 @@ export function useChartData(expenses, allowanceData, fixedCosts, isLoadingExpen
       allowanceRemaining: formatCurrency(remainingCents),
       monthlyFixedCosts: formatCurrency(totalFixedCostsCents),
       totalSpentCents,
-      allowanceCents,
+      allowanceCents: allowanceAmountCents,
     };
   }, [expenses, allowanceData, fixedCosts]);
 

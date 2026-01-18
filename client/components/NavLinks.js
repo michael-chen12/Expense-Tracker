@@ -10,11 +10,13 @@ export default function NavLinks() {
   const dashboardHref = signedIn ? '/' : '/login';
   const expensesHref = signedIn ? '/expenses' : '/login';
   const summaryHref = signedIn ? '/summary' : '/login';
+  const recurringHref = signedIn ? '/recurring' : '/login';
 
   return (
     <>
       <Link className="nav-link" href={dashboardHref}>Dashboard</Link>
       <Link className="nav-link" href={expensesHref}>Expenses</Link>
+      <Link className="nav-link" href={recurringHref}>Recurring</Link>
       <Link className="nav-link" href={summaryHref}>Summary</Link>
     </>
   );

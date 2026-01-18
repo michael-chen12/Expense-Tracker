@@ -11,6 +11,9 @@ export default function AllowanceSection({
   onChange,
   onSubmit
 }) {
+  console.log('[AllowanceSection] allowanceStatus:', allowanceStatus);
+  console.log('[AllowanceSection] allowance:', allowance);
+  
   return (
     <section className="card" style={{ marginTop: '24px' }}>
       <div className="card-header">
@@ -20,9 +23,9 @@ export default function AllowanceSection({
 
       <div className="grid two fixed-costs-grid">
         <div>
-          <h3>{formatCurrency(allowanceStatus?.remaining || 0)}</h3>
+          <h3>{formatCurrency(allowanceStatus?.remaining ?? 0)}</h3>
           <p className="subtle">Remaining for the current period.</p>
-          <p className="subtle">Spent: {formatCurrency(allowanceStatus?.totalSpent || 0)}</p>
+          <p className="subtle">Spent: {formatCurrency(allowanceStatus?.totalSpent ?? 0)}</p>
           <p className="subtle">Next top-up: {allowanceStatus?.nextTopUp || '—'}</p>
         </div>
 

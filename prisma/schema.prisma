@@ -21,6 +21,7 @@ model User {
   expenses   Expense[]
   fixedCosts FixedCost[]
   allowance  Allowance?
+  recurringExpenses RecurringExpense[]
 }
 
 model Expense {
@@ -61,4 +62,26 @@ model Allowance {
   cadence   String   // 'day', 'week', 'month'
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model RecurringExpense {
+  id              Int      @id @default(autoincrement())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amountCents     Int
+  category        String
+  note            String?
+  frequency       String   // 'daily', 'weekly', 'monthly', 'yearly'
+  dayOfWeek       Int?     // For weekly (0-6, where 0 is Sunday)
+  dayOfMonth      Int?     // For monthly (1-31)
+  monthOfYear     Int?     // For yearly (1-12)
+  nextDate        String   // ISO date string (YYYY-MM-DD)
+  endDate         String?  // Optional end date (YYYY-MM-DD)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, nextDate])
 }

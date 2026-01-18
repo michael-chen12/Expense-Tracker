@@ -20,7 +20,6 @@ export default function DashboardCharts({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: '16px' }}>
         <Spinner size="large" color="primary" />
-        <p className="subtle">Loading dashboard data...</p>
       </div>
     );
   }

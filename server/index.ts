@@ -646,12 +646,18 @@ const VALID_CADENCES = ['day', 'week', 'month'];
 // Get allowance settings for authenticated user
 app.get('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
   try {
+    console.log('[GET /api/allowance] User ID from auth:', req.userId);
+    
     if (!req.userId) {
+      console.log('[GET /api/allowance] No user ID');
       return res.json({ amount: 0, cadence: 'month' });
     }
 
     const resolvedUserId = await resolveUserId(req.userId);
+    console.log('[GET /api/allowance] Resolved user ID:', resolvedUserId);
+    
     if (!resolvedUserId) {
+      console.log('[GET /api/allowance] Could not resolve user ID');
       return res.json({ amount: 0, cadence: 'month' });
     }
 
@@ -659,7 +665,10 @@ app.get('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
       where: { userId: resolvedUserId }
     });
 
+    console.log('[GET /api/allowance] Found allowance:', allowance);
+
     if (!allowance) {
+      console.log('[GET /api/allowance] No allowance record found for user');
       return res.json({ amount: 0, cadence: 'month' });
     }
 
@@ -676,11 +685,16 @@ app.get('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
 // Set allowance settings
 app.put('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
   try {
+    console.log('[PUT /api/allowance] User ID:', req.userId);
+    console.log('[PUT /api/allowance] Request body:', req.body);
+    
     if (!req.userId) {
       return res.status(401).json({ error: 'Authentication required.' });
     }
 
     const amountCents = parseAmountToCents(req.body.amount);
+    console.log('[PUT /api/allowance] Parsed amount:', amountCents);
+    
     if (amountCents === null) {
       return res.status(400).json({ error: 'Amount must be a positive number.' });
     }
@@ -691,6 +705,8 @@ app.put('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
     }
 
     const resolvedUserId = await resolveUserId(req.userId);
+    console.log('[PUT /api/allowance] Resolved user ID:', resolvedUserId);
+    
     if (!resolvedUserId) {
       return res.status(401).json({ error: 'User not found. Please sign in again.' });
     }
@@ -700,6 +716,8 @@ app.put('/api/allowance', optionalAuth, async (req: Request, res: Response) => {
       update: { amountCents, cadence },
       create: { userId: resolvedUserId, amountCents, cadence }
     });
+
+    console.log('[PUT /api/allowance] Saved allowance:', allowance);
 
     res.json({
       amount: centsToDollars(allowance.amountCents),
@@ -792,6 +810,20 @@ app.get('/api/allowance/status', optionalAuth, async (req: Request, res: Respons
     const totalSpent = centsToDollars(totalSpentCents);
     const remaining = Number((settings.amount - totalSpent).toFixed(2));
 
+    console.log('[GET /api/allowance/status] Debug info:', {
+      now: formatDate(now),
+      cadence: settings.cadence,
+      startDate,
+      endDate,
+      settings: settings.amount,
+      expenseCount: expenses.length,
+      totalSpentCents,
+      totalSpent,
+      remaining,
+      allowanceAmountCents: allowance?.amountCents,
+      allowanceFound: !!allowance
+    });
+
     res.json({
       settings,
       label,
@@ -857,6 +889,450 @@ app.post('/api/users/sync', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error syncing user:', error);
     res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+
+// ============================================
+// Recurring Expenses Endpoints
+// ============================================
+
+// Helper function to calculate next date for recurring expense
+function calculateNextDate(frequency: string, nextDate: string, dayOfWeek?: number | null, dayOfMonth?: number | null, monthOfYear?: number | null): string {
+  const current = new Date(nextDate);
+  
+  switch (frequency) {
+    case 'daily':
+      current.setDate(current.getDate() + 1);
+      break;
+    case 'weekly':
+      current.setDate(current.getDate() + 7);
+      break;
+    case 'monthly':
+      if (dayOfMonth) {
+        current.setMonth(current.getMonth() + 1);
+        current.setDate(dayOfMonth);
+      } else {
+        current.setMonth(current.getMonth() + 1);
+      }
+      break;
+    case 'yearly':
+      if (monthOfYear) {
+        current.setFullYear(current.getFullYear() + 1);
+        current.setMonth(monthOfYear - 1);
+      } else {
+        current.setFullYear(current.getFullYear() + 1);
+      }
+      break;
+  }
+  
+  return current.toISOString().split('T')[0];
+}
+
+// Create recurring expense
+app.post('/api/recurring-expenses', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const { amount, category, note, frequency, dayOfWeek, dayOfMonth, monthOfYear, nextDate, endDate } = req.body;
+
+    // Validate inputs
+    const amountCents = parseAmountToCents(amount);
+    if (amountCents === null) {
+      return res.status(400).json({ error: 'Amount must be a positive number.' });
+    }
+
+    if (!category || !String(category).trim()) {
+      return res.status(400).json({ error: 'Category is required.' });
+    }
+
+    if (!frequency || !['daily', 'weekly', 'monthly', 'yearly'].includes(frequency)) {
+      return res.status(400).json({ error: 'Invalid frequency.' });
+    }
+
+    // Resolve user
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
+
+    const recurringExpense = await prisma.recurringExpense.create({
+      data: {
+        userId: user.id,
+        amountCents,
+        category: String(category).trim(),
+        note: note ? String(note).trim() : null,
+        frequency,
+        dayOfWeek: dayOfWeek || null,
+        dayOfMonth: dayOfMonth || null,
+        monthOfYear: monthOfYear || null,
+        nextDate: nextDate || new Date().toISOString().split('T')[0],
+        endDate: endDate || null
+      }
+    });
+
+    res.status(201).json({
+      item: {
+        id: recurringExpense.id,
+        amount: centsToDollars(recurringExpense.amountCents),
+        category: recurringExpense.category,
+        note: recurringExpense.note || '',
+        frequency: recurringExpense.frequency,
+        dayOfWeek: recurringExpense.dayOfWeek,
+        dayOfMonth: recurringExpense.dayOfMonth,
+        monthOfYear: recurringExpense.monthOfYear,
+        nextDate: recurringExpense.nextDate,
+        endDate: recurringExpense.endDate,
+        isActive: recurringExpense.isActive,
+        createdAt: recurringExpense.createdAt.toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('[POST /api/recurring-expenses] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to create recurring expense.' });
+  }
+});
+
+// Get all recurring expenses for user
+app.get('/api/recurring-expenses', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    // Resolve user
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
+
+    const recurring = await prisma.recurringExpense.findMany({
+      where: {
+        userId: user.id,
+        isActive: true
+      },
+      orderBy: {
+        nextDate: 'asc'
+      }
+    });
+
+    res.json({
+      items: recurring.map(r => ({
+        id: r.id,
+        amount: centsToDollars(r.amountCents),
+        category: r.category,
+        note: r.note || '',
+        frequency: r.frequency,
+        dayOfWeek: r.dayOfWeek,
+        dayOfMonth: r.dayOfMonth,
+        monthOfYear: r.monthOfYear,
+        nextDate: r.nextDate,
+        endDate: r.endDate,
+        isActive: r.isActive,
+        createdAt: r.createdAt.toISOString()
+      }))
+    });
+  } catch (error) {
+    console.error('[GET /api/recurring-expenses] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to fetch recurring expenses.' });
+  }
+});
+
+// Get single recurring expense
+app.get('/api/recurring-expenses/:id', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: 'Invalid ID.' });
+    }
+
+    // Resolve user
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
+
+    const recurring = await prisma.recurringExpense.findFirst({
+      where: {
+        id,
+        userId: user.id
+      }
+    });
+
+    if (!recurring) {
+      return res.status(404).json({ error: 'Recurring expense not found.' });
+    }
+
+    res.json({
+      item: {
+        id: recurring.id,
+        amount: centsToDollars(recurring.amountCents),
+        category: recurring.category,
+        note: recurring.note || '',
+        frequency: recurring.frequency,
+        dayOfWeek: recurring.dayOfWeek,
+        dayOfMonth: recurring.dayOfMonth,
+        monthOfYear: recurring.monthOfYear,
+        nextDate: recurring.nextDate,
+        endDate: recurring.endDate,
+        isActive: recurring.isActive,
+        createdAt: recurring.createdAt.toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('[GET /api/recurring-expenses/:id] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to fetch recurring expense.' });
+  }
+});
+
+// Update recurring expense
+app.put('/api/recurring-expenses/:id', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: 'Invalid ID.' });
+    }
+
+    // Resolve user
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
+
+    // Check ownership
+    const existing = await prisma.recurringExpense.findFirst({
+      where: { id, userId: user.id }
+    });
+
+    if (!existing) {
+      return res.status(404).json({ error: 'Recurring expense not found.' });
+    }
+
+    const { amount, category, note, frequency, dayOfWeek, dayOfMonth, monthOfYear, nextDate, endDate, isActive } = req.body;
+
+    const updateData: any = {};
+    if (amount !== undefined) {
+      const amountCents = parseAmountToCents(amount);
+      if (amountCents === null) {
+        return res.status(400).json({ error: 'Amount must be a positive number.' });
+      }
+      updateData.amountCents = amountCents;
+    }
+    if (category !== undefined) {
+      updateData.category = String(category).trim();
+    }
+    if (note !== undefined) {
+      updateData.note = note ? String(note).trim() : null;
+    }
+    if (frequency !== undefined) {
+      updateData.frequency = frequency;
+    }
+    if (dayOfWeek !== undefined) {
+      updateData.dayOfWeek = dayOfWeek;
+    }
+    if (dayOfMonth !== undefined) {
+      updateData.dayOfMonth = dayOfMonth;
+    }
+    if (monthOfYear !== undefined) {
+      updateData.monthOfYear = monthOfYear;
+    }
+    if (nextDate !== undefined) {
+      updateData.nextDate = nextDate;
+    }
+    if (endDate !== undefined) {
+      updateData.endDate = endDate;
+    }
+    if (isActive !== undefined) {
+      updateData.isActive = isActive;
+    }
+
+    const updated = await prisma.recurringExpense.update({
+      where: { id },
+      data: updateData
+    });
+
+    res.json({
+      item: {
+        id: updated.id,
+        amount: centsToDollars(updated.amountCents),
+        category: updated.category,
+        note: updated.note || '',
+        frequency: updated.frequency,
+        dayOfWeek: updated.dayOfWeek,
+        dayOfMonth: updated.dayOfMonth,
+        monthOfYear: updated.monthOfYear,
+        nextDate: updated.nextDate,
+        endDate: updated.endDate,
+        isActive: updated.isActive,
+        createdAt: updated.createdAt.toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('[PUT /api/recurring-expenses/:id] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to update recurring expense.' });
+  }
+});
+
+// Delete recurring expense
+app.delete('/api/recurring-expenses/:id', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: 'Invalid ID.' });
+    }
+
+    // Resolve user
+    let user = await prisma.user.findUnique({
+      where: { id: req.userId }
+    });
+    
+    if (!user) {
+      user = await prisma.user.findUnique({
+        where: { githubId: req.userId }
+      });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not found.' });
+    }
+
+    // Check ownership
+    const existing = await prisma.recurringExpense.findFirst({
+      where: { id, userId: user.id }
+    });
+
+    if (!existing) {
+      return res.status(404).json({ error: 'Recurring expense not found.' });
+    }
+
+    // Soft delete by marking as inactive
+    await prisma.recurringExpense.update({
+      where: { id },
+      data: { isActive: false }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[DELETE /api/recurring-expenses/:id] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to delete recurring expense.' });
+  }
+});
+
+// Process recurring expenses (generate new expenses from templates)
+app.post('/api/recurring-expenses/process', optionalAuth, async (req: Request, res: Response) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Find all active recurring expenses where nextDate <= today
+    const duRecurring = await prisma.recurringExpense.findMany({
+      where: {
+        isActive: true,
+        nextDate: {
+          lte: today
+        }
+      },
+      include: {
+        user: true
+      }
+    });
+
+    const processedCount = { created: 0, updated: 0 };
+
+    for (const recurring of duRecurring) {
+      // Check if we should still process (endDate not passed)
+      if (recurring.endDate && recurring.endDate < today) {
+        // Deactivate if end date has passed
+        await prisma.recurringExpense.update({
+          where: { id: recurring.id },
+          data: { isActive: false }
+        });
+        continue;
+      }
+
+      // Create expense from template
+      await prisma.expense.create({
+        data: {
+          userId: recurring.userId,
+          amountCents: recurring.amountCents,
+          category: recurring.category,
+          date: recurring.nextDate,
+          note: recurring.note || undefined
+        }
+      });
+      
+      processedCount.created++;
+
+      // Calculate and update nextDate
+      const newNextDate = calculateNextDate(
+        recurring.frequency,
+        recurring.nextDate,
+        recurring.dayOfWeek,
+        recurring.dayOfMonth,
+        recurring.monthOfYear
+      );
+
+      await prisma.recurringExpense.update({
+        where: { id: recurring.id },
+        data: { nextDate: newNextDate }
+      });
+      
+      processedCount.updated++;
+    }
+
+    console.log(`[Process Recurring] Created ${processedCount.created} expenses, updated ${processedCount.updated} templates`);
+    res.json({ processed: processedCount });
+  } catch (error) {
+    console.error('[POST /api/recurring-expenses/process] Error:', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'Failed to process recurring expenses.' });
   }
 });
 

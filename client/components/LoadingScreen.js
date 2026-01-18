@@ -1,6 +1,6 @@
 import Spinner from './Spinner';
 
-export default function LoadingScreen({ message = 'Loading...' }) {
+export default function LoadingScreen({ message = '' }) {
   return (
     <div className="loading-screen">
       <div className="loading-content">

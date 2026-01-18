@@ -252,3 +252,91 @@ export async function setAllowanceSettings(settings: { amount: number | string; 
 export async function getAllowanceStatus(): Promise<AllowanceStatus> {
   return fetchAPI<AllowanceStatus>('/api/allowance/status');
 }
+// ============================================
+// Recurring Expenses
+// ============================================
+
+export interface RecurringExpense {
+  id: number;
+  amount: number;
+  category: string;
+  note: string;
+  frequency: string;
+  dayOfWeek?: number | null;
+  dayOfMonth?: number | null;
+  monthOfYear?: number | null;
+  nextDate: string;
+  endDate?: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface RecurringExpenseListResponse {
+  items: RecurringExpense[];
+}
+
+interface RecurringExpenseResponse {
+  item: RecurringExpense;
+}
+
+export async function getRecurringExpenses(): Promise<RecurringExpense[]> {
+  const response = await fetchAPI<RecurringExpenseListResponse>('/api/recurring-expenses');
+  return response.items;
+}
+
+export async function getRecurringExpense(id: number): Promise<RecurringExpense> {
+  const response = await fetchAPI<RecurringExpenseResponse>(`/api/recurring-expenses/${id}`);
+  return response.item;
+}
+
+export async function createRecurringExpense(payload: {
+  amount: number;
+  category: string;
+  note?: string;
+  frequency: string;
+  dayOfWeek?: number | null;
+  dayOfMonth?: number | null;
+  monthOfYear?: number | null;
+  nextDate?: string;
+  endDate?: string | null;
+}): Promise<RecurringExpense> {
+  const response = await fetchAPI<RecurringExpenseResponse>('/api/recurring-expenses', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return response.item;
+}
+
+export async function updateRecurringExpense(
+  id: number,
+  payload: Partial<{
+    amount: number;
+    category: string;
+    note?: string;
+    frequency: string;
+    dayOfWeek?: number | null;
+    dayOfMonth?: number | null;
+    monthOfYear?: number | null;
+    nextDate?: string;
+    endDate?: string | null;
+    isActive: boolean;
+  }>
+): Promise<RecurringExpense> {
+  const response = await fetchAPI<RecurringExpenseResponse>(`/api/recurring-expenses/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+  return response.item;
+}
+
+export async function deleteRecurringExpense(id: number): Promise<{ success: boolean }> {
+  return fetchAPI<{ success: boolean }>(`/api/recurring-expenses/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function processRecurringExpenses(): Promise<{ processed: { created: number; updated: number } }> {
+  return fetchAPI<{ processed: { created: number; updated: number } }>('/api/recurring-expenses/process', {
+    method: 'POST',
+  });
+}

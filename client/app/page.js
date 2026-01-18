@@ -21,6 +21,7 @@ import DashboardCharts from '@/components/DashboardCharts';
 import RecentExpenses from '@/components/RecentExpenses';
 import AllowanceSection from '@/components/AllowanceSection';
 import FixedCostsSection from '@/components/FixedCostsSection';
+import UpcomingRecurringExpenses from '@/components/UpcomingRecurringExpenses';
 
 function getMonthRange() {
   const today = new Date();
@@ -101,6 +102,8 @@ function Dashboard() {
       getAllowanceStatus()
     ])
       .then(([settings, status]) => {
+        console.log('[Dashboard] Loaded settings:', settings);
+        console.log('[Dashboard] Loaded allowanceStatus:', status);
         setAllowance({
           amount: String(settings.amount),
           cadence: settings.cadence
@@ -109,6 +112,7 @@ function Dashboard() {
         setAllowanceError('');
       })
       .catch((fetchError) => {
+        console.error('[Dashboard] Error loading allowance:', fetchError);
         setAllowanceError(fetchError.message || 'Unable to load allowance settings.');
       })
       .finally(() => {
@@ -265,6 +269,8 @@ function Dashboard() {
             error={error}
           />
 
+          <UpcomingRecurringExpenses />
+
           <AllowanceSection
             allowance={allowance}
             allowanceStatus={allowanceStatus}
@@ -294,7 +300,7 @@ export default function Home() {
 
   // Show loading state
   if (status === 'loading') {
-    return <LoadingScreen message="Loading your dashboard..." />;
+    return <LoadingScreen message="" />;
   }
 
   // Show landing page if not authenticated
