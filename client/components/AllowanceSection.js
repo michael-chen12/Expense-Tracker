@@ -17,7 +17,7 @@ export default function AllowanceSection({
   console.log('[AllowanceSection] allowance:', allowance);
   
   return (
-    <section className="card section-card">
+    <section className="card section-card allowance-section">
       <div className="card-header">
         <h2>Allowance top-up</h2>
         <span className="badge">{allowanceStatus?.label || 'Period'}</span>
@@ -33,7 +33,7 @@ export default function AllowanceSection({
 
         <Form onSubmit={onSubmit}>
           <FormGroup>
-            <FormLabel htmlFor="allowanceAmount">Allowance amount</FormLabel>
+            <FormLabel htmlFor="allowanceAmount" className="allowance-label">Allowance amount</FormLabel>
             <FormInput
               id="allowanceAmount"
               name="amount"
@@ -44,16 +44,18 @@ export default function AllowanceSection({
               onChange={onChange}
               placeholder="0.00"
               required
+              className="allowance-field"
             />
           </FormGroup>
           
           <FormGroup>
-            <FormLabel htmlFor="allowanceCadence">Top-up cadence</FormLabel>
+            <FormLabel htmlFor="allowanceCadence" className="allowance-label">Top-up cadence</FormLabel>
             <FormSelect
               id="allowanceCadence"
               name="cadence"
               value={allowance.cadence}
               onChange={onChange}
+              className="allowance-field"
             >
               <option value="day">Daily</option>
               <option value="week">Weekly</option>
@@ -75,6 +77,33 @@ export default function AllowanceSection({
           </FormActions>
         </Form>
       </div>
+      <style jsx>{`
+        :global(.allowance-section label),
+        :global(.allowance-section .allowance-label) {
+          color: var(--ink) !important;
+        }
+
+        :global(.allowance-section .allowance-field),
+        :global(.allowance-section input),
+        :global(.allowance-section select) {
+          color: var(--ink) !important;
+          background: var(--input-dark-bg) !important;
+          border-color: var(--input-dark-border, var(--border)) !important;
+          caret-color: var(--ink);
+        }
+
+        :global(.allowance-section .allowance-field::placeholder),
+        :global(.allowance-section input::placeholder) {
+          color: var(--muted) !important;
+          opacity: 0.85;
+        }
+
+        :global(.allowance-section .allowance-field option),
+        :global(.allowance-section select option) {
+          color: var(--ink) !important;
+          background: var(--card) !important;
+        }
+      `}</style>
     </section>
   );
 }

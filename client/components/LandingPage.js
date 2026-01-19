@@ -136,6 +136,7 @@ export default function LandingPage() {
 
       {/* Right Side - Sign Up Form */}
       <div className="landing-right">
+        <div className="mobile-logo">LEDGERLINE</div>
         <div className="signup-card">
           <Text as="h2" variant="heading-2" color="dark">Create Your Account</Text>
           <Text as="p" variant="body" color="light-gray" className="signup-subtitle">Start managing your finances today</Text>

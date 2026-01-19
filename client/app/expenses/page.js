@@ -197,12 +197,14 @@ export default function ExpensesPage() {
             const dailyTotal = groupedExpenses[dateKey].reduce((sum, expense) => sum + expense.amount, 0);
             return (
               <section key={dateKey} className="card">
-                <div className="card-header">
+                <div className="expense-date-header">
                   <div>
                     <h2>{formatDate(dateKey)}</h2>
                     <p className="subtle no-margin">Total: {formatCurrency(dailyTotal)}</p>
                   </div>
-                  <span className="badge">{groupedExpenses[dateKey].length} entries</span>
+                  <span className="badge">
+                    {groupedExpenses[dateKey].length} {groupedExpenses[dateKey].length === 1 ? 'entry' : 'entries'}
+                  </span>
                 </div>
                 <div className="expense-list">
                   {groupedExpenses[dateKey].map((expense) => (

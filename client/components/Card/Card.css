@@ -1,54 +1,206 @@
-/* Card Component Styles */
+/* ====================================================================
+   CARD COMPONENT STYLES
+   Composable card with flexible layouts and multiple variants
+   ==================================================================== */
 
-/* Base card styles */
+/* ===== BASE CARD STYLES ===== */
 .card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: var(--shadow);
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--card-transition);
 }
 
+/* ===== VARIANT STYLES ===== */
+
+/* Default - Filled with shadow */
+.card--default {
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--card-shadow);
+}
+
+/* Outlined - Border only, no shadow */
+.card--outlined {
+  background: transparent;
+  border: 2px solid var(--color-border);
+  box-shadow: none;
+}
+
+/* Elevated - Strong shadow, subtle background */
+.card--elevated {
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border-lighter);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Ghost - Minimal styling */
+.card--ghost {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* ===== PADDING VARIANTS ===== */
+.card--padding-none {
+  padding: var(--space-0);
+}
+
+.card--padding-sm {
+  padding: var(--card-padding-sm);
+}
+
+.card--padding-md {
+  padding: var(--card-padding-md);
+}
+
+.card--padding-lg {
+  padding: var(--card-padding-lg);
+}
+
+/* ===== STATE VARIANTS ===== */
+
+/* Success state */
+.card--success {
+  background: var(--color-success-bg);
+  border-color: var(--color-success-border);
+}
+
+.card--success .card-title {
+  color: var(--color-success);
+}
+
+/* Error state */
+.card--error {
+  background: var(--color-error-bg);
+  border-color: var(--color-error-border);
+}
+
+.card--error .card-title {
+  color: var(--color-error);
+}
+
+/* Warning state */
+.card--warning {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+}
+
+.card--warning .card-title {
+  color: var(--color-warning);
+}
+
+/* Info state */
+.card--info {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+}
+
+.card--info .card-title {
+  color: var(--color-info);
+}
+
+/* ===== INTERACTIVE VARIANT ===== */
+.card--interactive {
+  cursor: pointer;
+  transition: var(--card-transition);
+}
+
+.card--interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.card--interactive:active {
+  transform: translateY(0);
+}
+
+/* ===== CARD HEADER ===== */
 .card-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-lighter);
+  padding-bottom: var(--space-3);
 }
 
+/* When header is first child, adjust margins */
+.card > .card-header:first-child {
+  margin-top: 0;
+}
+
+/* ===== CARD TITLE ===== */
 .card-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ink);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
 }
 
+/* ===== CARD SUBTITLE ===== */
 .card-subtitle {
   margin: 0;
-  font-size: 14px;
-  color: var(--muted);
-  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-normal);
+  line-height: var(--line-height-normal);
 }
 
-/* Padding variants */
+/* ===== CARD BODY ===== */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-gap);
+}
+
+/* ===== CARD FOOTER ===== */
+.card-footer {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.card-footer--start {
+  justify-content: flex-start;
+}
+
+.card-footer--center {
+  justify-content: center;
+}
+
+.card-footer--end {
+  justify-content: flex-end;
+}
+
+.card-footer--between {
+  justify-content: space-between;
+}
+
+/* ===== BACKWARDS COMPATIBILITY ===== */
+/* Support old padding names */
 .card--padding-default {
-  padding: 22px;
+  padding: var(--card-padding-md);
 }
 
 .card--padding-compact {
-  padding: 16px;
+  padding: var(--card-padding-sm);
 }
 
 .card--padding-minimal {
-  padding: 12px;
+  padding: var(--space-3);
 }
 
 .card--padding-large {
-  padding: 32px;
+  padding: var(--card-padding-lg);
 }
 
-/* Variant modifiers */
+/* Support old variants */
 .card--minimal {
   background: transparent;
   border: none;
@@ -57,129 +209,66 @@
 }
 
 .card--compact {
-  padding: 16px;
-}
-
-.card--interactive {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.card--interactive:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.2);
-  border-color: var(--accent);
-}
-
-.card--interactive:active {
-  transform: translateY(0);
+  padding: var(--card-padding-sm);
 }
 
 .card--empty {
   background: rgba(124, 58, 237, 0.05);
-  border: 2px dashed var(--border);
+  border: 2px dashed var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 200px;
   text-align: center;
-  color: var(--muted);
+  color: var(--color-text-secondary);
 }
 
-.card--error {
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+/* ===== LIGHT MODE OVERRIDES ===== */
+[data-theme="light"] .card-header {
+  border-bottom-color: #f0f0f0;
 }
 
-.card--error .card-title {
-  color: #fca5a5;
+[data-theme="light"] .card-footer {
+  border-top-color: #f0f0f0;
 }
 
-.card--success {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.card--success .card-title {
-  color: #86efac;
-}
-
-/* Chart card specific styling */
-.chart-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 24px;
-  box-shadow: var(--shadow);
-}
-
-.chart-card-header {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.chart-card-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-/* Overview card styling */
-.overview-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
-  text-align: center;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow);
-}
-
-.overview-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
-}
-
-.overview-card-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-}
-
-.overview-card-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.overview-card-value.accent {
-  background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Responsive adjustments */
-@media (max-width: 767px) {
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
   .card {
-    padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
+  }
+
+  .card--padding-md,
+  .card--padding-default {
+    padding: var(--card-padding-sm);
+  }
+
+  .card-header {
+    margin-bottom: var(--space-3);
   }
 
   .card-title {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
 
   .card-subtitle {
-    font-size: 13px;
+    font-size: var(--text-xs);
   }
 
-  .overview-card-value {
-    font-size: 24px;
+  .card-footer {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .card-footer--end,
+  .card-footer--start,
+  .card-footer--center {
+    justify-content: stretch;
+  }
+
+  .card-footer .btn,
+  .card-footer .button,
+  .card-footer .button-modern {
+    width: 100%;
   }
 }

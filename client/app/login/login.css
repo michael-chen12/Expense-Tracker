@@ -1,11 +1,24 @@
 /* Login Page Styles */
 
 .auth-container {
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 40px 20px;
+  background: var(--bg);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* Light mode - purple gradient background */
+[data-theme="light"] .auth-container {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
 }
 

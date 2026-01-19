@@ -104,7 +104,7 @@ function RecurringExpensesPage() {
         </div>
         <div className="inline-actions">
           <Button
-            className="button ghost button--icon"
+            className="button ghost"
             onClick={handleProcess}
             disabled={processing}
           >

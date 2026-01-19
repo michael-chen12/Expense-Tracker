@@ -43,6 +43,12 @@
   border-top-color: transparent;
 }
 
+/* Variant: Inherit (uses parent's text color) */
+.spinner-inherit {
+  border-color: currentColor;
+  border-top-color: transparent;
+}
+
 /* Variant: Orange (for primary actions) */
 .spinner-orange {
   border-color: var(--accent);

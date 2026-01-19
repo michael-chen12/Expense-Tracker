@@ -1,0 +1,115 @@
+/* ====================================================================
+   BADGE COMPONENT STYLES
+   Status indicators, counts, and labels
+   ==================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--badge-padding-x);
+  border-radius: var(--radius-md);
+  font-size: var(--badge-font-size);
+  font-weight: var(--badge-font-weight);
+  white-space: nowrap;
+}
+
+/* ===== SIZE VARIANTS ===== */
+.badge--sm {
+  height: 20px;
+  padding: var(--space-0) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.badge--md {
+  height: 24px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.badge--lg {
+  height: 28px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+/* ===== COLOR VARIANTS ===== */
+
+/* Default - Neutral gray */
+.badge--default {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+  border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+/* Primary - Purple */
+.badge--primary {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+/* Success - Green */
+.badge--success {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+/* Warning - Amber */
+.badge--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* Error - Red */
+.badge--error {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-border);
+}
+
+/* Info - Cyan */
+.badge--info {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+  border: 1px solid var(--color-info-border);
+}
+
+/* ===== ROUNDED VARIANT ===== */
+.badge--rounded {
+  border-radius: var(--radius-full);
+}
+
+/* ===== DOT VARIANT ===== */
+.badge--dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+}
+
+.badge--dot.badge--sm {
+  width: 6px;
+  height: 6px;
+}
+
+.badge--dot.badge--lg {
+  width: 10px;
+  height: 10px;
+}
+
+/* ===== LIGHT MODE OVERRIDES ===== */
+[data-theme="light"] .badge--default {
+  background: rgba(107, 114, 128, 0.08);
+  color: #4b5563;
+  border-color: rgba(107, 114, 128, 0.15);
+}
+
+[data-theme="light"] .badge--primary {
+  background: rgba(109, 40, 217, 0.08);
+  color: #6d28d9;
+  border-color: rgba(109, 40, 217, 0.15);
+}

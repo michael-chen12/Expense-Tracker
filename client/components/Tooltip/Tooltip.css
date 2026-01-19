@@ -1,0 +1,108 @@
+/* ====================================================================
+   TOOLTIP COMPONENT STYLES
+   Contextual help text on hover
+   ==================================================================== */
+
+.tooltip-trigger {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  padding: var(--tooltip-padding);
+  border-radius: var(--tooltip-border-radius);
+  font-size: var(--tooltip-font-size);
+  font-weight: var(--font-normal);
+  line-height: var(--line-height-normal);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.95) translateY(4px);
+  transition: opacity var(--transition-base) var(--ease-in-out),
+              transform var(--transition-base) var(--ease-in-out);
+}
+
+/* ===== VARIANT STYLES ===== */
+
+/* Dark variant (default) */
+.tooltip--dark {
+  background: var(--tooltip-background);
+  color: var(--tooltip-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Light variant */
+.tooltip--light {
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== PLACEMENT VARIANTS ===== */
+
+/* Top placement */
+.tooltip--top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.95);
+  margin-bottom: var(--space-2);
+}
+
+.tooltip--top.tooltip--visible {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Bottom placement */
+.tooltip--bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px) scale(0.95);
+  margin-top: var(--space-2);
+}
+
+.tooltip--bottom.tooltip--visible {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Left placement */
+.tooltip--left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px) scale(0.95);
+  margin-right: var(--space-2);
+  white-space: nowrap;
+}
+
+.tooltip--left.tooltip--visible {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+
+/* Right placement */
+.tooltip--right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px) scale(0.95);
+  margin-left: var(--space-2);
+  white-space: nowrap;
+}
+
+.tooltip--right.tooltip--visible {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+
+/* ===== VISIBLE STATE ===== */
+.tooltip--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== MAX WIDTH ===== */
+@media (max-width: 600px) {
+  .tooltip {
+    max-width: 180px;
+    white-space: normal;
+  }
+}

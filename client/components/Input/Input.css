@@ -1,138 +1,325 @@
-/* Input Component Styles */
+/* ====================================================================
+   INPUT COMPONENT STYLES
+   Enhanced input with icons, prefixes, suffixes, and clearable support
+   ==================================================================== */
 
+/* ===== INPUT WRAPPER ===== */
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-2);
 }
 
+/* ===== INPUT LABEL ===== */
 .input-label {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--light-text-secondary);
-  margin-bottom: 4px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
-.input-field {
-  padding: 10px 14px;
-  border: 1px solid var(--border, #d1d5db);
-  border-radius: 8px;
-  font-size: 15px;
+/* ===== INPUT CONTAINER ===== */
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-container--has-adornments .input {
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* ===== BASE INPUT ===== */
+.input {
+  width: 100%;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  height: var(--input-height-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--input-border-radius);
+  font-size: var(--input-font-size);
   font-family: inherit;
-  transition: all 0.2s ease;
-  background-color: rgba(255, 255, 255, 0.02);
-  color: var(--ink, #f3f4f6);
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  transition: var(--input-transition);
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--input-focus-shadow);
+}
+
+.input:disabled {
+  background: rgba(124, 58, 237, 0.05);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== SIZE VARIANTS ===== */
+.input--sm {
+  height: var(--input-height-sm);
+  padding: var(--space-1) var(--button-padding-x-sm);
+  font-size: var(--text-sm);
+}
+
+.input--md {
+  height: var(--input-height-md);
+  padding: var(--input-padding-y) var(--input-padding-x);
+  font-size: var(--input-font-size);
+}
+
+.input--lg {
+  height: var(--input-height-lg);
+  padding: var(--space-3) var(--button-padding-x-lg);
+  font-size: var(--text-lg);
+}
+
+/* ===== STATE VARIANTS ===== */
+
+/* Error state */
+.input--error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.input--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-border);
+}
+
+/* Success state */
+.input--success {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.input--success:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px var(--color-success-border);
+}
+
+/* Focused state (visual indicator) */
+.input--focused:not(:focus) {
+  border-color: var(--accent);
+}
+
+/* Full width */
+.input--full {
+  width: 100%;
+}
+
+/* ===== INPUT ADORNMENTS ===== */
+
+/* Left and right adornments */
+.input-adornment {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.input-adornment--left {
+  left: var(--space-3);
+}
+
+.input-adornment--right {
+  right: var(--space-3);
+}
+
+/* ===== PREFIX & SUFFIX ===== */
+.input-prefix,
+.input-suffix {
+  position: absolute;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-normal);
+  pointer-events: none;
+  user-select: none;
+}
+
+.input-prefix {
+  left: var(--space-4);
+}
+
+.input-suffix {
+  right: var(--space-4);
+}
+
+.input-container--has-adornments .input {
+  padding-left: var(--space-10);
+  padding-right: var(--space-10);
+}
+
+/* ===== CLEAR BUTTON ===== */
+.input-clear-button {
+  position: absolute;
+  right: var(--space-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+  font-weight: var(--font-bold);
+  padding: var(--space-1);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-base) var(--ease-in-out);
+  opacity: 0.6;
+}
+
+.input-clear-button:hover {
+  opacity: 1;
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--color-text-primary);
+}
+
+.input-clear-button:focus-visible {
+  outline: var(--focus-outline-width) var(--focus-outline-style) var(--accent);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* ===== HELP TEXT ===== */
+.input-help {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.input-help--error {
+  color: var(--color-error);
+  font-weight: var(--font-medium);
+}
+
+/* ===== BACKWARDS COMPATIBILITY ===== */
+
+/* Support old size names */
+.input-field {
+  padding: var(--input-padding-y) var(--input-padding-x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--input-border-radius);
+  font-size: var(--input-font-size);
+  font-family: inherit;
+  transition: var(--input-transition);
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
 }
 
 .input-field::placeholder {
-  color: var(--muted, #d1d5db);
+  color: var(--input-placeholder);
 }
 
 .input-field:focus {
   outline: none;
   border-color: var(--accent);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .input-field:disabled {
-  background-color: rgba(255, 255, 255, 0.02);
-  cursor: not-allowed;
   opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .input-field:hover:not(:disabled) {
   border-color: var(--accent);
 }
 
-/* Light variant - for light backgrounds */
+/* Light variant */
 .input-field.light {
-  background-color: var(--input-light-bg);
-  border-color: var(--input-light-border);
-  color: var(--input-light-text);
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #1f2937;
 }
 
 .input-field.light::placeholder {
-  color: var(--input-placeholder);
+  color: #9ca3af;
 }
 
 .input-field.light:focus {
   border-color: var(--input-focus);
-  background-color: var(--bg-strong);
+  background: #ffffff;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-.input-field.light:hover:not(:disabled) {
-  border-color: var(--input-focus);
-}
-
-/* Dark variant - for dark backgrounds */
+/* Dark variant */
 .input-field.dark {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: var(--border);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
 }
 
 .input-field.dark::placeholder {
-  color: var(--muted);
+  color: var(--input-placeholder);
 }
 
 .input-field.dark:focus {
   border-color: var(--accent);
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-/* Error state */
-.input-field.error {
-  border-color: var(--input-error);
-  background-color: var(--error-bg);
-}
-
-.input-field.error:focus {
-  border-color: var(--input-error);
-  box-shadow: 0 0 0 3px var(--error-border);
-}
-
-/* Success state */
-.input-field.success {
-  border-color: var(--input-success);
-  background-color: var(--success-bg);
-}
-
-.input-field.success:focus {
-  border-color: var(--input-success);
-  box-shadow: 0 0 0 3px var(--success-border);
-}
-
-/* Size variants */
+/* Old size variants */
 .input-field.small {
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: var(--space-1) var(--button-padding-x-sm);
+  font-size: var(--text-sm);
 }
 
 .input-field.large {
-  padding: 12px 16px;
-  font-size: 16px;
+  padding: var(--space-3) var(--button-padding-x-lg);
+  font-size: var(--text-lg);
 }
 
-/* Full width */
+/* Old state variants */
+.input-field.error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.input-field.error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-border);
+}
+
+.input-field.success {
+  border-color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.input-field.success:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px var(--color-success-border);
+}
+
 .input-field.full-width {
   width: 100%;
 }
 
-/* Help text */
-.input-help {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .input,
+  .input-field {
+    font-size: var(--text-base);
+  }
 
-.input-help.error {
-  color: var(--error);
-}
-
-.input-help.success {
-  color: var(--success);
+  .input--lg,
+  .input-field.large {
+    padding: var(--space-2) var(--button-padding-x-md);
+  }
 }

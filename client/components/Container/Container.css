@@ -1,0 +1,68 @@
+/* ====================================================================
+   CONTAINER COMPONENT STYLES
+   Content width constraint with consistent padding
+   ==================================================================== */
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== MAX-WIDTH VARIANTS ===== */
+.container--sm {
+  max-width: var(--container-max-width-sm);
+}
+
+.container--md {
+  max-width: var(--container-max-width-md);
+}
+
+.container--lg {
+  max-width: var(--container-max-width-lg);
+}
+
+.container--xl {
+  max-width: var(--container-max-width-xl);
+}
+
+.container--full {
+  max-width: var(--container-max-width-full);
+}
+
+/* ===== PADDING VARIANTS ===== */
+.container--padding-none {
+  padding: var(--space-0);
+}
+
+.container--padding-sm {
+  padding: var(--space-2);
+}
+
+.container--padding-md {
+  padding: var(--space-4);
+}
+
+.container--padding-lg {
+  padding: var(--space-6);
+}
+
+/* ===== CENTERED VARIANT ===== */
+.container--centered {
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container--padding-lg {
+    padding: var(--space-4);
+  }
+
+  .container--lg {
+    max-width: 100%;
+  }
+}

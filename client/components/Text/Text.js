@@ -30,7 +30,7 @@ const colorMap = {
   ink: 'var(--ink)',
   dark: '#1f2937',
   'dark-gray': '#374151',
-  'light-gray': '#9ca3af',
+  'light-gray': '#4b5563',
   muted: 'var(--muted)',
   subtle: 'rgba(241, 245, 249, 0.7)',
   accent: 'var(--accent)',

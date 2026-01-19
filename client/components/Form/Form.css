@@ -1,120 +1,201 @@
-/* Form Component Styles */
+/* ====================================================================
+   FORM COMPONENT STYLES
+   Consolidated form components with design tokens
+   ==================================================================== */
 
+/* ===== FORM ===== */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
-/* Form group - label + input wrapper */
+/* ===== FORM GROUP ===== */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
-/* Form label */
+/* ===== FORM LABEL ===== */
 .form-label {
   display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink);
-  margin-bottom: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
-/* Form input - text, email, password, number, date */
-.form-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  background: var(--card);
-  color: var(--ink);
-  transition: all 0.2s ease;
+.form-label-required {
+  color: var(--color-error);
+  margin-left: var(--space-1);
+  font-weight: var(--font-bold);
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+/* ===== FORM SELECT ===== */
+.form-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
-.form-input:disabled {
-  background-color: rgba(255, 255, 255, 0.05);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.form-input::placeholder {
-  color: var(--muted);
-  opacity: 0.6;
-}
-
-/* Form select */
 .form-select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  height: var(--input-height-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--input-border-radius);
+  font-size: var(--input-font-size);
   font-family: inherit;
-  background: var(--card);
-  color: var(--ink);
-  transition: all 0.2s ease;
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  transition: var(--input-transition);
   cursor: pointer;
+  box-sizing: border-box;
+}
+
+.form-select:hover:not(:disabled) {
+  border-color: var(--accent);
 }
 
 .form-select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .form-select:disabled {
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(124, 58, 237, 0.05);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-/* Form textarea */
+/* Size variants */
+.form-select--sm {
+  height: var(--input-height-sm);
+  padding: var(--space-1) var(--button-padding-x-sm);
+  font-size: var(--text-sm);
+}
+
+.form-select--md {
+  height: var(--input-height-md);
+  padding: var(--input-padding-y) var(--input-padding-x);
+  font-size: var(--input-font-size);
+}
+
+.form-select--lg {
+  height: var(--input-height-lg);
+  padding: var(--space-3) var(--button-padding-x-lg);
+  font-size: var(--text-lg);
+}
+
+/* Error state */
+.form-select--error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.form-select--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-border);
+}
+
+/* ===== FORM TEXTAREA ===== */
+.form-textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .form-textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--input-border-radius);
+  font-size: var(--input-font-size);
   font-family: inherit;
-  background: var(--card);
-  color: var(--ink);
-  transition: all 0.2s ease;
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  transition: var(--input-transition);
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
+  box-sizing: border-box;
+}
+
+.form-textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
+.form-textarea:hover:not(:disabled) {
+  border-color: var(--accent);
 }
 
 .form-textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  box-shadow: var(--input-focus-shadow);
 }
 
 .form-textarea:disabled {
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(124, 58, 237, 0.05);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.form-textarea::placeholder {
-  color: var(--muted);
-  opacity: 0.6;
+/* Size variants */
+.form-textarea--sm {
+  padding: var(--space-1) var(--button-padding-x-sm);
+  font-size: var(--text-sm);
+  min-height: 80px;
 }
 
-/* Form checkbox and radio */
+.form-textarea--md {
+  padding: var(--input-padding-y) var(--input-padding-x);
+  font-size: var(--input-font-size);
+  min-height: 100px;
+}
+
+.form-textarea--lg {
+  padding: var(--space-3) var(--button-padding-x-lg);
+  font-size: var(--text-lg);
+  min-height: 120px;
+}
+
+/* Error state */
+.form-textarea--error {
+  border-color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.form-textarea--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-border);
+}
+
+/* ===== FORM CHECKBOX & RADIO ===== */
+.form-checkbox-label,
+.form-radio-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  user-select: none;
+}
+
+.form-checkbox-label:hover,
+.form-radio-label:hover {
+  color: var(--accent);
+}
+
 .form-checkbox,
 .form-radio {
-  margin-right: 8px;
+  flex-shrink: 0;
   cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
 }
 
 .form-checkbox:disabled,
@@ -123,36 +204,58 @@
   opacity: 0.6;
 }
 
-/* Form row - for horizontal layout */
+.form-checkbox-label:has(:disabled),
+.form-radio-label:has(:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== FORM ROW ===== */
 .form-row {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-4);
 }
 
 .form-row > * {
-  flex: 1;
+  min-width: 0;
 }
 
-/* Form error message */
+/* ===== FORM ERROR MESSAGE ===== */
 .form-error-message {
-  padding: 10px 12px;
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 8px;
-  color: #fca5a5;
-  font-size: 14px;
-  margin-top: 0;
+  padding: var(--space-3);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  margin: 0;
 }
 
-/* Form actions - buttons container */
+/* ===== FORM HELP TEXT ===== */
+.form-help {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.form-help--error {
+  color: var(--color-error);
+  font-weight: var(--font-medium);
+}
+
+.form-help-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-2) 0 0 0;
+}
+
+/* ===== FORM ACTIONS ===== */
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.form-actions--end {
-  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .form-actions--start {
@@ -163,49 +266,104 @@
   justify-content: center;
 }
 
+.form-actions--end {
+  justify-content: flex-end;
+}
+
 .form-actions--between {
   justify-content: space-between;
 }
 
-/* Form section - for grouping fields */
+/* ===== FORM SECTION ===== */
 .form-section {
-  margin-top: 8px;
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .form-section-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0 0 12px 0;
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
 }
 
-/* Form card wrapper */
+/* ===== FORM CARD ===== */
 .form-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: var(--shadow);
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--card-border-radius);
+  padding: var(--card-padding-md);
+  box-shadow: var(--card-shadow);
 }
 
-/* Form help text */
-.form-help-text {
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
+/* ===== BACKWARDS COMPATIBILITY ===== */
+
+/* Old form input styling */
+.form-input {
+  width: 100%;
+  padding: var(--input-padding-y) var(--input-padding-x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--input-border-radius);
+  font-size: var(--input-font-size);
+  font-family: inherit;
+  background: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  transition: var(--input-transition);
+  box-sizing: border-box;
 }
 
-/* Responsive adjustments */
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--input-focus-shadow);
+}
+
+.form-input:disabled {
+  background: rgba(124, 58, 237, 0.05);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .form-row {
-    flex-direction: column;
+  .form {
+    gap: var(--space-3);
   }
-  
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
   .form-actions {
     flex-direction: column;
+    gap: var(--space-2);
   }
-  
-  .form-actions .button {
+
+  .form-actions .btn,
+  .form-actions .button,
+  .form-actions .button-modern {
     width: 100%;
+  }
+
+  .form-select,
+  .form-textarea,
+  .form-input {
+    font-size: var(--text-base);
+  }
+
+  .form-section {
+    margin-top: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .form-card {
+    padding: var(--card-padding-sm);
   }
 }
