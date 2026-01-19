@@ -1,6 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {
+  Form,
+  FormGroup,
+  FormLabel,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  FormError,
+  FormActions,
+  FormCard
+} from '@/components/Form';
+import { Modal, ModalActions } from '@/components/Modal';
 import Spinner from '@/components/Spinner';
 import './ExpenseForm.css';
 
@@ -35,6 +47,7 @@ export default function ExpenseForm({
   const [categorySelect, setCategorySelect] = useState(DEFAULT_CATEGORIES[0]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const initialCategory = String(initialValues.category || '').trim();
@@ -119,15 +132,11 @@ export default function ExpenseForm({
       return;
     }
 
-    const confirmed = window.confirm('Delete this expense?');
-    if (!confirmed) {
-      return;
-    }
-
     setSaving(true);
 
     try {
       await onDelete();
+      setShowDeleteModal(false);
     } catch (deleteError) {
       setError(deleteError.message || 'Something went wrong.');
     } finally {
@@ -136,78 +145,130 @@ export default function ExpenseForm({
   };
 
   return (
-    <form className="card" onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="amount">Amount</label>
-        <input
-          id="amount"
-          name="amount"
-          type="number"
-          min="0"
-          step="0.01"
-          value={form.amount}
-          onChange={handleChange}
-          placeholder="0.00"
-          required
-        />
-      </div>
+    <FormCard>
+      <Form onSubmit={handleSubmit}>
+        <FormGroup>
+          <FormLabel htmlFor="amount">Amount</FormLabel>
+          <FormInput
+            id="amount"
+            name="amount"
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.amount}
+            onChange={handleChange}
+            placeholder="0.00"
+            required
+          />
+        </FormGroup>
 
-      <div>
-        <label htmlFor="categorySelect">Category</label>
-        <select id="categorySelect" value={categorySelect} onChange={handleCategorySelect}>
-          {DEFAULT_CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-      </div>
+        <FormGroup>
+          <FormLabel htmlFor="categorySelect">Category</FormLabel>
+          <FormSelect id="categorySelect" value={categorySelect} onChange={handleCategorySelect}>
+            {DEFAULT_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </FormSelect>
+        </FormGroup>
 
-      <div>
-        <label htmlFor="date">Date</label>
-        <input
-          id="date"
-          name="date"
-          type="date"
-          value={form.date}
-          onChange={handleChange}
-          required
-        />
-      </div>
+        <FormGroup>
+          <FormLabel htmlFor="date">Date</FormLabel>
+          <FormInput
+            id="date"
+            name="date"
+            type="date"
+            value={form.date}
+            onChange={handleChange}
+            required
+          />
+        </FormGroup>
 
-      <div>
-        <label htmlFor="note">Note</label>
-        <textarea
-          id="note"
-          name="note"
-          value={form.note}
-          onChange={handleChange}
-          placeholder="Optional details"
-        />
-      </div>
+        <FormGroup>
+          <FormLabel htmlFor="note">Note</FormLabel>
+          <FormTextarea
+            id="note"
+            name="note"
+            value={form.note}
+            onChange={handleChange}
+            placeholder="Optional details"
+          />
+        </FormGroup>
 
-      {error ? <div className="error">{error}</div> : null}
+        <FormError>{error}</FormError>
 
-      <div className="inline-actions">
-        <button className="button primary" type="submit" disabled={saving}>
-          {saving ? (
-            <span className="button-loading-content">
-              <Spinner size="small" color="white" />
-              Saving...
-            </span>
-          ) : submitLabel}
-        </button>
-        {onDelete ? (
-          <button className="button ghost" type="button" onClick={handleDelete} disabled={saving}>
+        <FormActions align="start">
+          <button className="button primary" type="submit" disabled={saving}>
             {saving ? (
               <span className="button-loading-content">
-                <Spinner size="small" color="gray" />
-                Deleting...
+                <Spinner size="small" color="white" />
+                Saving...
               </span>
-            ) : 'Delete'}
+            ) : submitLabel}
           </button>
-        ) : null}
-      </div>
-    </form>
+          {onDelete && (
+            <button
+              className="button ghost"
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              disabled={saving}
+            >
+              {saving ? (
+                <span className="button-loading-content">
+                  <Spinner size="small" color="gray" />
+                  Deleting...
+                </span>
+              ) : 'Delete'}
+            </button>
+          )}
+        </FormActions>
+      </Form>
+
+      {onDelete && (
+        <Modal
+          open={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Delete expense"
+          description="This action will permanently remove this expense entry."
+        >
+          <div className="modal-detail-card">
+            <div className="modal-detail-header">
+              <div>
+                <p className="modal-detail-title">{form.category || 'Uncategorized'}</p>
+                <p className="modal-detail-meta">Date: {form.date || '—'}</p>
+              </div>
+              <p className="modal-detail-amount">{form.amount ? `$${Number(form.amount).toFixed(2)}` : '$0.00'}</p>
+            </div>
+            <p className="modal-detail-note">{form.note ? form.note : 'No note provided.'}</p>
+          </div>
+
+          <p className="modal-message">Are you sure you want to delete this expense?</p>
+          <ModalActions>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={saving}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="button primary"
+              onClick={handleDelete}
+              disabled={saving}
+            >
+              {saving ? (
+                <span className="button-loading-content">
+                  <Spinner size="small" color="white" />
+                  Deleting...
+                </span>
+              ) : 'Delete expense'}
+            </button>
+          </ModalActions>
+        </Modal>
+      )}
+    </FormCard>
   );
 }

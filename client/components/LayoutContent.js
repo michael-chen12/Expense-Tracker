@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { AuthButton } from '@/components/Button';
 import NavLinks from '@/components/NavLinks';
 import SkipToMain from '@/components/SkipToMain';
+import ThemeToggleButton from '@/components/ThemeToggleButton/ThemeToggleButton';
 
 export default function LayoutContent({ children }) {
   const { data: session, status } = useSession();
@@ -22,6 +23,7 @@ export default function LayoutContent({ children }) {
           <Link className="brand" href="/">Ledgerline</Link>
           <nav className="nav" aria-label="Main navigation">
             <NavLinks />
+            <ThemeToggleButton />
             <AuthButton />
           </nav>
         </header>

@@ -1,6 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { 
+  Form, 
+  FormGroup, 
+  FormLabel, 
+  FormInput, 
+  FormSelect, 
+  FormRow, 
+  FormError, 
+  FormActions,
+  FormCard,
+  FormSection
+} from '@/components/Form';
 import FrequencySelector from './FrequencySelector';
 import Spinner from '@/components/Spinner';
 import './RecurringExpense.css';
@@ -97,104 +109,106 @@ export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpens
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card card-form">
-      <h2>{editingExpense ? 'Edit Recurring Expense' : 'New Recurring Expense'}</h2>
+    <FormCard>
+      <Form onSubmit={handleSubmit}>
+        <h2>{editingExpense ? 'Edit Recurring Expense' : 'New Recurring Expense'}</h2>
 
-      <div className="form-grid-two">
-        <div>
-          <label htmlFor="amount">Amount</label>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            min="0"
-            step="0.01"
-            value={formData.amount}
+        <FormRow>
+          <FormGroup>
+            <FormLabel htmlFor="amount">Amount</FormLabel>
+            <FormInput
+              id="amount"
+              name="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.amount}
+              onChange={handleChange}
+              placeholder="0.00"
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <FormLabel htmlFor="category">Category</FormLabel>
+            <FormSelect
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select category</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </FormSelect>
+          </FormGroup>
+        </FormRow>
+
+        <FormGroup>
+          <FormLabel htmlFor="note">Note (optional)</FormLabel>
+          <FormInput
+            id="note"
+            name="note"
+            type="text"
+            value={formData.note}
             onChange={handleChange}
-            placeholder="0.00"
-            required
+            placeholder="e.g., Netflix subscription"
           />
-        </div>
+        </FormGroup>
 
-        <div>
-          <label htmlFor="category">Category</label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select category</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="form-section">
-        <label htmlFor="note">Note (optional)</label>
-        <input
-          id="note"
-          name="note"
-          type="text"
-          value={formData.note}
-          onChange={handleChange}
-          placeholder="e.g., Netflix subscription"
-        />
-      </div>
-
-      <div style={{ marginTop: '16px' }}>
-        <FrequencySelector
-          frequency={formData.frequency}
-          dayOfWeek={formData.dayOfWeek}
-          dayOfMonth={formData.dayOfMonth}
-          monthOfYear={formData.monthOfYear}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-grid-two">
-        <div>
-          <label htmlFor="nextDate">Start Date</label>
-          <input
-            id="nextDate"
-            name="nextDate"
-            type="date"
-            value={formData.nextDate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="endDate">End Date (optional)</label>
-          <input
-            id="endDate"
-            name="endDate"
-            type="date"
-            value={formData.endDate}
+        <FormSection>
+          <FrequencySelector
+            frequency={formData.frequency}
+            dayOfWeek={formData.dayOfWeek}
+            dayOfMonth={formData.dayOfMonth}
+            monthOfYear={formData.monthOfYear}
             onChange={handleChange}
           />
-        </div>
-      </div>
+        </FormSection>
 
-      {error && <div className="error form-error">{error}</div>}
+        <FormRow>
+          <FormGroup>
+            <FormLabel htmlFor="nextDate">Start Date</FormLabel>
+            <FormInput
+              id="nextDate"
+              name="nextDate"
+              type="date"
+              value={formData.nextDate}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
 
-      <div className="inline-actions form-actions">
-        <button className="button primary" type="submit" disabled={submitting}>
-          {submitting ? (
-            <span className="button-loading-content">
-              <Spinner size="small" color="white" />
-              {editingExpense ? 'Updating...' : 'Creating...'}
-            </span>
-          ) : editingExpense ? 'Update Recurring Expense' : 'Create Recurring Expense'}
-        </button>
-        <button type="button" className="button ghost" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
-        </button>
-      </div>
-    </form>
+          <FormGroup>
+            <FormLabel htmlFor="endDate">End Date (optional)</FormLabel>
+            <FormInput
+              id="endDate"
+              name="endDate"
+              type="date"
+              value={formData.endDate}
+              onChange={handleChange}
+            />
+          </FormGroup>
+        </FormRow>
+
+        <FormError>{error}</FormError>
+
+        <FormActions align="start">
+          <button className="button primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <span className="button-loading-content">
+                <Spinner size="small" color="white" />
+                {editingExpense ? 'Updating...' : 'Creating...'}
+              </span>
+            ) : editingExpense ? 'Update Recurring Expense' : 'Create Recurring Expense'}
+          </button>
+          <button type="button" className="button ghost" onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </button>
+        </FormActions>
+      </Form>
+    </FormCard>
   );
 }

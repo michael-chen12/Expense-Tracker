@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
 import { Button } from '@/components/Button';
+import { Modal, ModalActions } from '@/components/Modal';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
@@ -36,6 +37,8 @@ export default function MonthlySummaryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedKey, setExpandedKey] = useState('');
+  const [confirmExpense, setConfirmExpense] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Redirect to dashboard if user has no expenses
   useEffect(() => {
@@ -89,18 +92,21 @@ export default function MonthlySummaryPage() {
     loadExpenses();
   }, []);
 
-  const handleDelete = async (expenseId) => {
-    const confirmed = window.confirm('Delete this expense?');
-    if (!confirmed) {
-      return;
-    }
+  const requestDelete = (expense) => {
+    setConfirmExpense(expense);
+  };
+
+  const handleDelete = async () => {
+    if (!confirmExpense) return;
+
+    setDeleting(true);
 
     try {
-      await deleteExpense(expenseId);
+      await deleteExpense(confirmExpense.id);
       
       // Check if this was the last expense
       const allExpenses = Object.values(groupedExpenses).flat();
-      const remainingExpenses = allExpenses.filter((expense) => expense.id !== expenseId);
+      const remainingExpenses = allExpenses.filter((expense) => expense.id !== confirmExpense.id);
       
       if (remainingExpenses.length === 0) {
         // If no expenses remain after deletion, redirect to dashboard
@@ -111,6 +117,9 @@ export default function MonthlySummaryPage() {
       }
     } catch (deleteError) {
       setError(deleteError.message || 'Unable to delete expense.');
+    } finally {
+      setDeleting(false);
+      setConfirmExpense(null);
     }
   };
 
@@ -190,12 +199,31 @@ export default function MonthlySummaryPage() {
                           </div>
                           <div className="expense-amount">{formatCurrency(expense.amount)}</div>
                           <div className="inline-actions">
-                            <Button variant="ghost" href={`/expenses/${expense.id}`}>Edit</Button>
+                            <Link
+                              className="button ghost button--icon"
+                              href={`/expenses/${expense.id}`}
+                              aria-label={`Edit ${expense.category}`}
+                            >
+                              <svg
+                                aria-hidden="true"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            </Link>
                             <button
-                              className="button ghost"
+                              className="button ghost button--icon"
                               type="button"
                               aria-label={`Delete ${expense.category}`}
-                              onClick={() => handleDelete(expense.id)}
+                              onClick={() => requestDelete(expense)}
                             >
                               <svg
                                 aria-hidden="true"
@@ -230,6 +258,51 @@ export default function MonthlySummaryPage() {
         ) : (
           <p className="subtle">No expenses yet. Add your first entry.</p>
         )}
+
+        <Modal
+          open={Boolean(confirmExpense)}
+          onClose={() => setConfirmExpense(null)}
+          title="Delete expense"
+          description="This will permanently remove the selected expense."
+        >
+          {confirmExpense ? (
+            <div className="modal-detail-card">
+              <div className="modal-detail-header">
+                <div>
+                  <p className="modal-detail-title">{confirmExpense.category || 'Uncategorized'}</p>
+                  <p className="modal-detail-meta">Date: {confirmExpense.date ? formatDate(confirmExpense.date) : '—'}</p>
+                </div>
+                <p className="modal-detail-amount">{formatCurrency(confirmExpense.amount || 0)}</p>
+              </div>
+              <p className="modal-detail-note">{confirmExpense.note || 'No note provided.'}</p>
+            </div>
+          ) : null}
+
+          <p className="modal-message">Delete expense?</p>
+          <ModalActions>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => setConfirmExpense(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="button primary"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <span className="button-loading-content">
+                  <Spinner size="small" color="white" />
+                  Deleting...
+                </span>
+              ) : 'Delete expense'}
+            </button>
+          </ModalActions>
+        </Modal>
       </div>
     </AuthGate>
   );

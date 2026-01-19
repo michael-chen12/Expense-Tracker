@@ -1,0 +1,174 @@
+/* Text Component Styles */
+
+.text {
+  margin: 0;
+  font-family: inherit;
+}
+
+/* Heading variants */
+.text.heading-1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink, #f3f4f6);
+  letter-spacing: -0.02em;
+}
+
+.text.heading-2 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink, #f3f4f6);
+  letter-spacing: -0.01em;
+}
+
+.text.heading-3 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.heading-4 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.heading-5 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.heading-6 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink, #f3f4f6);
+}
+
+/* Body variants */
+.text.body-large {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.body {
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.body-small {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink, #f3f4f6);
+}
+
+.text.body-tiny {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink, #f3f4f6);
+}
+
+/* Semantic color variants */
+.text.muted {
+  color: var(--muted, #d1d5db);
+}
+
+.text.subtle {
+  color: rgba(241, 245, 249, 0.7);
+}
+
+.text.accent {
+  color: var(--accent);
+}
+
+.text.success {
+  color: #10b981;
+}
+
+.text.error {
+  color: #ef4444;
+}
+
+.text.warning {
+  color: #f59e0b;
+}
+
+/* Weight variants */
+.text.font-light {
+  font-weight: 300;
+}
+
+.text.font-normal {
+  font-weight: 400;
+}
+
+.text.font-medium {
+  font-weight: 500;
+}
+
+.text.font-semibold {
+  font-weight: 600;
+}
+
+.text.font-bold {
+  font-weight: 700;
+}
+
+/* Alignment variants */
+.text.text-left {
+  text-align: left;
+}
+
+.text.text-center {
+  text-align: center;
+}
+
+.text.text-right {
+  text-align: right;
+}
+
+/* Truncation and overflow */
+.text.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.text.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Text transform */
+.text.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text.capitalize {
+  text-transform: capitalize;
+}
+
+.text.lowercase {
+  text-transform: lowercase;
+}

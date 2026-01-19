@@ -7,6 +7,7 @@ import AuthGate from '@/components/AuthGate';
 import LandingPage from '@/components/LandingPage';
 import LoadingScreen from '@/components/LoadingScreen';
 import { Button } from '@/components/Button';
+import { Modal, ModalActions } from '@/components/Modal';
 import {
   getExpenses,
   deleteExpense,
@@ -14,6 +15,7 @@ import {
   getAllowanceStatus,
   setAllowanceSettings
 } from '@/lib/api-backend';
+import { formatCurrency, formatDate } from '@/lib/format';
 import { useChartData } from '@/lib/hooks/useChartData';
 import DashboardCharts from '@/components/DashboardCharts';
 import RecentExpenses from '@/components/RecentExpenses';
@@ -47,6 +49,8 @@ function Dashboard() {
   const [allowanceError, setAllowanceError] = useState('');
   const [savingAllowance, setSavingAllowance] = useState(false);
   const [dateRange, setDateRange] = useState(getMonthRange());
+  const [confirmExpense, setConfirmExpense] = useState(null);
+  const [deletingExpense, setDeletingExpense] = useState(false);
 
   // Check if all dashboard data is loaded
   const isDashboardLoading = loading || loadingAllowance;
@@ -146,16 +150,28 @@ function Dashboard() {
       setSavingAllowance(false);
     }
   };
-
-
-  const handleExpenseDelete = async (expenseId) => {
-    const confirmed = window.confirm('Delete this expense?');
-    if (!confirmed) {
-      return;
+  const requestExpenseDelete = (expenseId) => {
+    const expense = recent.find((item) => item.id === expenseId);
+    if (expense) {
+      setConfirmExpense({
+        id: expenseId,
+        category: expense.category,
+        amount: expense.amount,
+        date: expense.date,
+        note: expense.note
+      });
+    } else {
+      setConfirmExpense({ id: expenseId });
     }
+  };
+
+  const handleExpenseDelete = async () => {
+    if (!confirmExpense) return;
+
+    setDeletingExpense(true);
 
     try {
-      await deleteExpense(expenseId);
+      await deleteExpense(confirmExpense.id);
       // Refresh recent expenses
       const recentData = await getExpenses({ pageSize: 5 });
       setRecent(recentData.items || []);
@@ -165,6 +181,9 @@ function Dashboard() {
       setError('');
     } catch (deleteError) {
       setError(deleteError.message || 'Unable to delete expense.');
+    } finally {
+      setDeletingExpense(false);
+      setConfirmExpense(null);
     }
   };
 
@@ -212,7 +231,7 @@ function Dashboard() {
             <>
               <RecentExpenses
                 expenses={recent}
-                onDelete={handleExpenseDelete}
+                onDelete={requestExpenseDelete}
                 error={error}
               />
 
@@ -230,6 +249,53 @@ function Dashboard() {
           )}
         </>
       )}
+
+      <Modal
+        open={Boolean(confirmExpense)}
+        onClose={() => setConfirmExpense(null)}
+        title="Delete expense"
+        description="This will permanently remove the selected expense."
+      >
+        {confirmExpense ? (
+          <div className="modal-detail-card">
+            <div className="modal-detail-header">
+              <div>
+                <p className="modal-detail-title">{confirmExpense.category || 'Uncategorized'}</p>
+                <p className="modal-detail-meta">Date: {confirmExpense.date ? formatDate(confirmExpense.date) : '—'}</p>
+              </div>
+              {typeof confirmExpense.amount === 'number' ? (
+                <p className="modal-detail-amount">{formatCurrency(confirmExpense.amount)}</p>
+              ) : null}
+            </div>
+            <p className="modal-detail-note">{confirmExpense.note || 'No note provided.'}</p>
+          </div>
+        ) : null}
+
+        <p className="modal-message">Delete expense?</p>
+        <ModalActions>
+          <button
+            type="button"
+            className="button ghost"
+            onClick={() => setConfirmExpense(null)}
+            disabled={deletingExpense}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="button primary"
+            onClick={handleExpenseDelete}
+            disabled={deletingExpense}
+          >
+            {deletingExpense ? (
+              <span className="button-loading-content">
+                <Spinner size="small" color="white" />
+                Deleting...
+              </span>
+            ) : 'Delete expense'}
+          </button>
+        </ModalActions>
+      </Modal>
     </div>
   );
 }

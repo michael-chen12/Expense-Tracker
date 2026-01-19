@@ -45,7 +45,7 @@
 
 /* Variant: Orange (for primary actions) */
 .spinner-orange {
-  border-color: #ff7a00;
+  border-color: var(--accent);
   border-top-color: transparent;
 }
 

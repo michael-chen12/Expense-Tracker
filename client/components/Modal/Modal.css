@@ -1,0 +1,144 @@
+/* Modal Component Styles */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1200;
+  animation: modal-fade-in 0.18s ease;
+}
+
+.modal {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  width: min(520px, 100%);
+  max-width: 90vw;
+  padding: 22px 24px;
+  position: relative;
+  animation: modal-pop 0.22s ease;
+  outline: none;
+}
+
+.modal--sm {
+  width: min(420px, 100%);
+}
+
+.modal--lg {
+  width: min(720px, 100%);
+}
+
+.modal-title {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-description {
+  margin: 0 0 12px 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.modal-body {
+  margin-top: 8px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-actions--start {
+  justify-content: flex-start;
+}
+
+.modal-actions--center {
+  justify-content: center;
+}
+
+.modal-actions--between {
+  justify-content: space-between;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.modal-message {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.modal-detail-card {
+  background: var(--input-dark-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 12px 0 16px 0;
+}
+
+.modal-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.modal-detail-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-detail-amount {
+  margin: 0;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.modal-detail-meta,
+.modal-detail-note {
+  margin: 6px 0 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-pop {
+  from { transform: translateY(8px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .modal {
+    padding: 18px;
+    border-radius: 14px;
+  }
+  .modal-actions {
+    flex-direction: column;
+  }
+  .modal-actions .button {
+    width: 100%;
+  }
+}

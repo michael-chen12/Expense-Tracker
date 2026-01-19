@@ -1,9 +1,14 @@
 'use client';
 
+import { useState } from 'react';
+import { Modal, ModalActions } from '@/components/Modal';
 import { formatCurrency, formatDate } from '@/lib/format';
 import './RecurringExpense.css';
 
 export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdit }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const getFrequencyLabel = (freq, dayOfWeek, dayOfMonth, monthOfYear) => {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -22,10 +27,13 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
     }
   };
 
-  const handleDelete = () => {
-    const confirmed = window.confirm(`Delete recurring expense: ${recurringExpense.category}?`);
-    if (confirmed) {
-      onDelete(recurringExpense.id);
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await onDelete(recurringExpense.id);
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -88,7 +96,7 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
           <button
             type="button"
             className="button ghost button--icon"
-            onClick={handleDelete}
+            onClick={() => setShowDeleteModal(true)}
             aria-label={`Delete ${recurringExpense.category}`}
           >
             <svg
@@ -111,6 +119,71 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
           </button>
         </div>
       </div>
+
+      <Modal
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete recurring expense"
+        description="This will remove all future occurrences of this recurring expense."
+      >
+        <div className="modal-detail-card">
+          <div className="modal-detail-header">
+            <div>
+              <p className="modal-detail-title">{recurringExpense.category}</p>
+              <p className="modal-detail-meta">Next: {formatDate(recurringExpense.nextDate)}</p>
+              {recurringExpense.endDate ? (
+                <p className="modal-detail-meta">Ends: {formatDate(recurringExpense.endDate)}</p>
+              ) : null}
+            </div>
+            <p className="modal-detail-amount">{formatCurrency(recurringExpense.amount)}</p>
+          </div>
+          <p className="modal-detail-meta">Frequency: {getFrequencyLabel(
+            recurringExpense.frequency,
+            recurringExpense.dayOfWeek,
+            recurringExpense.dayOfMonth,
+            recurringExpense.monthOfYear
+          )}</p>
+          <p className="modal-detail-note">{recurringExpense.note || 'No note provided.'}</p>
+        </div>
+
+        <p className="modal-message">Delete recurring expense?</p>
+        <ModalActions>
+          <button
+            type="button"
+            className="button ghost"
+            onClick={() => setShowDeleteModal(false)}
+            disabled={isDeleting}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="button primary"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <span className="button-loading-content">
+                <svg
+                  aria-hidden="true"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" opacity="0.25" />
+                  <path d="M12 2a10 10 0 0 1 10 10" />
+                </svg>
+                Deleting...
+              </span>
+            ) : 'Delete'}
+          </button>
+        </ModalActions>
+      </Modal>
     </div>
   );
 }

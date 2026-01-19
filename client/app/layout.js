@@ -11,6 +11,24 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('ledgerline-theme') ||
+                    (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                  document.documentElement.dataset.theme = theme;
+                  document.documentElement.style.colorScheme = theme;
+                } catch (e) {
+                  // localStorage blocked, use default
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <Providers>
           <ErrorBoundary>

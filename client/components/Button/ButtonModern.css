@@ -26,40 +26,41 @@
 }
 
 .button-modern:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--button-primary-bg);
   outline-offset: 2px;
 }
 
-/* Primary button variant - Blue with hover lift effect */
+/* Primary button variant - Purple with hover lift effect */
 .button-modern.primary {
-  background-color: #2563eb;
+  background-color: var(--button-primary-bg);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
 }
 
 .button-modern.primary:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  background-color: var(--button-primary-hover);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
 }
 
 .button-modern.primary:active:not(:disabled) {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
 }
 
 /* Ghost button variant - Outline style with dark background */
 .button-modern.ghost {
   background-color: transparent;
-  color: #1b1b1b;
-  border: 2px solid #1b1b1b;
+  color: var(--ink);
+  border: 2px solid var(--border);
 }
 
 .button-modern.ghost:hover:not(:disabled) {
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: rgba(124, 58, 237, 0.1);
+  color: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(27, 27, 27, 0.2);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.15);
 }
 
 .button-modern.ghost:active:not(:disabled) {
@@ -68,15 +69,17 @@
 
 /* Reverse button variant - Dark background */
 .button-modern.reverse {
-  background-color: #1f2937;
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.25);
+  background-color: var(--card);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .button-modern.reverse:hover:not(:disabled) {
-  background-color: #111827;
+  background-color: rgba(124, 58, 237, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(31, 41, 55, 0.35);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
 }
 
 .button-modern.reverse:active:not(:disabled) {
@@ -84,18 +87,18 @@
   box-shadow: 0 2px 8px rgba(31, 41, 55, 0.25);
 }
 
-/* Outline button variant - White with blue text */
+/* Outline button variant - White with accent text */
 .button-modern.outline {
-  background-color: #ffffff;
-  color: #2563eb;
-  border: 2px solid #2563eb;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  background-color: var(--button-outline-bg);
+  color: var(--button-outline-text);
+  border: 2px solid var(--button-outline-border);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
 }
 
 .button-modern.outline:hover:not(:disabled) {
-  background-color: #f0f4ff;
+  background-color: var(--accent-soft);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
 }
 
 .button-modern.outline:active:not(:disabled) {

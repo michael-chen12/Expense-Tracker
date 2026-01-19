@@ -1,0 +1,199 @@
+/* Register Page Styles */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+}
+
+/* Default (dark mode) styles */
+.auth-card {
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  color: var(--ink);
+}
+
+.auth-header .text {
+  margin: 0;
+}
+
+.auth-header .text.heading-2 {
+  color: var(--ink);
+}
+
+.auth-header .text.body {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.auth-form {
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-group input:disabled {
+  background: var(--bg);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-divider span {
+  position: relative;
+  background: var(--card);
+  padding: 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.github-button {
+  background: #24292e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.github-button:hover {
+  background: #1b1f23;
+}
+
+.github-button:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.auth-footer .text {
+  margin: 0;
+  color: var(--muted);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Light mode overrides */
+[data-theme="light"] .auth-card {
+  background: var(--bg-strong);
+  color: var(--light-text);
+}
+
+[data-theme="light"] .auth-header h1 {
+  color: var(--light-text);
+}
+
+[data-theme="light"] .auth-header .text.heading-2 {
+  color: var(--light-text);
+}
+
+[data-theme="light"] .auth-header .text.body {
+  color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .form-group label {
+  color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .form-group input {
+  background-color: var(--bg-strong);
+  color: var(--light-text);
+  border-color: var(--light-border);
+}
+
+[data-theme="light"] .form-group input:disabled {
+  background: var(--bg);
+}
+
+[data-theme="light"] .auth-divider::before {
+  background: var(--light-border);
+}
+
+[data-theme="light"] .auth-divider span {
+  background: var(--bg-strong);
+  color: var(--light-text-secondary);
+}
+
+[data-theme="light"] .auth-footer {
+  border-top: 1px solid var(--light-border);
+}
+
+[data-theme="light"] .auth-footer .text {
+  color: var(--light-text-secondary);
+}

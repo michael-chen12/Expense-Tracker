@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FormCard, FormSection, FormLabel } from '@/components/Form';
 import './DateRangeFilter.css';
 
 /**
@@ -114,64 +115,68 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
   };
 
   return (
-    <div className="date-range-filter">
-      <div className="filter-header">
-        <h3>Date Range</h3>
-        <span>{dateRange.label}</span>
-      </div>
+    <FormCard className="date-range-filter-card">
+      <FormSection>
+        <div className="filter-header">
+          <h3>Date Range</h3>
+          <span>{dateRange.label}</span>
+        </div>
 
-      <div className="preset-buttons">
-        {presets.map((preset) => (
-          <button
-            key={preset.label}
-            type="button"
-            className="preset-button"
-            onClick={() => handlePresetClick(preset)}
-          >
-            {preset.label}
-          </button>
-        ))}
-        <button
-          type="button"
-          className="preset-button custom-button"
-          onClick={() => setShowCustom(!showCustom)}
-        >
-          {showCustom ? 'Cancel' : 'Custom Range'}
-        </button>
-      </div>
-
-      {showCustom && (
-        <div className="custom-range-inputs">
-          <div className="input-group">
-            <label htmlFor="custom-from">From</label>
-            <input
-              id="custom-from"
-              type="date"
-              value={customFrom}
-              onChange={(e) => setCustomFrom(e.target.value)}
-              max={customTo}
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="custom-to">To</label>
-            <input
-              id="custom-to"
-              type="date"
-              value={customTo}
-              onChange={(e) => setCustomTo(e.target.value)}
-              min={customFrom}
-            />
-          </div>
+        <div className="preset-buttons">
+          {presets.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              className="preset-button"
+              onClick={() => handlePresetClick(preset)}
+            >
+              {preset.label}
+            </button>
+          ))}
           <button
             type="button"
-            className="button primary"
-            onClick={handleCustomApply}
-            disabled={!customFrom || !customTo}
+            className="preset-button custom-button"
+            onClick={() => setShowCustom(!showCustom)}
           >
-            Apply
+            {showCustom ? 'Cancel' : 'Custom Range'}
           </button>
         </div>
-      )}
-    </div>
+
+        {showCustom && (
+          <div className="custom-range-inputs">
+            <div className="input-group">
+              <FormLabel htmlFor="custom-from">From</FormLabel>
+              <input
+                id="custom-from"
+                type="date"
+                value={customFrom}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                max={customTo}
+                className="form-input"
+              />
+            </div>
+            <div className="input-group">
+              <FormLabel htmlFor="custom-to">To</FormLabel>
+              <input
+                id="custom-to"
+                type="date"
+                value={customTo}
+                onChange={(e) => setCustomTo(e.target.value)}
+                min={customFrom}
+                className="form-input"
+              />
+            </div>
+            <button
+              type="button"
+              className="button primary"
+              onClick={handleCustomApply}
+              disabled={!customFrom || !customTo}
+            >
+              Apply
+            </button>
+          </div>
+        )}
+      </FormSection>
+    </FormCard>
   );
 }

@@ -9,14 +9,14 @@
 .recurring-expense-form h3 {
   margin: 0 0 8px;
   font-size: 18px;
-  color: #1b1b1b;
+  color: var(--ink, #f3f4f6);
 }
 
 .recurring-expense-form label {
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #1b1b1b;
+  color: var(--ink, #f3f4f6);
   margin-bottom: 6px;
 }
 
@@ -34,8 +34,8 @@
 .recurring-expense-form input:focus,
 .recurring-expense-form select:focus {
   outline: none;
-  border-color: #ff7a00;
-  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
 .recurring-expense-form .error {
@@ -82,7 +82,7 @@
 .recurring-expense-card__amount {
   font-size: 20px;
   font-weight: 700;
-  color: #ff7a00;
+  color: var(--accent);
 }
 
 .recurring-expense-card__note {
@@ -123,13 +123,13 @@
 }
 
 .recurring-expense-card__actions button:hover {
-  color: #ff7a00;
+  color: var(--accent);
 }
 
 .recurring-expense-card__amount {
   font-size: 20px;
   font-weight: 700;
-  color: #ff7a00;
+  color: var(--accent);
 }
 
 .recurring-expense-card__footer {
@@ -138,7 +138,7 @@
   align-items: center;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #e5dccf;
+  border-top: 1px solid var(--border);
 }
 
 .recurring-expense-card__actions {
@@ -156,7 +156,7 @@
 }
 
 .recurring-expense-card__actions button:hover {
-  color: #ff7a00;
+  color: var(--accent);
 }
 
 /* Frequency Selector Styles */
@@ -183,7 +183,7 @@
 .frequency-selector label {
   font-size: 14px;
   font-weight: 500;
-  color: #1b1b1b;
+  color: var(--ink, #f3f4f6);
   margin-bottom: 6px;
   display: block;
 }
