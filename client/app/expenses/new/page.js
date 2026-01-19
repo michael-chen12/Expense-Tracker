@@ -1,11 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { createExpense } from '@/lib/api-backend';
+import Spinner from '@/components/Spinner';
 
-export default function NewExpensePage() {
+function NewExpenseForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const today = new Date().toISOString().slice(0, 10);
@@ -40,5 +42,13 @@ export default function NewExpensePage() {
         <ExpenseForm initialValues={initialValues} submitLabel="Add expense" onSubmit={handleSubmit} />
       </div>
     </AuthGate>
+  );
+}
+
+export default function NewExpensePage() {
+  return (
+    <Suspense fallback={<div className="loading-container"><Spinner size="large" /></div>}>
+      <NewExpenseForm />
+    </Suspense>
   );
 }
