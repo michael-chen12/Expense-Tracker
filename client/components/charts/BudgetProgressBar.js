@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCurrency } from '@/lib/chart-utils';
+import './Charts.css';
 
 /**
  * Budget Progress Bar - Visual indicator of allowance usage

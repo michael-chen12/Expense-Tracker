@@ -1,14 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { Button } from '@/components/Button';
 import { formatCurrency, formatDate } from '@/lib/format';
 
 export default function RecentExpenses({ expenses, onDelete, error }) {
   return (
-    <section className="card" style={{ marginTop: '24px' }}>
+    <section className="card section-card">
       <div className="card-header">
         <h2>Recent expenses</h2>
-        <Link className="button ghost" href="/expenses">View all</Link>
+        <Button variant="ghost" href="/expenses">View all</Button>
       </div>
 
       <div className="expense-list">
@@ -20,9 +21,28 @@ export default function RecentExpenses({ expenses, onDelete, error }) {
             </div>
             <div className="expense-amount">{formatCurrency(expense.amount)}</div>
             <div className="inline-actions">
-              <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+              <Link
+                className="button ghost button--icon"
+                href={`/expenses/${expense.id}`}
+                aria-label={`Edit ${expense.category}`}
+              >
+                <svg
+                  aria-hidden="true"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </Link>
               <button
-                className="button ghost"
+                className="button ghost button--icon"
                 type="button"
                 aria-label={`Delete ${expense.category} expense`}
                 onClick={() => onDelete(expense.id)}

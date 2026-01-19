@@ -1,12 +1,9 @@
 'use client';
 
 import Spinner from '@/components/Spinner';
-import OverviewCard from '@/components/charts/OverviewCard';
-import ChartCard from '@/components/charts/ChartCard';
-import ChartEmptyState from '@/components/charts/ChartEmptyState';
-import SpendingTrendChart from '@/components/charts/SpendingTrendChart';
-import CategoryBreakdownChart from '@/components/charts/CategoryBreakdownChart';
-import BudgetProgressBar from '@/components/charts/BudgetProgressBar';
+import { OverviewCard, ChartCard } from '@/components/Card';
+import ChartEmptyState from '@/components/Charts/ChartEmptyState';
+import { SpendingTrendChart, CategoryBreakdownChart, BudgetProgressBar } from '@/components/Charts';
 
 export default function DashboardCharts({
   isLoading,
@@ -19,7 +16,7 @@ export default function DashboardCharts({
 }) {
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: '16px' }}>
+      <div className="chart-loading">
         <Spinner size="large" color="primary" />
       </div>
     );
@@ -29,7 +26,7 @@ export default function DashboardCharts({
     <>
       {/* Show chart error if any */}
       {chartError && (
-        <div className="error" style={{ marginBottom: '24px' }}>
+        <div className="error chart-error">
           {chartError}
         </div>
       )}
@@ -51,38 +48,16 @@ export default function DashboardCharts({
 
       {/* Info message for months with no expenses */}
       {hasData && monthlyTrendData.some(m => m.count === 0) && (
-        <div className="chart-info" style={{
-          marginBottom: '20px',
-          padding: '12px 16px',
-          background: '#fff8f0',
-          border: '1px solid #ffd699',
-          borderRadius: '8px',
-          fontSize: '14px',
-          color: '#6b645b',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span style={{ fontSize: '16px' }}>ℹ️</span>
+        <div className="chart-info">
+          <span className="chart-info-icon">ℹ️</span>
           <span>Some months show $0 because no expenses were recorded during that period</span>
         </div>
       )}
 
       {/* Onboarding tip for users with limited data */}
       {hasData && monthlyTrendData.length < 3 && (
-        <div className="chart-tip" style={{
-          marginBottom: '20px',
-          padding: '12px 16px',
-          background: '#f0f9ff',
-          border: '1px solid #bae6fd',
-          borderRadius: '8px',
-          fontSize: '14px',
-          color: '#6b645b',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span style={{ fontSize: '16px' }}>💡</span>
+        <div className="chart-tip">
+          <span className="chart-tip-icon">💡</span>
           <span>Your spending trends will become more insightful as you track more expenses over time</span>
         </div>
       )}

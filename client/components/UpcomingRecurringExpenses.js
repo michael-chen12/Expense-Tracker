@@ -67,11 +67,11 @@ export default function UpcomingRecurringExpenses() {
 
   if (isLoading) {
     return (
-      <section className="card" style={{ marginTop: '24px' }}>
+      <section className="card section-card">
         <div className="card-header">
           <h2>Upcoming Recurring</h2>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+        <div className="loading-center">
           <Spinner size="medium" color="primary" />
         </div>
       </section>
@@ -87,7 +87,7 @@ export default function UpcomingRecurringExpenses() {
   }
 
   return (
-    <section className="card" style={{ marginTop: '24px' }}>
+    <section className="card section-card">
       <div className="card-header">
         <h2>Upcoming Recurring</h2>
         <Link className="button ghost" href="/recurring">Manage</Link>

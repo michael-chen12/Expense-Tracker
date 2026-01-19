@@ -9,6 +9,7 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
+import cron from 'node-cron';
 import { prisma } from './lib/prisma';
 import { authenticateToken, optionalAuth } from './middleware/auth';
 
@@ -1136,11 +1137,11 @@ app.delete('/api/recurring-expenses/:id', optionalAuth, async (req: Request, res
   }
 });
 
-// Process recurring expenses (generate new expenses from templates)
-app.post('/api/recurring-expenses/process', optionalAuth, async (req: Request, res: Response) => {
+// Helper function to process recurring expenses
+async function processRecurringExpenses() {
   try {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // Find all active recurring expenses where nextDate <= today
     const duRecurring = await prisma.recurringExpense.findMany({
       where: {
@@ -1177,7 +1178,7 @@ app.post('/api/recurring-expenses/process', optionalAuth, async (req: Request, r
           note: recurring.note || undefined
         }
       });
-      
+
       processedCount.created++;
 
       // Calculate and update nextDate
@@ -1193,11 +1194,22 @@ app.post('/api/recurring-expenses/process', optionalAuth, async (req: Request, r
         where: { id: recurring.id },
         data: { nextDate: newNextDate }
       });
-      
+
       processedCount.updated++;
     }
 
     console.log(`[Process Recurring] Created ${processedCount.created} expenses, updated ${processedCount.updated} templates`);
+    return processedCount;
+  } catch (error) {
+    console.error('[Process Recurring] Error:', error instanceof Error ? error.message : error);
+    throw error;
+  }
+}
+
+// Process recurring expenses (generate new expenses from templates)
+app.post('/api/recurring-expenses/process', optionalAuth, async (_req: Request, res: Response) => {
+  try {
+    const processedCount = await processRecurringExpenses();
     res.json({ processed: processedCount });
   } catch (error) {
     console.error('[POST /api/recurring-expenses/process] Error:', error instanceof Error ? error.message : error);
@@ -1208,6 +1220,18 @@ app.post('/api/recurring-expenses/process', optionalAuth, async (req: Request, r
 // Start server
 app.listen(PORT, () => {
   console.log(`Expense API running on http://localhost:${PORT}`);
+
+  // Set up cron job to process recurring expenses daily at midnight
+  cron.schedule('0 0 * * *', async () => {
+    console.log('[Cron] Running daily recurring expenses processing...');
+    try {
+      await processRecurringExpenses();
+    } catch (error) {
+      console.error('[Cron] Failed to process recurring expenses:', error);
+    }
+  });
+
+  console.log('[Cron] Scheduled daily recurring expenses processing at midnight');
 });
 
 // Graceful shutdown

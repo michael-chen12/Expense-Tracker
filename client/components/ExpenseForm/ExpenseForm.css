@@ -1,0 +1,142 @@
+/* ExpenseForm Component Styles */
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.expense-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink, #f3f4f6);
+  margin-bottom: 6px;
+}
+
+.expense-form input,
+.expense-form select,
+.expense-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5dccf;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.expense-form input:focus,
+.expense-form select:focus,
+.expense-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.expense-form input:disabled,
+.expense-form select:disabled,
+.expense-form textarea:disabled {
+  background-color: #f8f6f2;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.expense-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.expense-form .error {
+  padding: 10px 12px;
+  background-color: #fef2f2;
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.inline-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.inline-actions .button {
+  flex: 1;
+}
+
+/* Compact form variant */
+.expense-form--compact {
+  gap: 16px;
+}
+
+.expense-form--compact label {
+  font-size: 13px;
+}
+
+.expense-form--compact input,
+.expense-form--compact select,
+.expense-form--compact textarea {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* Two-column layout for wider forms */
+.expense-form--two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.expense-form--two-column > *:last-child {
+  grid-column: 1 / -1;
+}
+
+/* Horizontal layout variant */
+.expense-form--horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.expense-form--horizontal > div {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Success state */
+.expense-form--success input,
+.expense-form--success select {
+  border-color: #10b981;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .expense-form--two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-form--two-column > *:last-child {
+    grid-column: 1;
+  }
+
+  .expense-form--horizontal {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expense-form--horizontal > div {
+    min-width: auto;
+  }
+
+  .inline-actions {
+    flex-direction: column;
+  }
+
+  .inline-actions .button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,140 @@
+/* DateRangeFilter Component Styles */
+
+.date-range-filter-card {
+  margin-bottom: 32px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink, #f3f4f6);
+}
+
+.filter-header span {
+  font-size: 13px;
+  color: var(--muted, #d1d5db);
+  font-weight: 500;
+}
+
+/* Preset buttons */
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.preset-button {
+  padding: 8px 16px;
+  border: 1px solid var(--border, #404854);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink, #f3f4f6);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-button:hover {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.preset-button:active {
+  transform: scale(0.98);
+}
+
+.preset-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Custom button variant */
+.custom-button {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.custom-button:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+/* Custom range inputs section */
+.custom-range-inputs {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border, #404854);
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border, #404854);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--ink, #f3f4f6);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.form-input::placeholder {
+  color: var(--muted, #d1d5db);
+}
+
+.form-input:disabled {
+  background-color: var(--card, #0f111f);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .filter-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .preset-buttons {
+    flex-direction: column;
+  }
+
+  .preset-button {
+    width: 100%;
+  }
+
+  .custom-range-inputs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .input-group {
+    width: 100%;
+  }
+}

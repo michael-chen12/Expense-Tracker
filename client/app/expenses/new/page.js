@@ -1,13 +1,23 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
-import ExpenseForm from '@/components/ExpenseForm';
+import { ExpenseForm } from '@/components/ExpenseForm';
 import { createExpense } from '@/lib/api-backend';
 
 export default function NewExpensePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const today = new Date().toISOString().slice(0, 10);
+
+  // Check for pre-filled values from duplicate action
+  const isDuplicate = searchParams.has('category') || searchParams.has('amount');
+  const initialValues = {
+    date: today,
+    category: searchParams.get('category') || '',
+    amount: searchParams.get('amount') || '',
+    note: searchParams.get('note') || ''
+  };
 
   const handleSubmit = async (payload) => {
     await createExpense(payload);
@@ -19,11 +29,15 @@ export default function NewExpensePage() {
       <div>
         <div className="page-header">
           <div>
-            <h1>New expense</h1>
-            <p className="subtle">Log a fresh expense in seconds.</p>
+            <h1>{isDuplicate ? 'Duplicate expense' : 'New expense'}</h1>
+            <p className="subtle">
+              {isDuplicate
+                ? 'Review and save this duplicated expense.'
+                : 'Log a fresh expense in seconds.'}
+            </p>
           </div>
         </div>
-        <ExpenseForm initialValues={{ date: today }} submitLabel="Add expense" onSubmit={handleSubmit} />
+        <ExpenseForm initialValues={initialValues} submitLabel="Add expense" onSubmit={handleSubmit} />
       </div>
     </AuthGate>
   );

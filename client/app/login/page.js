@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Form, FormGroup, FormLabel, FormError, FormActions } from '@/components/Form';
+import { Input } from '@/components/Input';
+import { Text } from '@/components/Text';
 import Spinner from '@/components/Spinner';
+import './login.css';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,20 +70,21 @@ export default function LoginPage() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>Welcome Back</h1>
-          <p className="subtle">Sign in to your account</p>
+          <Text as="h1" variant="heading-2">Welcome Back</Text>
+          <Text as="p" variant="body" color="muted" className="subtle">Sign in to your account</Text>
         </div>
 
         {error && (
-          <div className="error" style={{ marginBottom: '20px' }}>
+          <div className="error error-margin">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleEmailLogin} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
+        <Form onSubmit={handleEmailLogin} className="auth-form">
+          <FormGroup>
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <Input
+              variant="light"
               id="email"
               name="email"
               type="email"
@@ -89,11 +94,12 @@ export default function LoginPage() {
               placeholder="your@email.com"
               disabled={loading}
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
+          <FormGroup>
+            <FormLabel htmlFor="password">Password</FormLabel>
+            <Input
+              variant="light"
               id="password"
               name="password"
               type="password"
@@ -103,7 +109,7 @@ export default function LoginPage() {
               placeholder="••••••••"
               disabled={loading}
             />
-          </div>
+          </FormGroup>
 
           <button
             type="submit"
@@ -111,13 +117,13 @@ export default function LoginPage() {
             disabled={loading}
           >
             {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span className="button-loading-content-centered">
                 <Spinner size="small" color="white" />
                 Signing in...
               </span>
             ) : 'Sign In'}
           </button>
-        </form>
+        </Form>
 
         <div className="auth-divider">
           <span>or</span>
@@ -150,139 +156,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        .auth-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .auth-card {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          padding: 40px;
-          width: 100%;
-          max-width: 420px;
-        }
-
-        .auth-header {
-          text-align: center;
-          margin-bottom: 30px;
-        }
-
-        .auth-header h1 {
-          margin: 0 0 8px 0;
-          font-size: 28px;
-          color: #1f2937;
-        }
-
-        .auth-form {
-          margin-bottom: 24px;
-        }
-
-        .form-group {
-          margin-bottom: 20px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: 500;
-          color: #374151;
-        }
-
-        .form-group input {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 6px;
-          font-size: 15px;
-          transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-          outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group input:disabled {
-          background: #f3f4f6;
-          cursor: not-allowed;
-        }
-
-        .full-width {
-          width: 100%;
-        }
-
-        .auth-divider {
-          position: relative;
-          text-align: center;
-          margin: 24px 0;
-        }
-
-        .auth-divider::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: #e5e7eb;
-        }
-
-        .auth-divider span {
-          position: relative;
-          background: white;
-          padding: 0 16px;
-          color: #6b7280;
-          font-size: 14px;
-        }
-
-        .github-button {
-          background: #24292e;
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .github-button:hover {
-          background: #1b1f23;
-        }
-
-        .github-button:disabled {
-          background: #6b7280;
-          cursor: not-allowed;
-        }
-
-        .auth-footer {
-          text-align: center;
-          margin-top: 24px;
-          padding-top: 24px;
-          border-top: 1px solid #e5e7eb;
-        }
-
-        .auth-footer p {
-          margin: 0;
-          color: #6b7280;
-        }
-
-        .link {
-          color: #667eea;
-          text-decoration: none;
-          font-weight: 500;
-        }
-
-        .link:hover {
-          text-decoration: underline;
-        }
-      `}</style>
     </div>
   );
 }

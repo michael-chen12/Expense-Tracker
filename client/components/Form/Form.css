@@ -1,0 +1,211 @@
+/* Form Component Styles */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form group - label + input wrapper */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Form label */
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 0;
+}
+
+/* Form input - text, email, password, number, date */
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--ink);
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-input:disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Form select */
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--ink);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-select:disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Form textarea */
+.form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--ink);
+  transition: all 0.2s ease;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-textarea:disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Form checkbox and radio */
+.form-checkbox,
+.form-radio {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.form-checkbox:disabled,
+.form-radio:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Form row - for horizontal layout */
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row > * {
+  flex: 1;
+}
+
+/* Form error message */
+.form-error-message {
+  padding: 10px 12px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 14px;
+  margin-top: 0;
+}
+
+/* Form actions - buttons container */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-actions--end {
+  justify-content: flex-end;
+}
+
+.form-actions--start {
+  justify-content: flex-start;
+}
+
+.form-actions--center {
+  justify-content: center;
+}
+
+.form-actions--between {
+  justify-content: space-between;
+}
+
+/* Form section - for grouping fields */
+.form-section {
+  margin-top: 8px;
+}
+
+.form-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 12px 0;
+}
+
+/* Form card wrapper */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+/* Form help text */
+.form-help-text {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .button {
+    width: 100%;
+  }
+}

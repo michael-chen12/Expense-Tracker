@@ -2,10 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
+import { Button } from '@/components/Button';
+import { Modal, ModalActions } from '@/components/Modal';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
+import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
 
 function groupByDate(expenses) {
   return expenses.reduce((acc, expense) => {
@@ -18,6 +22,8 @@ function groupByDate(expenses) {
 }
 
 export default function ExpensesPage() {
+  const router = useRouter();
+  const { hasExpenses, isLoading: checkingExpenses } = useHasExpenses();
   const today = new Date().toISOString().slice(0, 10);
   const [filters, setFilters] = useState({
     from: '',
@@ -27,6 +33,15 @@ export default function ExpensesPage() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [confirmExpense, setConfirmExpense] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // Redirect to dashboard if user has no expenses
+  useEffect(() => {
+    if (!checkingExpenses && hasExpenses === false) {
+      router.replace('/');
+    }
+  }, [hasExpenses, checkingExpenses, router]);
 
   const loadExpenses = async () => {
     setLoading(true);
@@ -57,22 +72,60 @@ export default function ExpensesPage() {
     }));
   };
 
-  const handleDelete = async (expenseId) => {
-    const confirmed = window.confirm('Delete this expense?');
-    if (!confirmed) {
-      return;
-    }
+  const requestDelete = (expense) => {
+    setConfirmExpense(expense);
+  };
+
+  const handleDuplicate = (expense) => {
+    // Navigate to new expense page with pre-filled data (today's date)
+    const params = new URLSearchParams({
+      category: expense.category || '',
+      amount: expense.amount ? String(expense.amount) : '',
+      note: expense.note || ''
+    });
+    router.push(`/expenses/new?${params.toString()}`);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmExpense) return;
+
+    setDeleting(true);
 
     try {
-      await deleteExpense(expenseId);
-      setExpenses((prev) => prev.filter((expense) => expense.id !== expenseId));
+      await deleteExpense(confirmExpense.id);
+      const updatedExpenses = expenses.filter((expense) => expense.id !== confirmExpense.id);
+      setExpenses(updatedExpenses);
+
+      // If no expenses remain after deletion, redirect to dashboard
+      if (updatedExpenses.length === 0) {
+        router.replace('/');
+      }
     } catch (deleteError) {
       setError(deleteError.message || 'Unable to delete expense.');
+    } finally {
+      setDeleting(false);
+      setConfirmExpense(null);
     }
   };
 
   const groupedExpenses = groupByDate(expenses);
   const dates = Object.keys(groupedExpenses).sort((a, b) => (a > b ? -1 : 1));
+
+  // Show loading while checking if user has expenses
+  if (checkingExpenses) {
+    return (
+      <AuthGate>
+        <div className="loading-state-centered">
+          <Spinner size="large" color="primary" />
+        </div>
+      </AuthGate>
+    );
+  }
+
+  // If user has no expenses, don't render (will redirect)
+  if (hasExpenses === false) {
+    return null;
+  }
 
   return (
     <AuthGate>
@@ -82,10 +135,10 @@ export default function ExpensesPage() {
           <h1>Expenses</h1>
           <p className="subtle">Filter, scan, and jump into edits.</p>
         </div>
-        <Link className="button primary" href="/expenses/new">New expense</Link>
+        <Button variant="primary" href="/expenses/new">New expense</Button>
       </div>
 
-      <section className="card" style={{ marginBottom: '20px' }}>
+      <section className="card card-form">
         <div className="card-header">
           <h2>Filters</h2>
           <button className="button ghost" type="button" onClick={loadExpenses}>
@@ -134,9 +187,9 @@ export default function ExpensesPage() {
       {error ? <div className="error">{error}</div> : null}
 
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+        <div className="loading-state">
           <Spinner size="medium" color="primary" />
-          <p className="subtle" style={{ margin: 0 }}>Loading expenses...</p>
+          <p className="subtle no-margin">Loading expenses...</p>
         </div>
       ) : dates.length ? (
         <div className="grid">
@@ -147,7 +200,7 @@ export default function ExpensesPage() {
                 <div className="card-header">
                   <div>
                     <h2>{formatDate(dateKey)}</h2>
-                    <p className="subtle" style={{ margin: 0 }}>Total: {formatCurrency(dailyTotal)}</p>
+                    <p className="subtle no-margin">Total: {formatCurrency(dailyTotal)}</p>
                   </div>
                   <span className="badge">{groupedExpenses[dateKey].length} entries</span>
                 </div>
@@ -160,12 +213,52 @@ export default function ExpensesPage() {
                     </div>
                     <div className="expense-amount">{formatCurrency(expense.amount)}</div>
                     <div className="inline-actions">
-                      <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+                      <Link
+                        className="button ghost button--icon"
+                        href={`/expenses/${expense.id}`}
+                        aria-label={`Edit ${expense.category}`}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </Link>
                       <button
-                        className="button ghost"
+                        className="button ghost button--icon"
+                        type="button"
+                        aria-label={`Duplicate ${expense.category}`}
+                        onClick={() => handleDuplicate(expense)}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      </button>
+                      <button
+                        className="button ghost button--icon"
                         type="button"
                         aria-label={`Delete ${expense.category}`}
-                        onClick={() => handleDelete(expense.id)}
+                        onClick={() => requestDelete(expense)}
                       >
                         <svg
                           aria-hidden="true"
@@ -192,6 +285,51 @@ export default function ExpensesPage() {
             </section>
           );
           })}
+
+        <Modal
+          open={Boolean(confirmExpense)}
+          onClose={() => setConfirmExpense(null)}
+          title="Delete expense"
+          description="This will permanently remove the selected expense."
+        >
+          {confirmExpense ? (
+            <div className="modal-detail-card">
+              <div className="modal-detail-header">
+                <div>
+                  <p className="modal-detail-title">{confirmExpense.category || 'Uncategorized'}</p>
+                  <p className="modal-detail-meta">Date: {confirmExpense.date ? formatDate(confirmExpense.date) : '—'}</p>
+                </div>
+                <p className="modal-detail-amount">{formatCurrency(confirmExpense.amount || 0)}</p>
+              </div>
+              <p className="modal-detail-note">{confirmExpense.note || 'No note provided.'}</p>
+            </div>
+          ) : null}
+
+          <p className="modal-message">Delete expense?</p>
+          <ModalActions>
+            <button
+              type="button"
+              className="button ghost"
+              onClick={() => setConfirmExpense(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="button primary"
+              onClick={handleConfirmDelete}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <span className="button-loading-content">
+                  <Spinner size="small" color="white" />
+                  Deleting...
+                </span>
+              ) : 'Delete expense'}
+            </button>
+          </ModalActions>
+        </Modal>
         </div>
       ) : (
         <p className="subtle">No expenses match those filters.</p>

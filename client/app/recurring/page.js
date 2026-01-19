@@ -5,11 +5,12 @@ import Link from 'next/link';
 import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
 import Spinner from '@/components/Spinner';
-import RecurringExpenseForm from '@/components/recurring/RecurringExpenseForm';
-import RecurringExpenseList from '@/components/recurring/RecurringExpenseList';
+import { Button } from '@/components/Button';
+import { RecurringExpenseForm, RecurringExpenseList } from '@/components/RecurringExpense';
 import {
   getRecurringExpenses,
   createRecurringExpense,
+  updateRecurringExpense,
   deleteRecurringExpense,
   processRecurringExpenses
 } from '@/lib/api-backend';
@@ -22,6 +23,7 @@ function RecurringExpensesPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [processing, setProcessing] = useState(false);
 
   const loadRecurringExpenses = async () => {
@@ -43,16 +45,27 @@ function RecurringExpensesPage() {
     }
   }, [session]);
 
-  const handleCreate = async (payload) => {
+  const handleSubmit = async (payload) => {
     try {
-      await createRecurringExpense(payload);
-      setSuccess('Recurring expense created successfully!');
+      if (editingExpense) {
+        await updateRecurringExpense(editingExpense.id, payload);
+        setSuccess('Recurring expense updated successfully!');
+      } else {
+        await createRecurringExpense(payload);
+        setSuccess('Recurring expense created successfully!');
+      }
       setShowForm(false);
+      setEditingExpense(null);
       await loadRecurringExpenses();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      throw new Error(err.message || 'Failed to create recurring expense');
+      throw new Error(err.message || `Failed to ${editingExpense ? 'update' : 'create'} recurring expense`);
     }
+  };
+
+  const handleEdit = (expense) => {
+    setEditingExpense(expense);
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -90,44 +103,47 @@ function RecurringExpensesPage() {
           <p className="subtle">Manage your recurring bills and subscriptions</p>
         </div>
         <div className="inline-actions">
-          <button
-            type="button"
-            className="button ghost"
+          <Button
+            className="button ghost button--icon"
             onClick={handleProcess}
             disabled={processing}
           >
             {processing ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="button-loading-content">
                 <Spinner size="small" color="primary" />
                 Processing...
               </span>
             ) : 'Process Now'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             className="button primary"
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              setShowForm(!showForm);
+              if (showForm) {
+                setEditingExpense(null);
+              }
+            }}
           >
             {showForm ? 'Cancel' : 'Add Recurring'}
-          </button>
+          </Button>
         </div>
       </div>
 
       {success && (
-        <div style={{ background: '#d4edda', color: '#155724', padding: '12px 16px', borderRadius: '8px', marginBottom: '24px' }}>
+        <div className="success-message">
           {success}
         </div>
       )}
 
       {error && (
-        <div className="error" style={{ marginBottom: '24px' }}>
+        <div className="error error-margin">
           {error}
         </div>
       )}
 
-      <div className="card" style={{ marginBottom: '24px', background: '#f8f6f2' }}>
-        <h3 style={{ marginTop: 0 }}>How it works</h3>
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+      <div className="card info-card">
+        <h3 className="info-card-title">How it works</h3>
+        <ul className="info-card-list">
           <li>Create recurring expenses for bills, subscriptions, and regular payments</li>
           <li>Choose the frequency: daily, weekly, monthly, or yearly</li>
           <li>Click "Process Now" to generate expenses from your recurring templates</li>
@@ -137,8 +153,12 @@ function RecurringExpensesPage() {
 
       {showForm && (
         <RecurringExpenseForm
-          onSubmit={handleCreate}
-          onCancel={() => setShowForm(false)}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingExpense(null);
+          }}
+          editingExpense={editingExpense}
         />
       )}
 
@@ -146,6 +166,7 @@ function RecurringExpensesPage() {
         recurringExpenses={recurringExpenses}
         isLoading={isLoading}
         onDelete={handleDelete}
+        onEdit={handleEdit}
       />
     </div>
   );
@@ -160,11 +181,11 @@ export default function RecurringExpensesPageWrapper() {
 
   if (!session) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
+      <div className="card card-centered">
         <h2>Please sign in to manage recurring expenses</h2>
-        <Link href="/" className="button primary" style={{ marginTop: '16px' }}>
+        <Button className="button primary margin-top-16" href="/">
           Go to Home
-        </Link>
+        </Button>
       </div>
     );
   }

@@ -1,0 +1,126 @@
+/* Modern Button Component Styles - Pill-shaped with smooth animations */
+
+/* Base button styles - Modern pill-shaped design */
+.button-modern {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.button-modern:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button-modern:focus-visible {
+  outline: 2px solid var(--button-primary-bg);
+  outline-offset: 2px;
+}
+
+/* Primary button variant - Purple with hover lift effect */
+.button-modern.primary {
+  background-color: var(--button-primary-bg);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+.button-modern.primary:hover:not(:disabled) {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+
+.button-modern.primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+/* Ghost button variant - Outline style with dark background */
+.button-modern.ghost {
+  background-color: transparent;
+  color: var(--ink);
+  border: 2px solid var(--border);
+}
+
+.button-modern.ghost:hover:not(:disabled) {
+  background-color: rgba(124, 58, 237, 0.1);
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.15);
+}
+
+.button-modern.ghost:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Reverse button variant - Dark background */
+.button-modern.reverse {
+  background-color: var(--card);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-modern.reverse:hover:not(:disabled) {
+  background-color: rgba(124, 58, 237, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
+}
+
+.button-modern.reverse:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.25);
+}
+
+/* Outline button variant - White with accent text */
+.button-modern.outline {
+  background-color: var(--button-outline-bg);
+  color: var(--button-outline-text);
+  border: 2px solid var(--button-outline-border);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+}
+
+.button-modern.outline:hover:not(:disabled) {
+  background-color: var(--accent-soft);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.2);
+}
+
+.button-modern.outline:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Compact variant for inline placement */
+.button-modern--compact {
+  padding: 8px 14px;
+  font-size: 12px;
+  border-radius: 50px;
+}
+
+/* Full width variant */
+.button-modern--full {
+  width: 100%;
+}
+
+/* Icon-only button */
+.button-modern--icon {
+  padding: 10px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+}

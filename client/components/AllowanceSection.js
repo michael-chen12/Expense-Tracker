@@ -1,5 +1,7 @@
 'use client';
 
+import { Form, FormGroup, FormLabel, FormInput, FormSelect, FormError, FormActions } from '@/components/Form';
+import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { formatCurrency } from '@/lib/format';
 
@@ -15,7 +17,7 @@ export default function AllowanceSection({
   console.log('[AllowanceSection] allowance:', allowance);
   
   return (
-    <section className="card" style={{ marginTop: '24px' }}>
+    <section className="card section-card">
       <div className="card-header">
         <h2>Allowance top-up</h2>
         <span className="badge">{allowanceStatus?.label || 'Period'}</span>
@@ -29,10 +31,10 @@ export default function AllowanceSection({
           <p className="subtle">Next top-up: {allowanceStatus?.nextTopUp || '—'}</p>
         </div>
 
-        <form onSubmit={onSubmit}>
-          <div>
-            <label htmlFor="allowanceAmount">Allowance amount</label>
-            <input
+        <Form onSubmit={onSubmit}>
+          <FormGroup>
+            <FormLabel htmlFor="allowanceAmount">Allowance amount</FormLabel>
+            <FormInput
               id="allowanceAmount"
               name="amount"
               type="number"
@@ -43,10 +45,11 @@ export default function AllowanceSection({
               placeholder="0.00"
               required
             />
-          </div>
-          <div>
-            <label htmlFor="allowanceCadence">Top-up cadence</label>
-            <select
+          </FormGroup>
+          
+          <FormGroup>
+            <FormLabel htmlFor="allowanceCadence">Top-up cadence</FormLabel>
+            <FormSelect
               id="allowanceCadence"
               name="cadence"
               value={allowance.cadence}
@@ -55,22 +58,22 @@ export default function AllowanceSection({
               <option value="day">Daily</option>
               <option value="week">Weekly</option>
               <option value="month">Monthly</option>
-            </select>
-          </div>
+            </FormSelect>
+          </FormGroup>
 
-          {allowanceError ? <div className="error">{allowanceError}</div> : null}
+          <FormError>{allowanceError}</FormError>
 
-          <div className="inline-actions">
-            <button className="button primary" type="submit" disabled={savingAllowance}>
+          <FormActions align="end">
+            <Button variant="primary" type="submit" disabled={savingAllowance}>
               {savingAllowance ? (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="button-loading-content">
                   <Spinner size="small" color="white" />
                   Saving...
                 </span>
               ) : 'Save allowance'}
-            </button>
-          </div>
-        </form>
+            </Button>
+          </FormActions>
+        </Form>
       </div>
     </section>
   );

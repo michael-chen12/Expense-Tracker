@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { formatCurrency } from '@/lib/chart-utils';
+import './Charts.css';
 
 /**
  * Spending Trend Chart - Shows spending over the last 6 months
@@ -21,42 +22,14 @@ export default function SpendingTrendChart({ data }) {
     if (active && payload && payload.length) {
       const isEmptyMonth = payload[0].payload.count === 0;
       return (
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e5dccf',
-            borderRadius: '12px',
-            padding: '12px 16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 4px',
-              fontWeight: '600',
-              fontSize: '14px',
-              color: '#1b1b1b',
-            }}
-          >
+        <div className="chart-tooltip">
+          <p className="chart-tooltip-title">
             {payload[0].payload.monthLabel}
           </p>
-          <p
-            style={{
-              margin: '0',
-              fontSize: '16px',
-              fontWeight: '700',
-              color: isEmptyMonth ? '#9ca3af' : '#ff7a00',
-            }}
-          >
+          <p className={`chart-tooltip-value ${isEmptyMonth ? 'chart-tooltip-value--muted' : 'chart-tooltip-value--primary'}`}>
             {formatCurrency(payload[0].value * 100)}
           </p>
-          <p
-            style={{
-              margin: '4px 0 0',
-              fontSize: '12px',
-              color: '#6b645b',
-            }}
-          >
+          <p className="chart-tooltip-subtitle">
             {isEmptyMonth
               ? 'No expenses recorded'
               : `${payload[0].payload.count} ${payload[0].payload.count === 1 ? 'expense' : 'expenses'}`
@@ -100,7 +73,7 @@ export default function SpendingTrendChart({ data }) {
         cx={cx}
         cy={cy}
         r={4}
-        fill="#ff7a00"
+        fill="#7c3aed"
         stroke="#ffffff"
         strokeWidth={2}
       />
@@ -108,7 +81,7 @@ export default function SpendingTrendChart({ data }) {
   };
 
   return (
-    <div style={{ width: '100%', height: 280 }}>
+    <div className="chart-wrapper">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
@@ -117,28 +90,28 @@ export default function SpendingTrendChart({ data }) {
         >
           <defs>
             <linearGradient id="colorSpending" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#ff7a00" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#fff0dc" stopOpacity={0.1} />
+              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5dccf" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" />
           <XAxis
             dataKey="monthLabel"
-            tick={{ fill: '#6b645b', fontSize: 12 }}
+            tick={{ fill: '#d1d5db', fontSize: 12 }}
             tickLine={false}
-            axisLine={{ stroke: '#e5dccf' }}
+            axisLine={{ stroke: '#2a2a40' }}
           />
           <YAxis
-            tick={{ fill: '#6b645b', fontSize: 12 }}
+            tick={{ fill: '#d1d5db', fontSize: 12 }}
             tickLine={false}
-            axisLine={{ stroke: '#e5dccf' }}
+            axisLine={{ stroke: '#2a2a40' }}
             tickFormatter={formatYAxis}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#ff7a00', strokeWidth: 1 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#7c3aed', strokeWidth: 1 }} />
           <Area
             type="monotone"
             dataKey="total"
-            stroke="#ff7a00"
+            stroke="#7c3aed"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorSpending)"
