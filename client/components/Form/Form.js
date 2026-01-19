@@ -1,5 +1,6 @@
 'use client';
 
+import Input from '../Input/Input';
 import './Form.css';
 
 /**
@@ -34,45 +35,115 @@ export function FormLabel({ htmlFor, children, required, className = '' }) {
   return (
     <label htmlFor={htmlFor} className={`form-label ${className}`}>
       {children}
-      {required && <span style={{ color: '#ef4444', marginLeft: '4px' }}>*</span>}
+      {required && <span className="form-label-required">*</span>}
     </label>
   );
 }
 
 /**
  * FormInput - Text, email, password, number, date inputs
+ * Now uses the enhanced Input component from the Input package
  */
-export function FormInput({ className = '', ...props }) {
-  return <input className={`form-input ${className}`} {...props} />;
-}
-
-/**
- * FormSelect - Select dropdown
- */
-export function FormSelect({ children, className = '', ...props }) {
+export function FormInput({
+  size = 'md',
+  label = '',
+  error = '',
+  help = '',
+  leftIcon = null,
+  rightIcon = null,
+  prefix = null,
+  suffix = null,
+  clearable = false,
+  onClear = null,
+  className = '',
+  ...props
+}) {
   return (
-    <select className={`form-select ${className}`} {...props}>
-      {children}
-    </select>
+    <Input
+      size={size}
+      label={label}
+      error={error}
+      help={help}
+      leftIcon={leftIcon}
+      rightIcon={rightIcon}
+      prefix={prefix}
+      suffix={suffix}
+      clearable={clearable}
+      onClear={onClear}
+      className={className}
+      {...props}
+    />
   );
 }
 
 /**
- * FormTextarea - Textarea input
+ * FormSelect - Select dropdown with consistent styling
  */
-export function FormTextarea({ className = '', ...props }) {
-  return <textarea className={`form-textarea ${className}`} {...props} />;
+export function FormSelect({
+  size = 'md',
+  label = '',
+  error = '',
+  help = '',
+  children,
+  className = '',
+  ...props
+}) {
+  const sizeClass = ` form-select--${size}`;
+  const stateClass = error ? ' form-select--error' : '';
+  const classes = `form-select${sizeClass}${stateClass}${className ? ' ' + className : ''}`.trim();
+
+  return (
+    <div className="form-select-wrapper">
+      {label && <label className="form-label">{label}</label>}
+      <select className={classes} {...props}>
+        {children}
+      </select>
+      {(error || help) && (
+        <div className={`form-help${error ? ' form-help--error' : ''}`}>
+          {error || help}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**
- * FormCheckbox - Checkbox input
+ * FormTextarea - Textarea input with consistent styling
+ */
+export function FormTextarea({
+  size = 'md',
+  label = '',
+  error = '',
+  help = '',
+  className = '',
+  ...props
+}) {
+  const sizeClass = ` form-textarea--${size}`;
+  const stateClass = error ? ' form-textarea--error' : '';
+  const classes = `form-textarea${sizeClass}${stateClass}${className ? ' ' + className : ''}`.trim();
+
+  return (
+    <div className="form-textarea-wrapper">
+      {label && <label className="form-label">{label}</label>}
+      <textarea className={classes} {...props} />
+      {(error || help) && (
+        <div className={`form-help${error ? ' form-help--error' : ''}`}>
+          {error || help}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * FormCheckbox - Checkbox input with label
  */
 export function FormCheckbox({ label, className = '', ...props }) {
   if (label) {
     return (
-      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-        <input type="checkbox" className={`form-checkbox ${className}`} {...props} />
-        {label}
+      <label className={`form-checkbox-label ${className}`}>
+        <input type="checkbox" className="form-checkbox" {...props} />
+        <span>{label}</span>
       </label>
     );
   }
@@ -80,14 +151,14 @@ export function FormCheckbox({ label, className = '', ...props }) {
 }
 
 /**
- * FormRadio - Radio input
+ * FormRadio - Radio input with label
  */
 export function FormRadio({ label, className = '', ...props }) {
   if (label) {
     return (
-      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-        <input type="radio" className={`form-radio ${className}`} {...props} />
-        {label}
+      <label className={`form-radio-label ${className}`}>
+        <input type="radio" className="form-radio" {...props} />
+        <span>{label}</span>
       </label>
     );
   }

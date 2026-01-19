@@ -7,6 +7,8 @@ import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
 import { Button } from '@/components/Button';
 import { Modal, ModalActions } from '@/components/Modal';
+import Alert from '@/components/Alert';
+import { Form, FormGroup, FormLabel, FormSelect } from '@/components/Form';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
@@ -139,52 +141,79 @@ export default function ExpensesPage() {
       </div>
 
       <section className="card card-form">
-        <div className="card-header">
+        <div className="card-header filters-header">
           <h2>Filters</h2>
-          <button className="button ghost" type="button" onClick={loadExpenses}>
+          <Button variant="ghost" onClick={loadExpenses}>
             Apply filters
-          </button>
+          </Button>
         </div>
-        <div className="filter-grid">
-          <div>
-            <label htmlFor="from">From</label>
-            <input id="from" name="from" type="date" value={filters.from} onChange={handleChange} max={today} />
+        <Form onSubmit={(e) => { e.preventDefault(); loadExpenses(); }}>
+          <div className="filter-grid">
+            <FormGroup>
+              <FormLabel htmlFor="from">From</FormLabel>
+              <input 
+                id="from" 
+                name="from" 
+                type="date" 
+                value={filters.from} 
+                onChange={handleChange} 
+                max={today}
+                className="form-input"
+              />
+            </FormGroup>
+            <FormGroup>
+              <FormLabel htmlFor="to">To</FormLabel>
+              <input
+                id="to"
+                name="to"
+                type="date"
+                value={filters.to}
+                onChange={handleChange}
+                max={today}
+                min={filters.from || undefined}
+                disabled={!filters.from}
+                title={filters.from ? '' : 'Select a From date first'}
+                className="form-input"
+              />
+            </FormGroup>
+            <FormGroup>
+              <FormLabel htmlFor="category">Category</FormLabel>
+              <FormSelect id="category" name="category" value={filters.category} onChange={handleChange}>
+                <option value="">All categories</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Food">Food</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Housing">Housing</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Subscriptions">Subscriptions</option>
+                <option value="Health">Health</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Education">Education</option>
+                <option value="Travel">Travel</option>
+                <option value="Other">Other</option>
+              </FormSelect>
+            </FormGroup>
           </div>
-          <div>
-            <label htmlFor="to">To</label>
-            <input
-              id="to"
-              name="to"
-              type="date"
-              value={filters.to}
-              onChange={handleChange}
-              max={today}
-              min={filters.from || undefined}
-              disabled={!filters.from}
-              title={filters.from ? '' : 'Select a From date first'}
-            />
-          </div>
-          <div>
-            <label htmlFor="category">Category</label>
-            <select id="category" name="category" value={filters.category} onChange={handleChange}>
-              <option value="">All categories</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Food">Food</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Housing">Housing</option>
-              <option value="Utilities">Utilities</option>
-              <option value="Subscriptions">Subscriptions</option>
-              <option value="Health">Health</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Education">Education</option>
-              <option value="Travel">Travel</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
+        </Form>
+        <style jsx>{`
+          .filters-header {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+          }
+
+          @media (max-width: 640px) {
+            .filters-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
+            }
+          }
+        `}</style>
       </section>
 
-      {error ? <div className="error">{error}</div> : null}
+      {error ? <Alert variant="error" dismissible onDismiss={() => setError('')}>{error}</Alert> : null}
 
       {loading ? (
         <div className="loading-state">
@@ -197,12 +226,14 @@ export default function ExpensesPage() {
             const dailyTotal = groupedExpenses[dateKey].reduce((sum, expense) => sum + expense.amount, 0);
             return (
               <section key={dateKey} className="card">
-                <div className="card-header">
+                <div className="expense-date-header">
                   <div>
                     <h2>{formatDate(dateKey)}</h2>
                     <p className="subtle no-margin">Total: {formatCurrency(dailyTotal)}</p>
                   </div>
-                  <span className="badge">{groupedExpenses[dateKey].length} entries</span>
+                  <span className="badge">
+                    {groupedExpenses[dateKey].length} {groupedExpenses[dateKey].length === 1 ? 'entry' : 'entries'}
+                  </span>
                 </div>
                 <div className="expense-list">
                   {groupedExpenses[dateKey].map((expense) => (

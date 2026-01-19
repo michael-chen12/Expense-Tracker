@@ -97,12 +97,12 @@ export default function SpendingTrendChart({ data }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" />
           <XAxis
             dataKey="monthLabel"
-            tick={{ fill: '#d1d5db', fontSize: 12 }}
+            tick={{ fill: 'var(--ink)', fontSize: 12 }}
             tickLine={false}
             axisLine={{ stroke: '#2a2a40' }}
           />
           <YAxis
-            tick={{ fill: '#d1d5db', fontSize: 12 }}
+            tick={{ fill: 'var(--ink)', fontSize: 12 }}
             tickLine={false}
             axisLine={{ stroke: '#2a2a40' }}
             tickFormatter={formatYAxis}

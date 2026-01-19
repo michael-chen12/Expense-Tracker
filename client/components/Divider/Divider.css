@@ -1,0 +1,124 @@
+/* ====================================================================
+   DIVIDER COMPONENT STYLES
+   Visual separators for content sections
+   ==================================================================== */
+
+.divider {
+  background-color: transparent;
+  border: none;
+}
+
+/* ===== ORIENTATION VARIANTS ===== */
+
+/* Horizontal divider */
+.divider--horizontal {
+  width: 100%;
+  height: var(--divider-width);
+  background-color: var(--divider-color);
+  margin: 0;
+}
+
+/* Vertical divider */
+.divider--vertical {
+  width: var(--divider-width);
+  height: 100%;
+  background-color: var(--divider-color);
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ===== SPACING VARIANTS ===== */
+.divider--spacing-2 {
+  margin: var(--space-2) 0;
+}
+
+.divider--vertical.divider--spacing-2 {
+  margin: 0 var(--space-2);
+}
+
+.divider--spacing-4 {
+  margin: var(--space-4) 0;
+}
+
+.divider--vertical.divider--spacing-4 {
+  margin: 0 var(--space-4);
+}
+
+.divider--spacing-6 {
+  margin: var(--space-6) 0;
+}
+
+.divider--vertical.divider--spacing-6 {
+  margin: 0 var(--space-6);
+}
+
+.divider--spacing-8 {
+  margin: var(--space-8) 0;
+}
+
+.divider--vertical.divider--spacing-8 {
+  margin: 0 var(--space-8);
+}
+
+/* ===== VARIANT STYLES ===== */
+
+/* Solid (default) */
+.divider--solid {
+  border-top: var(--divider-width) solid var(--divider-color);
+}
+
+.divider--vertical.divider--solid {
+  border-top: none;
+  border-left: var(--divider-width) solid var(--divider-color);
+}
+
+/* Dashed */
+.divider--dashed {
+  border-top: var(--divider-width) dashed var(--divider-color);
+}
+
+.divider--vertical.divider--dashed {
+  border-top: none;
+  border-left: var(--divider-width) dashed var(--divider-color);
+}
+
+/* Dotted */
+.divider--dotted {
+  border-top: var(--divider-width) dotted var(--divider-color);
+}
+
+.divider--vertical.divider--dotted {
+  border-top: none;
+  border-left: var(--divider-width) dotted var(--divider-color);
+}
+
+/* ===== LABELED DIVIDER ===== */
+.divider--labeled {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.divider-label {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  padding: 0 var(--space-2);
+}
+
+.divider--labeled::before,
+.divider--labeled::after {
+  content: '';
+  flex: 1;
+  height: var(--divider-width);
+  background-color: var(--divider-color);
+}
+
+/* ===== LIGHT MODE OVERRIDES ===== */
+[data-theme="light"] .divider-label {
+  color: #6b7280;
+}
