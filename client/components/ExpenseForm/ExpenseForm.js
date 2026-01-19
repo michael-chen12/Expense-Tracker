@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Spinner from './Spinner';
+import Spinner from '@/components/Spinner';
+import './ExpenseForm.css';
 
 const EMPTY_FORM = {
   amount: '',

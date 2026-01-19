@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import AuthButton from '@/components/AuthButton';
+import { AuthButton } from '@/components/Button';
 import NavLinks from '@/components/NavLinks';
 import SkipToMain from '@/components/SkipToMain';
 

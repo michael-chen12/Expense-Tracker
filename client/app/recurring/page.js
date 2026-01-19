@@ -5,8 +5,8 @@ import Link from 'next/link';
 import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
 import Spinner from '@/components/Spinner';
-import RecurringExpenseForm from '@/components/recurring/RecurringExpenseForm';
-import RecurringExpenseList from '@/components/recurring/RecurringExpenseList';
+import { RecurringExpenseForm } from '@/components/RecurringExpense';
+import { RecurringExpenseList } from '@/components/RecurringExpense';
 import {
   getRecurringExpenses,
   createRecurringExpense,

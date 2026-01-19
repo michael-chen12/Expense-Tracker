@@ -1,0 +1,118 @@
+/* Charts Component Styles */
+
+.chart-container {
+  width: 100%;
+  height: 280px;
+}
+
+.budget-progress-container {
+  width: 100%;
+}
+
+.budget-progress-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.budget-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #6b645b;
+}
+
+.budget-progress-header strong {
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+.budget-progress-track {
+  height: 8px;
+  background-color: #f0ede5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.budget-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.budget-progress-fill.green {
+  background-color: #10b981;
+}
+
+.budget-progress-fill.orange {
+  background-color: #f59e0b;
+}
+
+.budget-progress-fill.red {
+  background-color: #ef4444;
+}
+
+/* Compact progress bar variant */
+.budget-progress-bar--compact {
+  gap: 8px;
+}
+
+.budget-progress-bar--compact .budget-progress-header {
+  font-size: 12px;
+}
+
+.budget-progress-bar--compact .budget-progress-track {
+  height: 6px;
+}
+
+/* Chart empty state */
+.chart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b645b;
+}
+
+.chart-empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.chart-empty-state h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #1b1b1b;
+}
+
+.chart-empty-state p {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.chart-empty-state .button {
+  margin-top: 8px;
+}
+
+/* Responsive charts */
+@media (max-width: 768px) {
+  .chart-container {
+    height: 200px;
+  }
+
+  .budget-progress-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chart-empty-state {
+    padding: 30px 16px;
+  }
+
+  .chart-empty-state svg {
+    width: 60px;
+    height: 60px;
+  }
+}

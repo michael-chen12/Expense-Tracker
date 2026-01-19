@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Spinner from './Spinner';
+import Spinner from '@/components/Spinner';
 
 export default function LandingPage() {
   const router = useRouter();

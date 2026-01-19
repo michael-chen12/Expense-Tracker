@@ -1,5 +1,7 @@
 'use client';
 
+import './SkeletonLoader.css';
+
 interface SkeletonCardProps {
   height?: string;
 }
@@ -80,21 +82,4 @@ export function SkeletonGrid({ count = 3, columns = 3 }: SkeletonGridProps) {
   );
 }
 
-// Add CSS animation to globals.css if not already present
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes skeleton-loading {
-      0% {
-        background-position: 200% 0;
-      }
-      100% {
-        background-position: -200% 0;
-      }
-    }
-  `;
-  if (!document.querySelector('style[data-skeleton]')) {
-    style.setAttribute('data-skeleton', 'true');
-    document.head.appendChild(style);
-  }
-}
+

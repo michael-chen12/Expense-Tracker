@@ -18,7 +18,7 @@ import DashboardCharts from '@/components/DashboardCharts';
 import RecentExpenses from '@/components/RecentExpenses';
 import AllowanceSection from '@/components/AllowanceSection';
 import UpcomingRecurringExpenses from '@/components/UpcomingRecurringExpenses';
-import DateRangeFilter from '@/components/DateRangeFilter';
+import { DateRangeFilter } from '@/components/DateRangeFilter';
 import EmptyDashboardState from '@/components/EmptyDashboardState';
 
 function getMonthRange() {

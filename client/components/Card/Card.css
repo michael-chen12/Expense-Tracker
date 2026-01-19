@@ -1,0 +1,119 @@
+/* Card Component Styles */
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5dccf;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: #d9cfc0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Chart card specific styling */
+.chart-card {
+  background: #ffffff;
+  border: 1px solid #e5dccf;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.chart-card-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0ede5;
+}
+
+.chart-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+/* Overview card styling */
+.overview-card {
+  background: linear-gradient(135deg, #fafaf8 0%, #f5f3f0 100%);
+  border: 1px solid #e5dccf;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.overview-card:hover {
+  border-color: #d9cfc0;
+  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.1);
+}
+
+.overview-card-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b645b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.overview-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.overview-card-value.accent {
+  color: #ff7a00;
+}
+
+/* Compact card variant */
+.card--compact {
+  padding: 12px 16px;
+}
+
+/* Minimal card variant - no shadow */
+.card--minimal {
+  box-shadow: none;
+  border-color: #f0ede5;
+}
+
+.card--minimal:hover {
+  box-shadow: none;
+}
+
+/* Interactive card variant */
+.card--interactive {
+  cursor: pointer;
+}
+
+.card--interactive:hover {
+  border-color: #ff7a00;
+  box-shadow: 0 6px 16px rgba(255, 122, 0, 0.12);
+}
+
+.card--interactive:active {
+  transform: scale(0.98);
+}
+
+/* Empty state card */
+.card--empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b645b;
+}
+
+/* Error state card */
+.card--error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* Success state card */
+.card--success {
+  border-color: #10b981;
+  background-color: #f0fdf4;
+}

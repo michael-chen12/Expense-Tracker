@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
-import ExpenseForm from '@/components/ExpenseForm';
+import { ExpenseForm } from '@/components/ExpenseForm';
 import { createExpense } from '@/lib/api-backend';
 
 export default function NewExpensePage() {

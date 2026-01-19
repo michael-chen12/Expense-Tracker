@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { formatCurrency } from '@/lib/chart-utils';
+import './Charts.css';
 
 /**
  * Spending Trend Chart - Shows spending over the last 6 months

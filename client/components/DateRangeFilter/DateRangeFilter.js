@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import './DateRangeFilter.css';
 
 /**
  * Date Range Filter Component
@@ -175,101 +176,6 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
           </button>
         </div>
       )}
-
-      <style jsx>{`
-        .date-range-filter {
-          background: #ffffff;
-          border: 1px solid #e5dccf;
-          border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 24px;
-        }
-
-        .filter-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-
-        .preset-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .preset-button {
-          padding: 8px 16px;
-          border: 1px solid #e5dccf;
-          border-radius: 8px;
-          background: #ffffff;
-          color: #1b1b1b;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .preset-button:hover {
-          background: #f8f6f2;
-          border-color: #ff7a00;
-        }
-
-        .preset-button:active {
-          transform: scale(0.98);
-        }
-
-        .custom-button {
-          border-color: #ff7a00;
-          color: #ff7a00;
-        }
-
-        .custom-range-inputs {
-          margin-top: 16px;
-          padding-top: 16px;
-          border-top: 1px solid #e5dccf;
-          display: flex;
-          gap: 12px;
-          align-items: flex-end;
-        }
-
-        .input-group {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .input-group label {
-          font-size: 13px;
-          font-weight: 500;
-          color: #6b645b;
-        }
-
-        .input-group input {
-          padding: 8px 12px;
-          border: 1px solid #e5dccf;
-          border-radius: 8px;
-          font-size: 14px;
-          font-family: inherit;
-        }
-
-        .input-group input:focus {
-          outline: none;
-          border-color: #ff7a00;
-        }
-
-        @media (max-width: 640px) {
-          .custom-range-inputs {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .input-group {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

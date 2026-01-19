@@ -2,6 +2,7 @@
 
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import './Button.css';
 
 export default function AuthButton() {
   const { data: session, status } = useSession();

@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { formatCurrency } from '@/lib/chart-utils';
+import './Charts.css';
 
 /**
  * Category Breakdown Chart - Shows spending distribution by category

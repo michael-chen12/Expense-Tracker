@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
-import ExpenseForm from '@/components/ExpenseForm';
+import { ExpenseForm } from '@/components/ExpenseForm';
 import Spinner from '@/components/Spinner';
 import { deleteExpense, getExpense, updateExpense } from '@/lib/api-backend';
 
