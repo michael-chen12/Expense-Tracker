@@ -87,6 +87,13 @@
   gap: 8px;
 }
 
+/* Dark mode: use darker background for chart info */
+[data-theme="dark"] .chart-info {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
 .chart-info-icon {
   font-size: 16px;
 }
