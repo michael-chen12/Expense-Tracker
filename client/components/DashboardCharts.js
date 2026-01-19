@@ -2,8 +2,8 @@
 
 import Spinner from '@/components/Spinner';
 import { OverviewCard, ChartCard } from '@/components/Card';
-import ChartEmptyState from '@/components/Charts/ChartEmptyState';
-import { SpendingTrendChart, CategoryBreakdownChart, BudgetProgressBar } from '@/components/Charts';
+import ChartEmptyState from '@/components/charts/ChartEmptyState';
+import { SpendingTrendChart, CategoryBreakdownChart, BudgetProgressBar } from '@/components/charts';
 
 export default function DashboardCharts({
   isLoading,
