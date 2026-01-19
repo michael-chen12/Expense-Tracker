@@ -29,34 +29,35 @@
 }
 
 /* Primary button variant */
-.button.primary {
+.button--primary {
   background-color: var(--accent);
   color: #ffffff;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
 
-.button.primary:hover:not(:disabled) {
+.button--primary:hover:not(:disabled) {
   background-color: var(--accent-deep);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
 }
 
-.button.primary:active:not(:disabled) {
-  transform: translateY(0);
+.button--primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
 
 /* Ghost button variant - minimal style */
-.button.ghost {
+.button--ghost {
   background-color: transparent;
   color: var(--ink);
-  border: 1px solid transparent;
+  border: none;
 }
 
-.button.ghost:hover:not(:disabled) {
+.button--ghost:hover:not(:disabled) {
   background-color: rgba(124, 58, 237, 0.1);
-  border-color: var(--accent);
 }
 
-.button.ghost:active:not(:disabled) {
+.button--ghost:active:not(:disabled) {
   background-color: rgba(124, 58, 237, 0.15);
 }
 

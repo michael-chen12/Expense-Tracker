@@ -6,8 +6,7 @@ import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
 import Spinner from '@/components/Spinner';
 import { Button } from '@/components/Button';
-import { RecurringExpenseForm } from '@/components/RecurringExpense';
-import { RecurringExpenseList } from '@/components/RecurringExpense';
+import { RecurringExpenseForm, RecurringExpenseList } from '@/components/RecurringExpense';
 import {
   getRecurringExpenses,
   createRecurringExpense,
@@ -105,7 +104,7 @@ function RecurringExpensesPage() {
         </div>
         <div className="inline-actions">
           <Button
-            className="button ghost"
+            className="button ghost button--icon"
             onClick={handleProcess}
             disabled={processing}
           >

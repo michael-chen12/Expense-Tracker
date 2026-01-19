@@ -1,6 +1,7 @@
 'use client';
 
 import { Form, FormGroup, FormLabel, FormInput, FormSelect, FormError, FormActions } from '@/components/Form';
+import { Button } from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { formatCurrency } from '@/lib/format';
 
@@ -62,15 +63,15 @@ export default function AllowanceSection({
 
           <FormError>{allowanceError}</FormError>
 
-          <FormActions align="start">
-            <button className="button primary" type="submit" disabled={savingAllowance}>
+          <FormActions align="end">
+            <Button variant="primary" type="submit" disabled={savingAllowance}>
               {savingAllowance ? (
                 <span className="button-loading-content">
                   <Spinner size="small" color="white" />
                   Saving...
                 </span>
               ) : 'Save allowance'}
-            </button>
+            </Button>
           </FormActions>
         </Form>
       </div>

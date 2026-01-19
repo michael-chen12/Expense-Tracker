@@ -16,6 +16,19 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
   // Preset date range options
   const presets = [
     {
+      label: 'Last 7 Days',
+      getValue: () => {
+        const today = new Date();
+        const from = new Date(today);
+        from.setDate(today.getDate() - 6);
+        return {
+          from: from.toISOString().slice(0, 10),
+          to: today.toISOString().slice(0, 10),
+          label: 'Last 7 Days'
+        };
+      }
+    },
+    {
       label: 'This Month',
       getValue: () => {
         const today = new Date();

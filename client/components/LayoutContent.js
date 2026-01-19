@@ -7,6 +7,8 @@ import { AuthButton } from '@/components/Button';
 import NavLinks from '@/components/NavLinks';
 import SkipToMain from '@/components/SkipToMain';
 import ThemeToggleButton from '@/components/ThemeToggleButton/ThemeToggleButton';
+import KeyboardShortcutsHelp from '@/components/KeyboardShortcutsHelp';
+import useKeyboardShortcuts from '@/lib/hooks/useKeyboardShortcuts';
 
 export default function LayoutContent({ children }) {
   const { data: session, status } = useSession();
@@ -14,6 +16,9 @@ export default function LayoutContent({ children }) {
 
   // Hide navbar on landing page (homepage when not authenticated)
   const isLandingPage = pathname === '/' && !session && status !== 'loading';
+
+  // Enable keyboard shortcuts when user is authenticated
+  useKeyboardShortcuts({ enabled: !!session });
 
   return (
     <div className="page">
@@ -32,6 +37,8 @@ export default function LayoutContent({ children }) {
       {!isLandingPage && (
         <footer className="footer">Built with Next.js + PostgreSQL</footer>
       )}
+      {/* Keyboard shortcuts help modal */}
+      {session && <KeyboardShortcutsHelp />}
     </div>
   );
 }

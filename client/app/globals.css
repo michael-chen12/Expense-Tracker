@@ -411,6 +411,17 @@ a {
   margin-top: 12px;
 }
 
+/* Differentiate dropdown items from summary header rows */
+.summary-expense-list-inner .expense-row {
+  background: #1a1a2e;
+  border-color: #2a2a45;
+}
+
+[data-theme="light"] .summary-expense-list-inner .expense-row {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
 .margin-right-8 {
   margin-right: 8px;
 }

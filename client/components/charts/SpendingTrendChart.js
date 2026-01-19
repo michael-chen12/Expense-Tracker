@@ -73,7 +73,7 @@ export default function SpendingTrendChart({ data }) {
         cx={cx}
         cy={cy}
         r={4}
-        fill="#ff7a00"
+        fill="#7c3aed"
         stroke="#ffffff"
         strokeWidth={2}
       />
@@ -90,28 +90,28 @@ export default function SpendingTrendChart({ data }) {
         >
           <defs>
             <linearGradient id="colorSpending" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#ff7a00" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#fff0dc" stopOpacity={0.1} />
+              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5dccf" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a40" />
           <XAxis
             dataKey="monthLabel"
-            tick={{ fill: '#6b645b', fontSize: 12 }}
+            tick={{ fill: '#d1d5db', fontSize: 12 }}
             tickLine={false}
-            axisLine={{ stroke: '#e5dccf' }}
+            axisLine={{ stroke: '#2a2a40' }}
           />
           <YAxis
-            tick={{ fill: '#6b645b', fontSize: 12 }}
+            tick={{ fill: '#d1d5db', fontSize: 12 }}
             tickLine={false}
-            axisLine={{ stroke: '#e5dccf' }}
+            axisLine={{ stroke: '#2a2a40' }}
             tickFormatter={formatYAxis}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#ff7a00', strokeWidth: 1 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#7c3aed', strokeWidth: 1 }} />
           <Area
             type="monotone"
             dataKey="total"
-            stroke="#ff7a00"
+            stroke="#7c3aed"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorSpending)"
