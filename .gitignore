@@ -7,3 +7,8 @@ client/.env
 client/.env.*
 
 /generated/prisma
+
+# Playwright E2E tests
+client/e2e/.auth/
+client/playwright-report/
+client/test-results/

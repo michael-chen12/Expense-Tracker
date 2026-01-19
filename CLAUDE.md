@@ -84,3 +84,8 @@ Required in `.env` at project root:
 - `NEXTAUTH_SECRET` - JWT secret (shared with backend)
 - `NEXTAUTH_URL` - Frontend URL (http://localhost:3000 for dev)
 - `GITHUB_ID` / `GITHUB_SECRET` - GitHub OAuth credentials
+
+
+## Instruction
+- When designing new component in the new page, look into the folders first for potentially a reusable components.
+- When adding a new page, be sure to add a link on the Navigation bar

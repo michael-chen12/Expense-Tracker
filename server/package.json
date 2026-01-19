@@ -7,7 +7,8 @@
     "dev": "nodemon --exec 'ts-node --transpile-only index.ts'",
     "start": "ts-node --transpile-only index.ts",
     "build": "tsc",
-    "prod": "node dist/index.js"
+    "prod": "node dist/index.js",
+    "seed:e2e-user": "ts-node seed-test-user-e2e.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^3.0.6",
