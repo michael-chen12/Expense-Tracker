@@ -34,9 +34,6 @@ export default function LayoutContent({ children }) {
         </header>
       )}
       <main id="main-content" className={isLandingPage ? "" : "main"}>{children}</main>
-      {!isLandingPage && (
-        <footer className="footer">Built with Next.js + PostgreSQL</footer>
-      )}
       {/* Keyboard shortcuts help modal */}
       {session && <KeyboardShortcutsHelp />}
     </div>
