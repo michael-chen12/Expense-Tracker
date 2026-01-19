@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
+import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
 
 function getMonthKey(dateValue) {
   const date = new Date(dateValue);
@@ -26,11 +28,20 @@ function formatMonthLabel(monthKey) {
 }
 
 export default function MonthlySummaryPage() {
+  const router = useRouter();
+  const { hasExpenses, isLoading: checkingExpenses } = useHasExpenses();
   const [months, setMonths] = useState([]);
   const [groupedExpenses, setGroupedExpenses] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedKey, setExpandedKey] = useState('');
+
+  // Redirect to dashboard if user has no expenses
+  useEffect(() => {
+    if (!checkingExpenses && hasExpenses === false) {
+      router.replace('/');
+    }
+  }, [hasExpenses, checkingExpenses, router]);
 
   const loadExpenses = () => {
     setLoading(true);
@@ -85,11 +96,38 @@ export default function MonthlySummaryPage() {
 
     try {
       await deleteExpense(expenseId);
-      loadExpenses();
+      
+      // Check if this was the last expense
+      const allExpenses = Object.values(groupedExpenses).flat();
+      const remainingExpenses = allExpenses.filter((expense) => expense.id !== expenseId);
+      
+      if (remainingExpenses.length === 0) {
+        // If no expenses remain after deletion, redirect to dashboard
+        router.replace('/');
+      } else {
+        // Otherwise reload expenses
+        loadExpenses();
+      }
     } catch (deleteError) {
       setError(deleteError.message || 'Unable to delete expense.');
     }
   };
+
+  // Show loading while checking if user has expenses
+  if (checkingExpenses) {
+    return (
+      <AuthGate>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
+          <Spinner size="large" color="primary" />
+        </div>
+      </AuthGate>
+    );
+  }
+
+  // If user has no expenses, don't render (will redirect)
+  if (hasExpenses === false) {
+    return null;
+  }
 
   return (
     <AuthGate>

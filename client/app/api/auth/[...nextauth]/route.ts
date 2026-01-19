@@ -22,6 +22,11 @@ const handler = NextAuth({
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+        },
+      },
     }),
     CredentialsProvider({
       name: 'credentials',

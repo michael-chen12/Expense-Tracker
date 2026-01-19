@@ -3,7 +3,7 @@
 import RecurringExpenseCard from './RecurringExpenseCard';
 import Spinner from '@/components/Spinner';
 
-export default function RecurringExpenseList({ recurringExpenses, isLoading, onDelete }) {
+export default function RecurringExpenseList({ recurringExpenses, isLoading, onDelete, onEdit }) {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
@@ -27,6 +27,7 @@ export default function RecurringExpenseList({ recurringExpenses, isLoading, onD
           key={expense.id}
           recurringExpense={expense}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
     </div>

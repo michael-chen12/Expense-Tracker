@@ -10,6 +10,7 @@ import RecurringExpenseList from '@/components/recurring/RecurringExpenseList';
 import {
   getRecurringExpenses,
   createRecurringExpense,
+  updateRecurringExpense,
   deleteRecurringExpense,
   processRecurringExpenses
 } from '@/lib/api-backend';
@@ -22,6 +23,7 @@ function RecurringExpensesPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
   const [processing, setProcessing] = useState(false);
 
   const loadRecurringExpenses = async () => {
@@ -43,16 +45,27 @@ function RecurringExpensesPage() {
     }
   }, [session]);
 
-  const handleCreate = async (payload) => {
+  const handleSubmit = async (payload) => {
     try {
-      await createRecurringExpense(payload);
-      setSuccess('Recurring expense created successfully!');
+      if (editingExpense) {
+        await updateRecurringExpense(editingExpense.id, payload);
+        setSuccess('Recurring expense updated successfully!');
+      } else {
+        await createRecurringExpense(payload);
+        setSuccess('Recurring expense created successfully!');
+      }
       setShowForm(false);
+      setEditingExpense(null);
       await loadRecurringExpenses();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      throw new Error(err.message || 'Failed to create recurring expense');
+      throw new Error(err.message || `Failed to ${editingExpense ? 'update' : 'create'} recurring expense`);
     }
+  };
+
+  const handleEdit = (expense) => {
+    setEditingExpense(expense);
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -106,7 +119,12 @@ function RecurringExpensesPage() {
           <button
             type="button"
             className="button primary"
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              setShowForm(!showForm);
+              if (showForm) {
+                setEditingExpense(null);
+              }
+            }}
           >
             {showForm ? 'Cancel' : 'Add Recurring'}
           </button>
@@ -137,8 +155,12 @@ function RecurringExpensesPage() {
 
       {showForm && (
         <RecurringExpenseForm
-          onSubmit={handleCreate}
-          onCancel={() => setShowForm(false)}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingExpense(null);
+          }}
+          editingExpense={editingExpense}
         />
       )}
 
@@ -146,6 +168,7 @@ function RecurringExpensesPage() {
         recurringExpenses={recurringExpenses}
         isLoading={isLoading}
         onDelete={handleDelete}
+        onEdit={handleEdit}
       />
     </div>
   );

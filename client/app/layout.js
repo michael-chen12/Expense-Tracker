@@ -1,4 +1,5 @@
 import LayoutContent from '@/components/LayoutContent';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import Providers from './providers';
 import './globals.css';
 
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Providers>
-          <LayoutContent>{children}</LayoutContent>
+          <ErrorBoundary>
+            <LayoutContent>{children}</LayoutContent>
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>

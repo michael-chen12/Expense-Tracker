@@ -19,6 +19,7 @@ import RecentExpenses from '@/components/RecentExpenses';
 import AllowanceSection from '@/components/AllowanceSection';
 import UpcomingRecurringExpenses from '@/components/UpcomingRecurringExpenses';
 import DateRangeFilter from '@/components/DateRangeFilter';
+import EmptyDashboardState from '@/components/EmptyDashboardState';
 
 function getMonthRange() {
   const today = new Date();
@@ -166,9 +167,12 @@ function Dashboard() {
     }
   };
 
+  // Check if user has no expenses at all
+  const hasNoExpenses = !isDashboardLoading && allExpenses.length === 0;
+
   return (
     <div>
-      {!isDashboardLoading && (
+      {!isDashboardLoading && !hasNoExpenses && (
         <>
           <div className="page-header">
             <div>
@@ -179,42 +183,50 @@ function Dashboard() {
           </div>
 
           {error ? <div className="error">{error}</div> : null}
-
-          <DateRangeFilter
-            dateRange={dateRange}
-            onDateRangeChange={setDateRange}
-          />
         </>
       )}
 
-      <DashboardCharts
-        isLoading={isDashboardLoading}
-        chartError={chartError}
-        hasData={hasData}
-        monthlyTrendData={monthlyTrendData}
-        categoryData={categoryData}
-        overviewMetrics={overviewMetrics}
-        dateRange={dateRange}
-      />
-
-      {!isDashboardLoading && (
+      {hasNoExpenses ? (
+        <EmptyDashboardState />
+      ) : (
         <>
-          <RecentExpenses
-            expenses={recent}
-            onDelete={handleExpenseDelete}
-            error={error}
+          {!isDashboardLoading && (
+            <DateRangeFilter
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+            />
+          )}
+
+          <DashboardCharts
+            isLoading={isDashboardLoading}
+            chartError={chartError}
+            hasData={hasData}
+            monthlyTrendData={monthlyTrendData}
+            categoryData={categoryData}
+            overviewMetrics={overviewMetrics}
+            dateRange={dateRange}
           />
 
-          <UpcomingRecurringExpenses />
+          {!isDashboardLoading && (
+            <>
+              <RecentExpenses
+                expenses={recent}
+                onDelete={handleExpenseDelete}
+                error={error}
+              />
 
-          <AllowanceSection
-            allowance={allowance}
-            allowanceStatus={allowanceStatus}
-            allowanceError={allowanceError}
-            savingAllowance={savingAllowance}
-            onChange={handleAllowanceChange}
-            onSubmit={handleAllowanceSubmit}
-          />
+              <UpcomingRecurringExpenses />
+
+              <AllowanceSection
+                allowance={allowance}
+                allowanceStatus={allowanceStatus}
+                allowanceError={allowanceError}
+                savingAllowance={savingAllowance}
+                onChange={handleAllowanceChange}
+                onSubmit={handleAllowanceSubmit}
+              />
+            </>
+          )}
         </>
       )}
     </div>

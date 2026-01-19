@@ -6,18 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.3",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "next-auth": "^4.24.7",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "25.0.9",
-    "typescript": "5.9.3"
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/ui": "^4.0.17",
+    "jsdom": "^27.4.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.17"
   }
 }

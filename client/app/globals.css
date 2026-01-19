@@ -539,4 +539,72 @@ textarea {
   .overview-card-value {
     font-size: 28px;
   }
+
+  /* Improve mobile spacing */
+  .main {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .inline-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .inline-actions button,
+  .inline-actions a {
+    width: 100%;
+  }
+
+  /* Stack form inputs on mobile */
+  .card form > div {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Improve table responsiveness */
+  table {
+    font-size: 14px;
+  }
+
+  th, td {
+    padding: 8px;
+  }
+
+  /* Make cards more compact on mobile */
+  .card {
+    padding: 16px;
+  }
+}
+
+/* Skeleton loader animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Accessibility - Skip to main link */
+.skip-to-main:focus {
+  position: fixed !important;
+  left: 16px !important;
+  top: 16px !important;
+  z-index: 9999;
+}
+
+/* Focus visible styles for better keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }

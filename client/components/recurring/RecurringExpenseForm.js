@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FrequencySelector from './FrequencySelector';
 import Spinner from '@/components/Spinner';
 
-export default function RecurringExpenseForm({ onSubmit, onCancel }) {
+export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpense = null }) {
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
@@ -16,6 +16,23 @@ export default function RecurringExpenseForm({ onSubmit, onCancel }) {
     nextDate: new Date().toISOString().slice(0, 10),
     endDate: ''
   });
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingExpense) {
+      setFormData({
+        amount: editingExpense.amount.toString(),
+        category: editingExpense.category,
+        note: editingExpense.note || '',
+        frequency: editingExpense.frequency,
+        dayOfWeek: editingExpense.dayOfWeek,
+        dayOfMonth: editingExpense.dayOfMonth,
+        monthOfYear: editingExpense.monthOfYear,
+        nextDate: editingExpense.nextDate,
+        endDate: editingExpense.endDate || ''
+      });
+    }
+  }, [editingExpense]);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -80,7 +97,7 @@ export default function RecurringExpenseForm({ onSubmit, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="card" style={{ marginBottom: '24px' }}>
-      <h3>Create Recurring Expense</h3>
+      <h3>{editingExpense ? 'Edit Recurring Expense' : 'Create Recurring Expense'}</h3>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
         <div>
@@ -169,9 +186,9 @@ export default function RecurringExpenseForm({ onSubmit, onCancel }) {
           {isSubmitting ? (
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Spinner size="small" color="white" />
-              Creating...
+              {editingExpense ? 'Updating...' : 'Creating...'}
             </span>
-          ) : 'Create Recurring Expense'}
+          ) : editingExpense ? 'Update Recurring Expense' : 'Create Recurring Expense'}
         </button>
         <button type="button" className="button ghost" onClick={onCancel} disabled={isSubmitting}>
           Cancel
