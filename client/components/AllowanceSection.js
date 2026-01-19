@@ -18,7 +18,7 @@ export default function AllowanceSection({
   
   return (
     <section className="card section-card allowance-section">
-      <div className="card-header">
+      <div className="card-header" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <h2>Allowance top-up</h2>
         <span className="badge">{allowanceStatus?.label || 'Period'}</span>
       </div>

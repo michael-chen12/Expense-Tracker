@@ -19,6 +19,11 @@
   margin: 0;
 }
 
+/* Ensure labels are visible in dark mode */
+[data-theme="dark"] .input-label {
+  color: #e5e7eb;
+}
+
 /* ===== INPUT CONTAINER ===== */
 .input-container {
   position: relative;
@@ -45,6 +50,33 @@
   color: var(--color-text-primary);
   transition: var(--input-transition);
   box-sizing: border-box;
+}
+
+/* Dark mode: ensure dark text on light backgrounds */
+[data-theme="dark"] .input {
+  background: #ffffff;
+  color: #1f2937;
+  border-color: #e5e7eb;
+}
+
+[data-theme="dark"] .input::placeholder {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .input:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+[data-theme="dark"] .input:focus {
+  background: #ffffff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+[data-theme="dark"] .input:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  opacity: 0.6;
 }
 
 .input::placeholder {

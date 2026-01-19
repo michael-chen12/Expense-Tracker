@@ -289,6 +289,36 @@
   margin-bottom: 20px;
 }
 
+/* Override Input component to always be in light mode */
+.signup-form .input-label {
+  color: #1a202c !important;
+}
+
+.signup-form .input {
+  background: #f9fafb !important;
+  border-color: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+.signup-form .input::placeholder {
+  color: #9ca3af !important;
+}
+
+.signup-form .input:focus {
+  border-color: var(--accent) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
+}
+
+.signup-form .input:hover:not(:disabled) {
+  border-color: var(--accent) !important;
+}
+
+.signup-form .input:disabled {
+  background: rgba(124, 58, 237, 0.05) !important;
+  color: #9ca3af !important;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
