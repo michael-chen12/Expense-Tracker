@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate --schema=../prisma/schema.prisma && next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate --schema=../prisma/schema.prisma",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
@@ -42,6 +43,7 @@
     "@vitest/ui": "^4.0.17",
     "jsdom": "^27.4.0",
     "pg": "^8.17.1",
+    "prisma": "^7.2.0",
     "typescript": "5.9.3",
     "vitest": "^4.0.17"
   }
