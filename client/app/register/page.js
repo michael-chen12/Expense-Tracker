@@ -102,7 +102,7 @@ export default function RegisterPage() {
         </div>
 
         {error && (
-          <div className="error" style={{ marginBottom: '20px' }}>
+          <div className="error error-margin">
             {error}
           </div>
         )}

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Button } from '@/components/Button';
 
 /**
  * Empty state component shown when there's no data to display in charts
@@ -30,9 +30,9 @@ export default function ChartEmptyState() {
       </svg>
       <h3>No expenses yet</h3>
       <p>Add your first expense to see insights and analytics!</p>
-      <Link href="/expenses/new" className="button primary">
+      <Button variant="primary" href="/expenses/new">
         Add Expense
-      </Link>
+      </Button>
     </div>
   );
 }

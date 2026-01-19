@@ -49,7 +49,11 @@
 
 /* Recurring Expense Card Styles */
 .recurring-expense-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
   padding: 16px;
+  box-shadow: var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -57,16 +61,69 @@
   transform: translateY(-2px);
 }
 
-.recurring-expense-card h3 {
-  margin: 0 0 4px;
-  font-size: 16px;
-  color: #1b1b1b;
+.recurring-expense-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 
-.recurring-expense-card .subtle {
+.recurring-expense-card__title {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.recurring-expense-card__frequency {
   margin: 0;
   font-size: 14px;
-  color: #6b645b;
+}
+
+.recurring-expense-card__amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff7a00;
+}
+
+.recurring-expense-card__note {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+
+.recurring-expense-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.recurring-expense-card__date {
+  margin: 0;
+  font-size: 12px;
+}
+
+.recurring-expense-card__date--end {
+  margin-top: 4px;
+}
+
+.recurring-expense-card__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.recurring-expense-card__actions button {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+  transition: color 0.2s ease;
+}
+
+.recurring-expense-card__actions button:hover {
+  color: #ff7a00;
 }
 
 .recurring-expense-card__amount {
@@ -94,7 +151,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #6b645b;
+  color: #9ca3af;
   transition: color 0.2s ease;
 }
 

@@ -30,11 +30,11 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
   };
 
   return (
-    <div className="card" style={{ padding: '16px', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+    <div className="recurring-expense-card">
+      <div className="recurring-expense-card__header">
         <div>
-          <h3 style={{ margin: '0 0 4px 0' }}>{recurringExpense.category}</h3>
-          <p className="subtle" style={{ margin: 0, fontSize: '14px' }}>
+          <h3 className="recurring-expense-card__title">{recurringExpense.category}</h3>
+          <p className="subtle recurring-expense-card__frequency">
             {getFrequencyLabel(
               recurringExpense.frequency,
               recurringExpense.dayOfWeek,
@@ -43,33 +43,32 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
             )}
           </p>
         </div>
-        <div style={{ fontSize: '20px', fontWeight: '700', color: '#ff7a00' }}>
+        <div className="recurring-expense-card__amount">
           {formatCurrency(recurringExpense.amount)}
         </div>
       </div>
 
       {recurringExpense.note && (
-        <p className="subtle" style={{ margin: '0 0 12px 0', fontSize: '14px' }}>
+        <p className="subtle recurring-expense-card__note">
           {recurringExpense.note}
         </p>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e5dccf' }}>
+      <div className="recurring-expense-card__footer">
         <div>
-          <p className="subtle" style={{ margin: 0, fontSize: '12px' }}>Next: {formatDate(recurringExpense.nextDate)}</p>
+          <p className="subtle recurring-expense-card__date">Next: {formatDate(recurringExpense.nextDate)}</p>
           {recurringExpense.endDate && (
-            <p className="subtle" style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
+            <p className="subtle recurring-expense-card__date recurring-expense-card__date--end">
               Ends: {formatDate(recurringExpense.endDate)}
             </p>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="recurring-expense-card__actions">
           <button
             type="button"
-            className="button ghost"
+            className="button ghost button--icon"
             onClick={() => onEdit(recurringExpense)}
             aria-label={`Edit ${recurringExpense.category}`}
-            style={{ padding: '8px' }}
           >
             <svg
               aria-hidden="true"
@@ -88,10 +87,9 @@ export default function RecurringExpenseCard({ recurringExpense, onDelete, onEdi
           </button>
           <button
             type="button"
-            className="button ghost"
+            className="button ghost button--icon"
             onClick={handleDelete}
             aria-label={`Delete ${recurringExpense.category}`}
-            style={{ padding: '8px' }}
           >
             <svg
               aria-hidden="true"

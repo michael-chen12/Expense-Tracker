@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import AuthGate from '@/components/AuthGate';
 import LandingPage from '@/components/LandingPage';
 import LoadingScreen from '@/components/LoadingScreen';
+import { Button } from '@/components/Button';
 import {
   getExpenses,
   deleteExpense,
@@ -179,7 +180,7 @@ function Dashboard() {
               <h1>Dashboard</h1>
               <p className="subtle">Track your spending and manage your budget.</p>
             </div>
-            <Link className="button primary" href="/expenses/new">Add expense</Link>
+            <Button variant="primary" href="/expenses/new">Add expense</Button>
           </div>
 
           {error ? <div className="error">{error}</div> : null}

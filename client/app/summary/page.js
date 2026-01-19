@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
+import { Button } from '@/components/Button';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
@@ -117,7 +118,7 @@ export default function MonthlySummaryPage() {
   if (checkingExpenses) {
     return (
       <AuthGate>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
+        <div className="loading-state-centered">
           <Spinner size="large" color="primary" />
         </div>
       </AuthGate>
@@ -142,9 +143,9 @@ export default function MonthlySummaryPage() {
         {error ? <div className="error">{error}</div> : null}
 
         {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+          <div className="loading-state">
             <Spinner size="medium" color="primary" />
-            <p className="subtle" style={{ margin: 0 }}>Loading summary...</p>
+            <p className="subtle no-margin">Loading summary...</p>
           </div>
         ) : months.length ? (
           <div className="expense-list">
@@ -173,25 +174,14 @@ export default function MonthlySummaryPage() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      style={{
-                        transition: 'transform 0.2s ease',
-                        transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                        marginLeft: '12px'
-                      }}
+                      className={`summary-expand-icon ${isExpanded ? 'summary-expand-icon--expanded' : ''}`}
                     >
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </button>
 
-                  <div
-                    style={{
-                      maxHeight: isExpanded ? '2000px' : '0',
-                      overflow: 'hidden',
-                      transition: 'max-height 0.5s ease-in-out, opacity 0.5s ease-in-out',
-                      opacity: isExpanded ? 1 : 0
-                    }}
-                  >
-                    <div className="expense-list" style={{ marginTop: '12px' }}>
+                  <div className={`summary-expense-list ${isExpanded ? 'summary-expense-list--expanded' : ''}`}>
+                    <div className="expense-list summary-expense-list-inner">
                       {monthExpenses.map((expense) => (
                         <div key={expense.id} className="expense-row">
                           <div>
@@ -200,7 +190,7 @@ export default function MonthlySummaryPage() {
                           </div>
                           <div className="expense-amount">{formatCurrency(expense.amount)}</div>
                           <div className="inline-actions">
-                            <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+                            <Button variant="ghost" href={`/expenses/${expense.id}`}>Edit</Button>
                             <button
                               className="button ghost"
                               type="button"

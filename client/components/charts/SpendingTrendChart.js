@@ -22,42 +22,14 @@ export default function SpendingTrendChart({ data }) {
     if (active && payload && payload.length) {
       const isEmptyMonth = payload[0].payload.count === 0;
       return (
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e5dccf',
-            borderRadius: '12px',
-            padding: '12px 16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 4px',
-              fontWeight: '600',
-              fontSize: '14px',
-              color: '#1b1b1b',
-            }}
-          >
+        <div className="chart-tooltip">
+          <p className="chart-tooltip-title">
             {payload[0].payload.monthLabel}
           </p>
-          <p
-            style={{
-              margin: '0',
-              fontSize: '16px',
-              fontWeight: '700',
-              color: isEmptyMonth ? '#9ca3af' : '#ff7a00',
-            }}
-          >
+          <p className={`chart-tooltip-value ${isEmptyMonth ? 'chart-tooltip-value--muted' : 'chart-tooltip-value--primary'}`}>
             {formatCurrency(payload[0].value * 100)}
           </p>
-          <p
-            style={{
-              margin: '4px 0 0',
-              fontSize: '12px',
-              color: '#6b645b',
-            }}
-          >
+          <p className="chart-tooltip-subtitle">
             {isEmptyMonth
               ? 'No expenses recorded'
               : `${payload[0].payload.count} ${payload[0].payload.count === 1 ? 'expense' : 'expenses'}`
@@ -109,7 +81,7 @@ export default function SpendingTrendChart({ data }) {
   };
 
   return (
-    <div style={{ width: '100%', height: 280 }}>
+    <div className="chart-wrapper">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}

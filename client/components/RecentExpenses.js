@@ -1,14 +1,14 @@
 'use client';
 
-import Link from 'next/link';
+import { Button } from '@/components/Button';
 import { formatCurrency, formatDate } from '@/lib/format';
 
 export default function RecentExpenses({ expenses, onDelete, error }) {
   return (
-    <section className="card" style={{ marginTop: '24px' }}>
+    <section className="card section-card">
       <div className="card-header">
         <h2>Recent expenses</h2>
-        <Link className="button ghost" href="/expenses">View all</Link>
+        <Button variant="ghost" href="/expenses">View all</Button>
       </div>
 
       <div className="expense-list">
@@ -20,7 +20,7 @@ export default function RecentExpenses({ expenses, onDelete, error }) {
             </div>
             <div className="expense-amount">{formatCurrency(expense.amount)}</div>
             <div className="inline-actions">
-              <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+              <Button variant="ghost" href={`/expenses/${expense.id}`}>Edit</Button>
               <button
                 className="button ghost"
                 type="button"

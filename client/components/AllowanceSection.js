@@ -15,7 +15,7 @@ export default function AllowanceSection({
   console.log('[AllowanceSection] allowance:', allowance);
   
   return (
-    <section className="card" style={{ marginTop: '24px' }}>
+    <section className="card section-card">
       <div className="card-header">
         <h2>Allowance top-up</h2>
         <span className="badge">{allowanceStatus?.label || 'Period'}</span>

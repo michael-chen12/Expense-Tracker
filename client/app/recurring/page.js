@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
 import Spinner from '@/components/Spinner';
+import { Button } from '@/components/Button';
 import { RecurringExpenseForm } from '@/components/RecurringExpense';
 import { RecurringExpenseList } from '@/components/RecurringExpense';
 import {
@@ -103,21 +104,19 @@ function RecurringExpensesPage() {
           <p className="subtle">Manage your recurring bills and subscriptions</p>
         </div>
         <div className="inline-actions">
-          <button
-            type="button"
+          <Button
             className="button ghost"
             onClick={handleProcess}
             disabled={processing}
           >
             {processing ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="button-loading-content">
                 <Spinner size="small" color="primary" />
                 Processing...
               </span>
             ) : 'Process Now'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             className="button primary"
             onClick={() => {
               setShowForm(!showForm);
@@ -127,25 +126,25 @@ function RecurringExpensesPage() {
             }}
           >
             {showForm ? 'Cancel' : 'Add Recurring'}
-          </button>
+          </Button>
         </div>
       </div>
 
       {success && (
-        <div style={{ background: '#d4edda', color: '#155724', padding: '12px 16px', borderRadius: '8px', marginBottom: '24px' }}>
+        <div className="success-message">
           {success}
         </div>
       )}
 
       {error && (
-        <div className="error" style={{ marginBottom: '24px' }}>
+        <div className="error error-margin">
           {error}
         </div>
       )}
 
-      <div className="card" style={{ marginBottom: '24px', background: '#f8f6f2' }}>
-        <h3 style={{ marginTop: 0 }}>How it works</h3>
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+      <div className="card info-card">
+        <h3 className="info-card-title">How it works</h3>
+        <ul className="info-card-list">
           <li>Create recurring expenses for bills, subscriptions, and regular payments</li>
           <li>Choose the frequency: daily, weekly, monthly, or yearly</li>
           <li>Click "Process Now" to generate expenses from your recurring templates</li>
@@ -183,11 +182,11 @@ export default function RecurringExpensesPageWrapper() {
 
   if (!session) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
+      <div className="card card-centered">
         <h2>Please sign in to manage recurring expenses</h2>
-        <Link href="/" className="button primary" style={{ marginTop: '16px' }}>
+        <Button className="button primary margin-top-16" href="/">
           Go to Home
-        </Link>
+        </Button>
       </div>
     );
   }

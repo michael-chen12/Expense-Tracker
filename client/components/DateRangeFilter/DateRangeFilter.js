@@ -116,12 +116,8 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
   return (
     <div className="date-range-filter">
       <div className="filter-header">
-        <h3 style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#1b1b1b' }}>
-          Date Range
-        </h3>
-        <span style={{ fontSize: '14px', color: '#6b645b', fontWeight: '500' }}>
-          {dateRange.label}
-        </span>
+        <h3>Date Range</h3>
+        <span>{dateRange.label}</span>
       </div>
 
       <div className="preset-buttons">

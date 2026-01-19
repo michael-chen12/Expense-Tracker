@@ -7,7 +7,7 @@ import './RecurringExpense.css';
 export default function RecurringExpenseList({ recurringExpenses, isLoading, onDelete, onEdit }) {
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+      <div className="loading-center">
         <Spinner size="large" color="primary" />
       </div>
     );
@@ -15,14 +15,14 @@ export default function RecurringExpenseList({ recurringExpenses, isLoading, onD
 
   if (!recurringExpenses || recurringExpenses.length === 0) {
     return (
-      <div className="card" style={{ padding: '40px', textAlign: 'center' }}>
+      <div className="card card-centered">
         <p className="subtle">No recurring expenses yet. Create one to get started!</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+    <div className="recurring-grid">
       {recurringExpenses.map(expense => (
         <RecurringExpenseCard
           key={expense.id}

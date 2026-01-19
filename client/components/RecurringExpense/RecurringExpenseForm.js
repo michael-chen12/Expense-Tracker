@@ -97,10 +97,10 @@ export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpens
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card" style={{ marginBottom: '24px' }}>
-      <h3>{editingExpense ? 'Edit Recurring Expense' : 'Create Recurring Expense'}</h3>
+    <form onSubmit={handleSubmit} className="card card-form">
+      <h2>{editingExpense ? 'Edit Recurring Expense' : 'New Recurring Expense'}</h2>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+      <div className="form-grid-two">
         <div>
           <label htmlFor="amount">Amount</label>
           <input
@@ -133,7 +133,7 @@ export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpens
         </div>
       </div>
 
-      <div style={{ marginTop: '16px' }}>
+      <div className="form-section">
         <label htmlFor="note">Note (optional)</label>
         <input
           id="note"
@@ -155,7 +155,7 @@ export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpens
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+      <div className="form-grid-two">
         <div>
           <label htmlFor="nextDate">Start Date</label>
           <input
@@ -180,12 +180,12 @@ export default function RecurringExpenseForm({ onSubmit, onCancel, editingExpens
         </div>
       </div>
 
-      {error && <div className="error" style={{ marginTop: '16px' }}>{error}</div>}
+      {error && <div className="error form-error">{error}</div>}
 
-      <div className="inline-actions" style={{ marginTop: '24px' }}>
-        <button type="submit" className="button primary" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="inline-actions form-actions">
+        <button className="button primary" type="submit" disabled={submitting}>
+          {submitting ? (
+            <span className="button-loading-content">
               <Spinner size="small" color="white" />
               {editingExpense ? 'Updating...' : 'Creating...'}
             </span>

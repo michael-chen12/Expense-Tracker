@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGate from '@/components/AuthGate';
 import Spinner from '@/components/Spinner';
+import { Button } from '@/components/Button';
 import { deleteExpense, getExpenses } from '@/lib/api-backend';
 import { formatCurrency, formatDate } from '@/lib/format';
 import { useHasExpenses } from '@/lib/hooks/useHasExpenses';
@@ -95,7 +96,7 @@ export default function ExpensesPage() {
   if (checkingExpenses) {
     return (
       <AuthGate>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
+        <div className="loading-state-centered">
           <Spinner size="large" color="primary" />
         </div>
       </AuthGate>
@@ -115,10 +116,10 @@ export default function ExpensesPage() {
           <h1>Expenses</h1>
           <p className="subtle">Filter, scan, and jump into edits.</p>
         </div>
-        <Link className="button primary" href="/expenses/new">New expense</Link>
+        <Button variant="primary" href="/expenses/new">New expense</Button>
       </div>
 
-      <section className="card" style={{ marginBottom: '20px' }}>
+      <section className="card card-form">
         <div className="card-header">
           <h2>Filters</h2>
           <button className="button ghost" type="button" onClick={loadExpenses}>
@@ -167,9 +168,9 @@ export default function ExpensesPage() {
       {error ? <div className="error">{error}</div> : null}
 
       {loading ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
+        <div className="loading-state">
           <Spinner size="medium" color="primary" />
-          <p className="subtle" style={{ margin: 0 }}>Loading expenses...</p>
+          <p className="subtle no-margin">Loading expenses...</p>
         </div>
       ) : dates.length ? (
         <div className="grid">
@@ -180,7 +181,7 @@ export default function ExpensesPage() {
                 <div className="card-header">
                   <div>
                     <h2>{formatDate(dateKey)}</h2>
-                    <p className="subtle" style={{ margin: 0 }}>Total: {formatCurrency(dailyTotal)}</p>
+                    <p className="subtle no-margin">Total: {formatCurrency(dailyTotal)}</p>
                   </div>
                   <span className="badge">{groupedExpenses[dateKey].length} entries</span>
                 </div>
@@ -193,7 +194,7 @@ export default function ExpensesPage() {
                     </div>
                     <div className="expense-amount">{formatCurrency(expense.amount)}</div>
                     <div className="inline-actions">
-                      <Link className="button ghost" href={`/expenses/${expense.id}`}>Edit</Link>
+                      <Button variant="ghost" href={`/expenses/${expense.id}`}>Edit</Button>
                       <button
                         className="button ghost"
                         type="button"

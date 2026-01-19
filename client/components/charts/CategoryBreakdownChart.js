@@ -12,51 +12,41 @@ export default function CategoryBreakdownChart({ data }) {
   // Calculate total for center display (data.total is already in dollars)
   const totalCents = data.reduce((sum, item) => sum + item.total * 100, 0);
 
-  // Custom label to show percentages
+  // Custom label to show percentages with white color
   const renderLabel = (entry) => {
-    return `${entry.percentage}%`;
+    const RADIAN = Math.PI / 180;
+    const { cx, cy, midAngle, outerRadius, percentage } = entry;
+    const radius = outerRadius + 10;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#ffffff"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        fontSize="14px"
+        fontWeight="600"
+      >
+        {`${percentage}%`}
+      </text>
+    );
   };
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e5dccf',
-            borderRadius: '12px',
-            padding: '12px 16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <p
-            style={{
-              margin: '0 0 4px',
-              fontWeight: '600',
-              fontSize: '14px',
-              color: '#1b1b1b',
-            }}
-          >
+        <div className="chart-tooltip">
+          <p className="chart-tooltip-title">
             {payload[0].payload.category}
           </p>
-          <p
-            style={{
-              margin: '0',
-              fontSize: '16px',
-              fontWeight: '700',
-              color: payload[0].payload.color,
-            }}
-          >
+          <p className="chart-tooltip-value" style={{ color: payload[0].payload.color }}>
             {formatCurrency(payload[0].value * 100)}
           </p>
-          <p
-            style={{
-              margin: '4px 0 0',
-              fontSize: '12px',
-              color: '#6b645b',
-            }}
-          >
+          <p className="chart-tooltip-subtitle">
             {payload[0].payload.percentage}% of total
           </p>
         </div>
@@ -69,36 +59,12 @@ export default function CategoryBreakdownChart({ data }) {
   const renderLegend = (props) => {
     const { payload } = props;
     return (
-      <ul
-        style={{
-          listStyle: 'none',
-          padding: 0,
-          margin: '16px 0 0',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '12px',
-          justifyContent: 'center',
-        }}
-      >
+      <ul className="chart-legend">
         {payload.map((entry, index) => (
-          <li
-            key={`legend-${index}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '12px',
-              color: '#6b645b',
-            }}
-          >
+          <li key={`legend-${index}`} className="chart-legend-item">
             <span
-              style={{
-                display: 'inline-block',
-                width: '12px',
-                height: '12px',
-                borderRadius: '50%',
-                background: entry.color,
-              }}
+              className="chart-legend-dot"
+              style={{ background: entry.color }}
             />
             <span>{entry.payload.category}</span>
           </li>
@@ -108,7 +74,7 @@ export default function CategoryBreakdownChart({ data }) {
   };
 
   return (
-    <div style={{ width: '100%', height: 280 }}>
+    <div className="chart-wrapper">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart aria-label="Category spending breakdown for current month">
           <Pie

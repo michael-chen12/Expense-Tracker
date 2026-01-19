@@ -12,13 +12,7 @@ export default function LiveRegion({ message, politeness = 'polite' }) {
       role="status"
       aria-live={politeness}
       aria-atomic="true"
-      style={{
-        position: 'absolute',
-        left: '-10000px',
-        width: '1px',
-        height: '1px',
-        overflow: 'hidden'
-      }}
+      className="sr-only"
     >
       {message}
     </div>

@@ -191,7 +191,7 @@ export default function ExpenseForm({
       <div className="inline-actions">
         <button className="button primary" type="submit" disabled={saving}>
           {saving ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="button-loading-content">
               <Spinner size="small" color="white" />
               Saving...
             </span>
@@ -200,7 +200,7 @@ export default function ExpenseForm({
         {onDelete ? (
           <button className="button ghost" type="button" onClick={handleDelete} disabled={saving}>
             {saving ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="button-loading-content">
                 <Spinner size="small" color="gray" />
                 Deleting...
               </span>

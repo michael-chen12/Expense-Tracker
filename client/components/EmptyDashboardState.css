@@ -1,0 +1,28 @@
+.empty-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  min-height: 400px;
+}
+
+.empty-dashboard-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.empty-dashboard-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: #f3f4f6;
+}
+
+.empty-dashboard-text {
+  font-size: 16px;
+  color: #d1d5db;
+  margin-bottom: 32px;
+  max-width: 400px;
+}
