@@ -110,12 +110,7 @@ openssl rand -base64 32
 
 **3. Database Setup**
 
-The database tables are already created in your Supabase instance. If starting fresh, run:
-
-```bash
-cd server
-npx ts-node seed-test-user.ts  # Create a test user
-```
+The database tables are already created in your Supabase instance.
 
 **4. Start Development Servers**
 
@@ -186,8 +181,6 @@ expense-tracker/
 │   ├── schema.prisma            # 5 models (User, Expense, etc.)
 │   ├── config.ts                # Prisma 7 configuration
 │   └── init.sql                 # Manual table creation
-├── docs/            # (To be removed - consolidated here)
-├── .claude/         # (To be removed - consolidated here)
 └── .env             # Environment variables
 ```
 
@@ -273,8 +266,6 @@ npm run test:coverage    # Generate coverage report
 npm run dev              # ts-node with nodemon (hot reload)
 npm run build            # TypeScript compilation to /dist
 npm run start            # Start production server
-npx ts-node test-db.ts   # Test database connection
-npx ts-node seed-test-user.ts  # Create test user
 ```
 
 ### Database (from root or /server)
@@ -1128,11 +1119,7 @@ lsof -ti:4000 | xargs kill -9
 
 1. Verify DATABASE_URL in `.env`
 2. Check Supabase project is active
-3. Test connection:
-   ```bash
-   cd server && npx ts-node test-db.ts
-   ```
-4. Ensure you're using connection pooler (port 6543)
+3. Ensure you're using connection pooler (port 6543)
 
 **TypeScript Errors**
 
