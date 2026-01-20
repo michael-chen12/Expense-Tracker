@@ -1,6 +1,3 @@
-[providers]
-node = "20.x"
-
 [phases.install]
 cmds = ["cd server && npm install"]
 
@@ -9,3 +6,6 @@ cmds = ["cd server && npx prisma generate"]
 
 [start]
 cmd = "cd server && npm start"
+
+[variables]
+NODE_VERSION = "20.19.0"
