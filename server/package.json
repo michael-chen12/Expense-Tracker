@@ -8,6 +8,7 @@
     "start": "ts-node --transpile-only index.ts",
     "build": "tsc",
     "prod": "node dist/index.js",
+    "postinstall": "prisma generate",
     "seed:e2e-user": "ts-node seed-test-user-e2e.ts"
   },
   "dependencies": {
