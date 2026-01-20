@@ -1,8 +1,4 @@
 # Expense Tracker (Ledgerline) - Complete Documentation
-
-**Last Updated**: 2026-01-20
-**Status**: Phase 1 & 2 Complete, Production Deployed
-
 ---
 
 ## Table of Contents
