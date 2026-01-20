@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  password   String?     // Hashed password (null for OAuth users)
+  githubId   String?     @unique
+  name       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  expenses   Expense[]
+  allowance  Allowance?
+  recurringExpenses RecurringExpense[]
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amountCents Int
+  category    String
+  date        String
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([userId, category])
+}
+
+
+model Allowance {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amountCents Int
+  cadence   String   // 'day', 'week', 'month'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RecurringExpense {
+  id              Int      @id @default(autoincrement())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  amountCents     Int
+  category        String
+  note            String?
+  frequency       String   // 'daily', 'weekly', 'monthly', 'yearly'
+  dayOfWeek       Int?     // For weekly (0-6, where 0 is Sunday)
+  dayOfMonth      Int?     // For monthly (1-31)
+  monthOfYear     Int?     // For yearly (1-12)
+  nextDate        String   // ISO date string (YYYY-MM-DD)
+  endDate         String?  // Optional end date (YYYY-MM-DD)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, nextDate])
+}
