@@ -1,3 +1,28 @@
+/* Dropdown animation for mobile preset buttons */
+@media (max-width: 640px) {
+  .preset-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .preset-dropdown.open {
+    max-height: 1000px;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .preset-dropdown-toggle {
+    width: auto;
+    padding: 0 4px;
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    cursor: pointer;
+  }
+}
 /* DateRangeFilter Component Styles */
 
 .date-range-filter-card {
@@ -10,6 +35,13 @@
   align-items: center;
   margin-bottom: 16px;
 }
+
+.filter-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 
 .filter-header h3 {
   margin: 0;
@@ -116,9 +148,13 @@
 /* Mobile responsive */
 @media (max-width: 640px) {
   .filter-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
+  }
+  .filter-header-left {
+    flex: 1;
+  }
   }
 
   .preset-buttons {
@@ -137,4 +173,3 @@
   .input-group {
     width: 100%;
   }
-}

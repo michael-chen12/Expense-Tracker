@@ -74,29 +74,34 @@ export default function CategoryBreakdownChart({ data }) {
   };
 
   return (
-    <div className="chart-wrapper">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart aria-label="Category spending breakdown for current month">
-          <Pie
-            data={data}
-            cx="50%"
-            cy="45%"
-            labelLine={false}
-            label={renderLabel}
-            outerRadius={80}
-            innerRadius={50}
-            fill="#8884d8"
-            dataKey="total"
-            animationDuration={600}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          <Legend content={renderLegend} />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="chart-card-content-row">
+      {renderLegend({ payload: data.map((entry, index) => ({
+        color: entry.color,
+        payload: entry
+      })) })}
+      <div className="chart-wrapper">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart aria-label="Category spending breakdown for current month">
+            <Pie
+              data={data}
+              cx="50%"
+              cy="45%"
+              labelLine={false}
+              label={renderLabel}
+              outerRadius={80}
+              innerRadius={50}
+              fill="#8884d8"
+              dataKey="total"
+              animationDuration={600}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -479,16 +479,22 @@ a {
   overflow: hidden;
 }
 
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  background: rgba(124, 58, 237, 0.1);
-  color: var(--accent);
-  border: 1px solid rgba(124, 58, 237, 0.2);
-}
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    width: auto;
+    min-width: 0;
+    white-space: nowrap;
+    box-shadow: none;
+  }
 
 /* Common utility classes */
 .section-card {
@@ -610,16 +616,24 @@ a {
   margin-top: 16px;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(124, 58, 237, 0.2);
-  color: #a78bfa;
-  font-weight: 600;
-  font-size: 12px;
-}
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(124, 58, 237, 0.15);
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    width: auto !important;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    box-shadow: none;
+    margin-left: 8px;
+  }
 
 form {
   display: grid;
@@ -893,39 +907,82 @@ textarea {
   }
 
   .expense-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
     padding: 12px 14px;
+    align-items: center;
+  }
+
+  .expense-row > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .expense-meta-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .expense-note {
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60vw;
+  }
+
+  .expense-amount {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-left: 0;
+    margin-top: 2px;
+    white-space: nowrap;
+    text-align: left;
+    align-self: flex-start;
+    width: 100%;
   }
 
   .expense-amount {
     text-align: left;
     justify-content: flex-start;
     font-size: 18px;
+    font-weight: 700;
+    order: 2;
   }
 
   .inline-actions {
-    justify-content: flex-start;
-    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    gap: 8px;
   }
 
-  .inline-actions button {
-    flex: 1;
+  .inline-actions button,
+  .inline-actions a {
+    flex: 0 0 auto;
     min-width: 44px;
-  }
-
-  .inline-actions .button--icon {
-    padding: 12px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
   }
 
   .inline-actions .button--icon svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 
   .card {
     padding: 18px;
     border-radius: 14px;
+    margin-bottom: 18px;
+    box-sizing: border-box;
   }
 
   .grid.two {
@@ -960,7 +1017,7 @@ textarea {
 
   /* Better mobile spacing */
   .main {
-    padding: 24px 16px 48px;
+    padding: 24px 12px 48px 12px;
   }
 
   .section-card {
@@ -1279,7 +1336,7 @@ textarea {
     gap: 12px;
   }
 
-  .card-header > *:last-child {
+  .card-header > *:last-child:not(.badge) {
     width: 100%;
   }
 

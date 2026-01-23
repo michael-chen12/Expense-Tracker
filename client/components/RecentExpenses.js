@@ -17,9 +17,11 @@ export default function RecentExpenses({ expenses, onDelete, error }) {
           <div key={expense.id} className="expense-row">
             <div>
               <h3>{expense.category}</h3>
-              <p>{expense.note || 'No note'} • {formatDate(expense.date)}</p>
+              <div className="expense-meta-row">
+                <span className="expense-note">{expense.note || 'No note'} • {formatDate(expense.date)}</span>
+                <span className="expense-amount">{formatCurrency(expense.amount)}</span>
+              </div>
             </div>
-            <div className="expense-amount">{formatCurrency(expense.amount)}</div>
             <div className="inline-actions">
               <Link
                 className="button ghost button--icon"

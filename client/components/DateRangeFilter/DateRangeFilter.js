@@ -12,6 +12,8 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
   const [showCustom, setShowCustom] = useState(false);
   const [customFrom, setCustomFrom] = useState(dateRange.from);
   const [customTo, setCustomTo] = useState(dateRange.to);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
 
   // Preset date range options
   const presets = [
@@ -131,11 +133,31 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
     <FormCard className="date-range-filter-card">
       <FormSection>
         <div className="filter-header">
-          <h3>Date Range</h3>
-          <span>{dateRange.label}</span>
+          <div className="filter-header-left">
+            <h3>Date Range</h3>
+            <span>{dateRange.label}</span>
+          </div>
+          {isMobile && (
+            <button
+              className="preset-dropdown-toggle"
+              type="button"
+              aria-expanded={dropdownOpen}
+              aria-controls="preset-dropdown"
+              onClick={() => setDropdownOpen((v) => !v)}
+            >
+              <span style={{ transition: 'transform 0.3s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+            </button>
+          )}
         </div>
-
-        <div className="preset-buttons">
+        <div
+          id="preset-dropdown"
+          className={`preset-buttons preset-dropdown${isMobile ? (dropdownOpen ? ' open' : '') : ''}`}
+          style={isMobile ? {
+            maxHeight: dropdownOpen ? 1000 : 0,
+            overflow: 'hidden',
+            transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1)'
+          } : {}}
+        >
           {presets.map((preset) => (
             <button
               key={preset.label}
@@ -154,7 +176,6 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
             {showCustom ? 'Cancel' : 'Custom Range'}
           </button>
         </div>
-
         {showCustom && (
           <div className="custom-range-inputs">
             <div className="input-group">

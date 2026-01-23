@@ -196,6 +196,7 @@
   height: 6px;
 }
 
+
 /* Chart empty state */
 .chart-empty-state {
   display: flex;
@@ -205,6 +206,33 @@
   padding: 40px 20px;
   text-align: center;
   color: var(--muted);
+}
+
+/* Responsive: legend left, chart right on mobile */
+@media (max-width: 700px) {
+  .chart-card-content-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+  }
+  .chart-legend {
+    flex: 1 1 40%;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0 0 0 4px;
+    min-width: 120px;
+    max-width: 50%;
+  }
+  .chart-container {
+    flex: 1 1 60%;
+    min-width: 120px;
+    max-width: 60vw;
+    height: 180px;
+    margin-left: 0;
+  }
 }
 
 .chart-empty-state svg {
