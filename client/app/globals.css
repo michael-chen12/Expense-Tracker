@@ -146,6 +146,32 @@ a {
   border-bottom: 1px solid var(--light-border);
 }
 
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+  opacity: 0.8;
+}
+
+.mobile-menu-backdrop {
+  display: none;
+}
+
 .brand {
   font-size: 22px;
   font-weight: 700;
@@ -158,6 +184,14 @@ a {
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.nav-content {
+  display: contents;
+}
+
+.nav-actions {
+  display: contents;
 }
 
 .nav-link {
@@ -323,6 +357,15 @@ a {
 [data-theme="light"] .button.ghost.auth-button--signout:hover {
   background: #f3e8ff;
   border-color: var(--accent-deep);
+}
+
+.button--icon {
+  padding: 8px;
+  min-width: auto;
+}
+
+.button--icon svg {
+  margin: 0;
 }
 
 .auth-button-loading {
@@ -741,28 +784,266 @@ textarea {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
-@media (max-width: 700px) {
+/* Mobile responsive breakpoints */
+@media (max-width: 768px) {
   .topbar {
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    gap: 0;
+  }
+
+  .topbar-inner {
+    width: 100%;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-strong);
+    border-left: 1px solid var(--border);
+    padding: 80px 20px 20px;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 20px;
+    transition: right 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme="light"] .nav {
+    background: var(--light-bg);
+    border-left: 1px solid var(--light-border);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav--open {
+    right: 0;
+  }
+
+  .nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .nav-actions {
+    display: flex;
+    flex-direction: column;
     gap: 12px;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .mobile-menu-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .nav-link {
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+  }
+
+  .nav-link:hover {
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  [data-theme="light"] .nav-link:hover {
+    background: #f3f4f6;
+  }
+
+  .brand {
+    font-size: 20px;
   }
 
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
   }
 
   .expense-row {
     grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px 14px;
   }
 
   .expense-amount {
     text-align: left;
+    justify-content: flex-start;
+    font-size: 18px;
   }
 
   .inline-actions {
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .inline-actions button {
+    flex: 1;
+    min-width: 44px;
+  }
+
+  .inline-actions .button--icon {
+    padding: 12px;
+  }
+
+  .inline-actions .button--icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .recurring-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Make buttons full-width on mobile */
+  .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Improve touch targets */
+  .button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  /* Better mobile spacing */
+  .main {
+    padding: 24px 16px 48px;
+  }
+
+  .section-card {
+    margin-top: 20px;
+  }
+
+  /* Adjust typography for mobile */
+  body {
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+
+  /* Improve form spacing */
+  form {
+    gap: 16px;
+  }
+
+  label {
+    font-size: 15px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  /* Better mobile table display */
+  .scroll-list {
+    max-height: 280px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .brand {
+    font-size: 18px;
+  }
+
+  .main {
+    padding: 20px 12px 40px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .button {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .nav {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .expense-row h3 {
+    font-size: 15px;
+  }
+
+  .expense-amount {
+    font-size: 16px;
   }
 }
 
@@ -936,67 +1217,108 @@ textarea {
 }
 
 /* Tablet and mobile responsive breakpoints */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 769px) and (max-width: 1023px) {
   .overview-cards {
     grid-template-columns: repeat(3, 1fr);
   }
 
   .charts-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .main {
+    padding: 32px 20px 56px;
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .overview-cards {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .charts-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .overview-card {
+    padding: 16px;
   }
 
   .overview-card-value {
     font-size: 28px;
   }
 
-  /* Improve mobile spacing */
-  .main {
+  .overview-card-label {
+    font-size: 12px;
+  }
+
+  .chart-card {
     padding: 16px;
   }
 
-  .page-header {
+  .chart-card-title {
+    font-size: 16px;
+  }
+
+  /* Make expense lists more compact */
+  .expense-list {
+    gap: 10px;
+  }
+
+  .expense-date-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Better mobile card layouts */
+  .card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
   }
 
-  .inline-actions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .inline-actions button,
-  .inline-actions a {
+  .card-header > *:last-child {
     width: 100%;
   }
 
-  /* Stack form inputs on mobile */
-  .card form > div {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Improve table responsiveness */
-  table {
-    font-size: 14px;
-  }
-
-  th, td {
-    padding: 8px;
-  }
-
-  /* Make cards more compact on mobile */
-  .card {
+  /* Improve budget progress bar */
+  .budget-progress-bar {
     padding: 16px;
+  }
+
+  .budget-progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 13px;
+  }
+
+  .budget-progress-track {
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-card-value {
+    font-size: 24px;
+  }
+
+  .chart-card {
+    padding: 12px;
+  }
+
+  .chart-empty-state {
+    padding: 40px 16px;
+  }
+
+  .chart-empty-state h3 {
+    font-size: 16px;
+  }
+
+  .chart-empty-state p {
+    font-size: 13px;
   }
 }
 
