@@ -90,7 +90,7 @@ export default function UpcomingRecurringExpenses() {
     <section className="card section-card">
       <div className="card-header">
         <h2>Upcoming Recurring</h2>
-        <Link className="button ghost" href="/recurring">Manage</Link>
+        <Link className="button primary" href="/recurring">Manage</Link>
       </div>
 
       <div className="expense-list">

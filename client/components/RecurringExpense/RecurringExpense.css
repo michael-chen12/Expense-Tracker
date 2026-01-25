@@ -150,19 +150,17 @@
 
 .recurring-expense-card__footer {
   display: flex;
-  flex-direction: column; /* Mobile-first: stack */
-  gap: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
   margin-top: 10px;
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
-@media (min-width: 480px) {
+@media (min-width: 640px) {
   .recurring-expense-card__footer {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
     margin-top: 12px;
     padding-top: 12px;
   }

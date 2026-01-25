@@ -7,8 +7,8 @@ import { formatCurrency, formatDate } from '@/lib/format';
 export default function RecentExpenses({ expenses, onDelete, error }) {
   return (
     <section className="card section-card">
-      <div className="card-header" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }}>
-        <h2 style={{ margin: 0 }}>Recent expenses</h2>
+      <div className="card-header">
+        <h2>Recent expenses</h2>
         <Button variant="ghost" href="/expenses">View all</Button>
       </div>
 
@@ -17,11 +17,9 @@ export default function RecentExpenses({ expenses, onDelete, error }) {
           <div key={expense.id} className="expense-row">
             <div>
               <h3>{expense.category}</h3>
-              <div className="expense-meta-row">
-                <span className="expense-note">{expense.note || 'No note'} • {formatDate(expense.date)}</span>
-                <span className="expense-amount">{formatCurrency(expense.amount)}</span>
-              </div>
+              <p>{expense.note || 'No note'} • {formatDate(expense.date)}</p>
             </div>
+            <div className="expense-amount">{formatCurrency(expense.amount)}</div>
             <div className="inline-actions">
               <Link
                 className="button ghost button--icon"

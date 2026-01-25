@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import './Modal.css';
 
 /**
@@ -94,7 +95,7 @@ export function Modal({
   const variantClass = ` modal--${variant}`;
   const modalClass = `modal${sizeClass}${variantClass}`.trim();
 
-  return (
+  const modalContent = (
     <div
       className="modal-overlay"
       onClick={handleOverlayClick}
@@ -124,6 +125,13 @@ export function Modal({
       </div>
     </div>
   );
+
+  // Use portal to render modal at document body level
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 }
 
 /**

@@ -171,7 +171,22 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
               aria-label={dropdownOpen ? 'Collapse date range options' : 'Expand date range options'}
               onClick={() => setDropdownOpen((v) => !v)}
             >
-              <span aria-hidden="true" style={{ transition: 'transform 0.3s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+              <svg 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ 
+                  transition: 'transform 0.3s ease', 
+                  transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' 
+                }}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </button>
           )}
         </div>

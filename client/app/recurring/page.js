@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
@@ -24,6 +24,7 @@ function RecurringExpensesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const formRef = useRef(null);
   
   // Use centralized notification hook
   const { error, success, showError, showSuccess } = useNotifications({ duration: 3000 });
@@ -66,6 +67,10 @@ function RecurringExpensesPage() {
   const handleEdit = (expense) => {
     setEditingExpense(expense);
     setShowForm(true);
+    // Scroll to form after state updates
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleDelete = async (id) => {
@@ -145,14 +150,16 @@ function RecurringExpensesPage() {
       </div>
 
       {showForm && (
-        <RecurringExpenseForm
-          onSubmit={handleSubmit}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingExpense(null);
-          }}
-          editingExpense={editingExpense}
-        />
+        <div ref={formRef}>
+          <RecurringExpenseForm
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingExpense(null);
+            }}
+            editingExpense={editingExpense}
+          />
+        </div>
       )}
 
       <RecurringExpenseList
