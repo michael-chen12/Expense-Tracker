@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AuthGate from '@/components/AuthGate';
 import LoadingScreen from '@/components/LoadingScreen';
-import Spinner from '@/components/Spinner';
+import { LoadingButton } from '@/components/LoadingButton';
 import { Button } from '@/components/Button';
 import { RecurringExpenseForm, RecurringExpenseList } from '@/components/RecurringExpense';
 import {
@@ -15,25 +15,26 @@ import {
   processRecurringExpenses
 } from '@/lib/api-backend';
 import { useSession } from 'next-auth/react';
+import { useNotifications } from '@/lib/hooks/useNotifications';
 
 function RecurringExpensesPage() {
   const { data: session } = useSession();
   const [recurringExpenses, setRecurringExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [processing, setProcessing] = useState(false);
+  
+  // Use centralized notification hook
+  const { error, success, showError, showSuccess } = useNotifications({ duration: 3000 });
 
   const loadRecurringExpenses = async () => {
     try {
       setIsLoading(true);
       const expenses = await getRecurringExpenses();
       setRecurringExpenses(expenses);
-      setError('');
     } catch (err) {
-      setError(err.message || 'Failed to load recurring expenses');
+      showError(err.message || 'Failed to load recurring expenses');
     } finally {
       setIsLoading(false);
     }
@@ -49,15 +50,14 @@ function RecurringExpensesPage() {
     try {
       if (editingExpense) {
         await updateRecurringExpense(editingExpense.id, payload);
-        setSuccess('Recurring expense updated successfully!');
+        showSuccess('Recurring expense updated successfully!');
       } else {
         await createRecurringExpense(payload);
-        setSuccess('Recurring expense created successfully!');
+        showSuccess('Recurring expense created successfully!');
       }
       setShowForm(false);
       setEditingExpense(null);
       await loadRecurringExpenses();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       throw new Error(err.message || `Failed to ${editingExpense ? 'update' : 'create'} recurring expense`);
     }
@@ -71,12 +71,10 @@ function RecurringExpensesPage() {
   const handleDelete = async (id) => {
     try {
       await deleteRecurringExpense(id);
-      setSuccess('Recurring expense deleted successfully!');
+      showSuccess('Recurring expense deleted successfully!');
       await loadRecurringExpenses();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(err.message || 'Failed to delete recurring expense');
-      setTimeout(() => setError(''), 3000);
+      showError(err.message || 'Failed to delete recurring expense');
     }
   };
 
@@ -84,12 +82,10 @@ function RecurringExpensesPage() {
     try {
       setProcessing(true);
       const result = await processRecurringExpenses();
-      setSuccess(`Processed! Created ${result.processed.created} expenses, updated ${result.processed.updated} templates.`);
+      showSuccess(`Processed! Created ${result.processed.created} expenses, updated ${result.processed.updated} templates.`);
       await loadRecurringExpenses();
-      setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
-      setError(err.message || 'Failed to process recurring expenses');
-      setTimeout(() => setError(''), 3000);
+      showError(err.message || 'Failed to process recurring expenses');
     } finally {
       setProcessing(false);
     }
@@ -103,18 +99,15 @@ function RecurringExpensesPage() {
           <p className="subtle">Manage your recurring bills and subscriptions</p>
         </div>
         <div className="inline-actions">
-          <Button
-            className="button ghost"
+          <LoadingButton
+            variant="ghost"
             onClick={handleProcess}
-            disabled={processing}
+            loading={processing}
+            loadingText="Processing..."
+            spinnerColor="primary"
           >
-            {processing ? (
-              <span className="button-loading-content">
-                <Spinner size="small" color="primary" />
-                Processing...
-              </span>
-            ) : 'Process Now'}
-          </Button>
+            Process Now
+          </LoadingButton>
           <Button
             className="button primary"
             onClick={() => {

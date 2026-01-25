@@ -13,7 +13,8 @@ import {
   FormCard
 } from '@/components/Form';
 import { Modal, ModalActions } from '@/components/Modal';
-import Spinner from '@/components/Spinner';
+import { LoadingButton } from '@/components/LoadingButton';
+import { validateExpenseForm } from '@/lib/validators';
 import './ExpenseForm.css';
 
 const EMPTY_FORM = {
@@ -94,29 +95,20 @@ export default function ExpenseForm({
     event.preventDefault();
     setError('');
 
-    const amountValue = Number(form.amount);
-    if (!form.amount || Number.isNaN(amountValue) || amountValue < 0) {
-      setError('Enter a valid amount.');
-      return;
-    }
-
-    const trimmedCategory = form.category.trim();
-    if (!trimmedCategory) {
-      setError('Pick a category.');
-      return;
-    }
-
-    if (!form.date) {
-      setError('Select a date.');
+    // Use centralized validation
+    const validationError = validateExpenseForm(form);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setSaving(true);
 
     try {
+      const amountValue = Number(form.amount);
       await onSubmit({
         amount: amountValue,
-        category: trimmedCategory,
+        category: form.category.trim(),
         date: form.date,
         note: form.note.trim()
       });
@@ -224,34 +216,26 @@ export default function ExpenseForm({
             {saving ? (
               <span className="button-loading-content">
                 <Spinner size="small" color="white" />
-                Saving...
-              </span>
-            ) : submitLabel}
-          </button>
+           LoadingButton
+            type="submit"
+            variant="primary"
+            loading={saving}
+            loadingText="Saving..."
+          >
+            {submitLabel}
+          </LoadingButton>
           {onDelete && (
-            <button
-              className="button ghost"
+            <LoadingButton
               type="button"
+              variant="ghost"
               onClick={() => setShowDeleteModal(true)}
-              disabled={saving}
-              aria-label="Delete this expense"
+              loading={saving}
+              loadingText="Deleting..."
+              spinnerColor="gray"
+              ariaLabel="Delete this expense"
             >
-              {saving ? (
-                <span className="button-loading-content">
-                  <Spinner size="small" color="gray" />
-                  Deleting...
-                </span>
-              ) : 'Delete'}
-            </button>
-          )}
-        </FormActions>
-      </Form>
-
-      {onDelete && (
-        <Modal
-          open={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          title="Delete expense"
+              Delete
+            </LoadingB="Delete expense"
           description="This action will permanently remove this expense entry."
         >
           <div className="modal-detail-card">
@@ -283,14 +267,12 @@ export default function ExpenseForm({
             >
               {saving ? (
                 <span className="button-loading-content">
-                  <Spinner size="small" color="white" />
-                  Deleting...
-                </span>
-              ) : 'Delete expense'}
-            </button>
-          </ModalActions>
-        </Modal>
-      )}
-    </FormCard>
-  );
-}
+             LoadingButton
+              type="button"
+              variant="primary"
+              onClick={handleDelete}
+              loading={saving}
+              loadingText="Deleting..."
+            >
+              Delete expense
+            </LoadingB

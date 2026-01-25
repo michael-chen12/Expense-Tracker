@@ -1,0 +1,14 @@
+/* LoadingButton Component Styles */
+
+.button-loading-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Ensure spinner is vertically centered */
+.button-loading-content > * {
+  display: inline-flex;
+  align-items: center;
+}
