@@ -207,16 +207,7 @@ export default function ExpenseForm({
         {error && <FormError id="form-error" role="alert" aria-live="polite">{error}</FormError>}
 
         <FormActions align="start">
-          <button 
-            className="button primary" 
-            type="submit" 
-            disabled={saving}
-            aria-busy={saving ? 'true' : 'false'}
-          >
-            {saving ? (
-              <span className="button-loading-content">
-                <Spinner size="small" color="white" />
-           LoadingButton
+          <LoadingButton
             type="submit"
             variant="primary"
             loading={saving}
@@ -235,7 +226,16 @@ export default function ExpenseForm({
               ariaLabel="Delete this expense"
             >
               Delete
-            </LoadingB="Delete expense"
+            </LoadingButton>
+          )}
+        </FormActions>
+      </Form>
+
+      {onDelete && (
+        <Modal
+          open={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          title="Delete expense"
           description="This action will permanently remove this expense entry."
         >
           <div className="modal-detail-card">
@@ -259,15 +259,7 @@ export default function ExpenseForm({
             >
               Cancel
             </button>
-            <button
-              type="button"
-              className="button primary"
-              onClick={handleDelete}
-              disabled={saving}
-            >
-              {saving ? (
-                <span className="button-loading-content">
-             LoadingButton
+            <LoadingButton
               type="button"
               variant="primary"
               onClick={handleDelete}
@@ -275,4 +267,10 @@ export default function ExpenseForm({
               loadingText="Deleting..."
             >
               Delete expense
-            </LoadingB
+            </LoadingButton>
+          </ModalActions>
+        </Modal>
+      )}
+    </FormCard>
+  );
+}
