@@ -328,3 +328,4 @@
 /* Compact list variant */
 .recurring-expense-list--compact {
   grid-template-columns: 1fr;
+}

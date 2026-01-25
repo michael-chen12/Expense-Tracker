@@ -370,3 +370,5 @@
   .input--lg,
   .input-field.large {
     padding: var(--space-3) var(--button-padding-x-lg);
+  }
+}
