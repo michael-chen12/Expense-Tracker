@@ -1,19 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FormCard, FormSection, FormLabel } from '@/components/Form';
 import './DateRangeFilter.css';
 
 /**
  * Date Range Filter Component
  * Allows users to select custom date ranges or use preset options
+ * Now with proper mobile viewport detection and accessibility
  */
 export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
   const [showCustom, setShowCustom] = useState(false);
   const [customFrom, setCustomFrom] = useState(dateRange.from);
   const [customTo, setCustomTo] = useState(dateRange.to);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Properly detect mobile viewport with resize listener
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia('(max-width: 640px)').matches);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Listen for viewport changes
+    const mediaQuery = window.matchMedia('(max-width: 640px)');
+    const handler = (e) => setIsMobile(e.matches);
+    
+    // Modern approach
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    } else {
+      // Fallback for older browsers
+      mediaQuery.addListener(handler);
+      return () => mediaQuery.removeListener(handler);
+    }
+  }, []);
 
   // Preset date range options
   const presets = [
@@ -143,9 +168,10 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
               type="button"
               aria-expanded={dropdownOpen}
               aria-controls="preset-dropdown"
+              aria-label={dropdownOpen ? 'Collapse date range options' : 'Expand date range options'}
               onClick={() => setDropdownOpen((v) => !v)}
             >
-              <span style={{ transition: 'transform 0.3s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+              <span aria-hidden="true" style={{ transition: 'transform 0.3s', transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
             </button>
           )}
         </div>
@@ -164,6 +190,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
               type="button"
               className="preset-button"
               onClick={() => handlePresetClick(preset)}
+              aria-label={`Filter by ${preset.label}`}
             >
               {preset.label}
             </button>
@@ -172,12 +199,14 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
             type="button"
             className="preset-button custom-button"
             onClick={() => setShowCustom(!showCustom)}
+            aria-expanded={showCustom}
+            aria-controls="custom-range-inputs"
           >
             {showCustom ? 'Cancel' : 'Custom Range'}
           </button>
         </div>
         {showCustom && (
-          <div className="custom-range-inputs">
+          <div id="custom-range-inputs" className="custom-range-inputs">
             <div className="input-group">
               <FormLabel htmlFor="custom-from">From</FormLabel>
               <input
@@ -187,6 +216,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
                 onChange={(e) => setCustomFrom(e.target.value)}
                 max={customTo}
                 className="form-input"
+                aria-required="true"
               />
             </div>
             <div className="input-group">
@@ -198,6 +228,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
                 onChange={(e) => setCustomTo(e.target.value)}
                 min={customFrom}
                 className="form-input"
+                aria-required="true"
               />
             </div>
             <button
@@ -205,6 +236,7 @@ export default function DateRangeFilter({ dateRange, onDateRangeChange }) {
               className="button primary"
               onClick={handleCustomApply}
               disabled={!customFrom || !customTo}
+              aria-label="Apply custom date range"
             >
               Apply
             </button>

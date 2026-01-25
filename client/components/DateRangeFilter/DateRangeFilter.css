@@ -21,6 +21,17 @@
     align-items: center;
     justify-content: flex-end;
     cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .preset-dropdown-toggle:hover {
+    transform: scale(1.1);
+  }
+  
+  .preset-dropdown-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 /* DateRangeFilter Component Styles - Mobile First */
@@ -146,7 +157,8 @@
 
 .preset-button:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: -2px;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
 }
 
 /* Custom button variant */
@@ -219,6 +231,7 @@
   outline: none;
   border-color: var(--accent);
   background: rgba(124, 58, 237, 0.05);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
 .form-input::placeholder {

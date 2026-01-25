@@ -81,12 +81,12 @@ export default function SpendingTrendChart({ data }) {
   };
 
   return (
-    <div className="chart-wrapper">
+    <div className="chart-wrapper" role="img" aria-label={`Spending trend chart showing ${data.length} months of expense data`}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
           margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-          aria-label="Spending trend over the last 6 months"
+          accessibilityLayer
         >
           <defs>
             <linearGradient id="colorSpending" x1="0" y1="0" x2="0" y2="1">

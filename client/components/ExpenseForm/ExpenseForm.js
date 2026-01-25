@@ -146,9 +146,9 @@ export default function ExpenseForm({
 
   return (
     <FormCard>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit} aria-label="Expense form">
         <FormGroup>
-          <FormLabel htmlFor="amount">Amount</FormLabel>
+          <FormLabel htmlFor="amount">Amount <span aria-label="required">*</span></FormLabel>
           <FormInput
             id="amount"
             name="amount"
@@ -159,12 +159,23 @@ export default function ExpenseForm({
             onChange={handleChange}
             placeholder="0.00"
             required
+            aria-required="true"
+            aria-invalid={error && error.includes('amount') ? 'true' : 'false'}
+            aria-describedby={error && error.includes('amount') ? 'form-error' : undefined}
           />
         </FormGroup>
 
         <FormGroup>
-          <FormLabel htmlFor="categorySelect">Category</FormLabel>
-          <FormSelect id="categorySelect" value={categorySelect} onChange={handleCategorySelect}>
+          <FormLabel htmlFor="categorySelect">Category <span aria-label="required">*</span></FormLabel>
+          <FormSelect 
+            id="categorySelect" 
+            value={categorySelect} 
+            onChange={handleCategorySelect}
+            required
+            aria-required="true"
+            aria-invalid={error && error.includes('category') ? 'true' : 'false'}
+            aria-describedby={error && error.includes('category') ? 'form-error' : undefined}
+          >
             {DEFAULT_CATEGORIES.map((category) => (
               <option key={category} value={category}>
                 {category}
@@ -174,7 +185,7 @@ export default function ExpenseForm({
         </FormGroup>
 
         <FormGroup>
-          <FormLabel htmlFor="date">Date</FormLabel>
+          <FormLabel htmlFor="date">Date <span aria-label="required">*</span></FormLabel>
           <FormInput
             id="date"
             name="date"
@@ -182,24 +193,34 @@ export default function ExpenseForm({
             value={form.date}
             onChange={handleChange}
             required
+            aria-required="true"
+            aria-invalid={error && error.includes('date') ? 'true' : 'false'}
+            aria-describedby={error && error.includes('date') ? 'form-error' : undefined}
           />
         </FormGroup>
 
         <FormGroup>
-          <FormLabel htmlFor="note">Note</FormLabel>
+          <FormLabel htmlFor="note">Note <span className="label-optional">(optional)</span></FormLabel>
           <FormTextarea
             id="note"
             name="note"
             value={form.note}
             onChange={handleChange}
             placeholder="Optional details"
+            aria-describedby="note-hint"
           />
+          <span id="note-hint" className="form-hint">Add any additional details about this expense</span>
         </FormGroup>
 
-        <FormError>{error}</FormError>
+        {error && <FormError id="form-error" role="alert" aria-live="polite">{error}</FormError>}
 
         <FormActions align="start">
-          <button className="button primary" type="submit" disabled={saving}>
+          <button 
+            className="button primary" 
+            type="submit" 
+            disabled={saving}
+            aria-busy={saving ? 'true' : 'false'}
+          >
             {saving ? (
               <span className="button-loading-content">
                 <Spinner size="small" color="white" />
@@ -213,6 +234,7 @@ export default function ExpenseForm({
               type="button"
               onClick={() => setShowDeleteModal(true)}
               disabled={saving}
+              aria-label="Delete this expense"
             >
               {saving ? (
                 <span className="button-loading-content">

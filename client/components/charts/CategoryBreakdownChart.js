@@ -79,9 +79,9 @@ export default function CategoryBreakdownChart({ data }) {
         color: entry.color,
         payload: entry
       })) })}
-      <div className="chart-wrapper">
+      <div className="chart-wrapper" role="img" aria-label={`Category breakdown pie chart showing spending across ${data.length} categories`}>
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart aria-label="Category spending breakdown for current month">
+          <PieChart accessibilityLayer>
             <Pie
               data={data}
               cx="50%"
