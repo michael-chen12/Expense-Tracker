@@ -343,15 +343,30 @@
   width: 100%;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+/* ===== RESPONSIVE - Mobile First ===== */
+
+/* Base mobile styles */
+.input,
+.input-field {
+  font-size: 16px; /* Prevent iOS zoom */
+  min-height: 48px; /* Touch-friendly */
+  padding: 14px var(--input-padding-x);
+}
+
+.input--lg,
+.input-field.large {
+  padding: var(--space-3) var(--button-padding-x-md);
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
   .input,
   .input-field {
-    font-size: var(--text-base);
+    font-size: var(--input-font-size);
+    min-height: var(--input-height-md);
+    padding: var(--input-padding-y) var(--input-padding-x);
   }
 
   .input--lg,
   .input-field.large {
-    padding: var(--space-2) var(--button-padding-x-md);
-  }
-}
+    padding: var(--space-3) var(--button-padding-x-lg);

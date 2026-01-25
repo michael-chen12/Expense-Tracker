@@ -455,15 +455,15 @@
 /* Mobile Logo - hidden by default */
 .mobile-logo {
   display: none;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--accent);
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
   letter-spacing: -0.5px;
 }
 
-/* Responsive */
+/* Responsive - Mobile first approach */
 @media (max-width: 1024px) {
   .landing-container {
     flex-direction: column;
@@ -481,5 +481,81 @@
     flex: 1;
     max-width: 100%;
     flex-direction: column;
+    padding: 32px 20px;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .signup-card {
+    max-width: 100%;
   }
 }
+
+/* Mobile improvements */
+@media (max-width: 640px) {
+  .landing-right {
+    padding: 24px 16px;
+  }
+
+  .mobile-logo {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .signup-card h2 {
+    font-size: 24px;
+  }
+
+  .signup-subtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .form-group input {
+    padding: 14px 16px;
+    font-size: 16px; /* Prevent iOS zoom */
+    min-height: 48px;
+  }
+
+  .signup-button {
+    padding: 14px;
+    font-size: 16px;
+    min-height: 48px;
+  }
+
+  .github-button {
+    padding: 14px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+
+  .divider {
+    margin: 20px 0;
+  }
+
+  .login-link {
+    margin-top: 20px;
+  }
+
+  .link-button {
+    padding: 4px; /* Better touch target */
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .landing-right {
+    padding: 20px 12px;
+  }
+
+  .signup-card h2 {
+    font-size: 22px;

@@ -428,17 +428,27 @@
   opacity: 0.8;
 }
 
-/* ===== RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 768px) {
+/* ===== RESPONSIVE - Mobile First ===== */
+
+/* Base mobile styles */
+.btn,
+.button,
+.button-modern {
+  font-size: var(--button-font-size-md);
+  min-height: 44px; /* Touch-friendly */
+}
+
+.btn--full,
+.button--full,
+.button-modern--full {
+  width: 100%;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
   .btn,
   .button,
   .button-modern {
-    font-size: var(--button-font-size-sm);
-  }
-
-  .btn--full,
-  .button--full,
-  .button-modern--full {
-    width: 100%;
+    min-height: auto;
   }
 }

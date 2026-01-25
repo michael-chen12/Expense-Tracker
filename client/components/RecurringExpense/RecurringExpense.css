@@ -1,4 +1,4 @@
-/* RecurringExpense Component Styles */
+/* RecurringExpense Component Styles - Mobile First */
 
 .recurring-expense-form {
   display: flex;
@@ -8,8 +8,14 @@
 
 .recurring-expense-form h3 {
   margin: 0 0 8px;
-  font-size: 18px;
+  font-size: 17px;
   color: var(--ink, #f3f4f6);
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-form h3 {
+    font-size: 18px;
+  }
 }
 
 .recurring-expense-form label {
@@ -23,12 +29,23 @@
 .recurring-expense-form input,
 .recurring-expense-form select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px; /* Mobile-first: larger touch targets */
   border: 1px solid #e5dccf;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px; /* Prevent iOS zoom */
   font-family: inherit;
   transition: all 0.2s ease;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-form input,
+  .recurring-expense-form select {
+    padding: 10px 12px;
+    font-size: 14px;
+    min-height: auto;
+  }
 }
 
 .recurring-expense-form input:focus,
@@ -51,10 +68,17 @@
 .recurring-expense-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 14px; /* Mobile-first: slightly smaller */
+  padding: 14px;
   box-shadow: var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card {
+    border-radius: 18px;
+    padding: 16px;
+  }
 }
 
 .recurring-expense-card:hover {
@@ -65,38 +89,83 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card__header {
+    margin-bottom: 12px;
+  }
 }
 
 .recurring-expense-card__title {
   margin: 0 0 4px 0;
-  font-size: 16px;
+  font-size: 15px;
   color: var(--ink);
+  line-height: 1.3;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card__title {
+    font-size: 16px;
+  }
 }
 
 .recurring-expense-card__frequency {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card__frequency {
+    font-size: 14px;
+  }
 }
 
 .recurring-expense-card__amount {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--accent);
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card__amount {
+    font-size: 20px;
+  }
 }
 
 .recurring-expense-card__note {
-  margin: 0 0 12px 0;
-  font-size: 14px;
+  margin: 0 0 10px 0;
+  font-size: 13px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-card__note {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+  }
 }
 
 .recurring-expense-card__footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  padding-top: 12px;
+  flex-direction: column; /* Mobile-first: stack */
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
+}
+
+@media (min-width: 480px) {
+  .recurring-expense-card__footer {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+  }
 }
 
 .recurring-expense-card__date {
@@ -114,45 +183,25 @@
 }
 
 .recurring-expense-card__actions button {
-  padding: 8px;
+  padding: 10px; /* Mobile-first: larger touch targets */
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--ink);
   transition: color 0.2s ease;
-}
-
-.recurring-expense-card__actions button:hover {
-  color: var(--accent);
-}
-
-.recurring-expense-card__amount {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.recurring-expense-card__footer {
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+  justify-content: center;
 }
 
-.recurring-expense-card__actions {
-  display: flex;
-  gap: 8px;
-}
-
-.recurring-expense-card__actions button {
-  padding: 8px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #9ca3af;
-  transition: color 0.2s ease;
+@media (min-width: 640px) {
+  .recurring-expense-card__actions button {
+    padding: 8px;
+    min-width: auto;
+    min-height: auto;
+  }
 }
 
 .recurring-expense-card__actions button:hover {
@@ -168,16 +217,39 @@
 
 .frequency-selector__primary {
   display: flex;
-  gap: 16px;
+  flex-direction: column; /* Mobile-first: stack */
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .frequency-selector__primary {
+    flex-direction: row;
+    gap: 16px;
+  }
 }
 
 .frequency-selector__secondary {
   display: flex;
-  gap: 16px;
+  flex-direction: column; /* Mobile-first: stack */
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .frequency-selector__secondary {
+    flex-direction: row;
+    gap: 16px;
+  }
 }
 
 .frequency-selector > div {
   flex: 1;
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .frequency-selector > div {
+    width: auto;
+  }
 }
 
 .frequency-selector label {
@@ -191,54 +263,68 @@
 .frequency-selector input,
 .frequency-selector select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid #e5dccf;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px; /* Prevent iOS zoom */
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .frequency-selector input,
+  .frequency-selector select {
+    padding: 10px 12px;
+    font-size: 14px;
+    min-height: auto;
+  }
 }
 
 /* RecurringExpenseList Styles */
 .recurring-expense-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr; /* Mobile-first: single column */
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .recurring-expense-list {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
 }
 
 .recurring-expense-list--empty {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 40px 20px;
+  padding: 32px 16px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-list--empty {
+    padding: 40px 20px;
+  }
 }
 
 .recurring-expense-list--loading {
   grid-column: 1 / -1;
   display: flex;
   justify-content: center;
-  padding: 40px;
+  padding: 32px;
+}
+
+@media (min-width: 640px) {
+  .recurring-expense-list--loading {
+    padding: 40px;
+  }
 }
 
 /* Compact list variant */
 .recurring-expense-list--compact {
   grid-template-columns: 1fr;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .recurring-expense-list {
-    grid-template-columns: 1fr;
-  }
-
-  .recurring-expense-card {
-    padding: 12px;
-  }
-
-  .frequency-selector__primary,
-  .frequency-selector__secondary {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .frequency-selector > div {
-    width: 100%;
-  }
-}
